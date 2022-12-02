@@ -41,7 +41,7 @@ public class Vehicle implements Serializable {
     public Vehicle() {
     }
 
-    public Vehicle(Driver driver, String model, String registrationPlate, int numberOfSeats, boolean isBabyAccessible, boolean isPetAccessible, Location currentLocation, VehicleType type) {
+    public Vehicle(Driver driver, String model, String registrationPlate, int passengerSeats, boolean isBabyAccessible, boolean isPetAccessible, Location currentLocation, VehicleType type) {
         this.driver = driver;
         this.model = model;
         this.registrationPlate = registrationPlate;
@@ -84,11 +84,11 @@ public class Vehicle implements Serializable {
         this.registrationPlate = registrationPlate;
     }
 
-    public int getNumberOfSeats() {
+    public int getPassengerSeats() {
         return numberOfSeats;
     }
 
-    public void setNumberOfSeats(int numberOfSeats) {
+    public void setPassengerSeats(int numberOfSeats) {
         this.numberOfSeats = numberOfSeats;
     }
 

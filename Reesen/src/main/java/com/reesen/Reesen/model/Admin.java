@@ -24,17 +24,17 @@ public class Admin implements Serializable {
     private String name;
 
     @Column(nullable = false)
-    private String lastName;
+    private String surname;
 
     public Admin() {
     }
 
-    public Admin(String username, String password, String profilePicture, String name, String lastName) {
+    public Admin(String username, String password, String profilePicture, String name, String surname) {
         this.username = username;
         this.password = password;
         this.profilePicture = profilePicture;
         this.name = name;
-        this.lastName = lastName;
+        this.surname = surname;
     }
 
     public Long getId() {
@@ -77,11 +77,11 @@ public class Admin implements Serializable {
         this.name = name;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getsurname() {
+        return surname;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setsurname(String surname) {
+        this.surname = surname;
     }
 }

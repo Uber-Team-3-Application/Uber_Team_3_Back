@@ -23,16 +23,16 @@ public class Passenger extends User implements Serializable{
     public Passenger() {
     }
 
-    public Passenger(String name, String lastName, String profilePicture, String phoneNumber, String email, String password, Set<Ride> rides, Set<FavoriteRoute> favouriteRoutes, boolean isConfirmedMail, double amountOfMoney) {
-        super(name, lastName, profilePicture, phoneNumber, email, password);
+    public Passenger(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, Set<Ride> rides, Set<FavoriteRoute> favouriteRoutes, boolean isConfirmedMail, double amountOfMoney) {
+        super(name, surname, profilePicture, telephoneNumber, email, password);
         this.rides = rides;
         this.favouriteRoutes = favouriteRoutes;
         this.isConfirmedMail = isConfirmedMail;
         this.amountOfMoney = amountOfMoney;
     }
 
-    public Passenger(String name, String lastName, String profilePicture, String phoneNumber, String email, String password, boolean isBlocked, boolean isActive, Set<Ride> rides, Set<FavoriteRoute> favouriteRoutes, boolean isConfirmedMail, double amountOfMoney) {
-        super(name, lastName, profilePicture, phoneNumber, email, password, isBlocked, isActive);
+    public Passenger(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, boolean isBlocked, boolean isActive, String address, Set<Ride> rides, Set<FavoriteRoute> favouriteRoutes, boolean isConfirmedMail, double amountOfMoney) {
+        super(name, surname, profilePicture, telephoneNumber, email, password, isBlocked, isActive, address);
         this.rides = rides;
         this.favouriteRoutes = favouriteRoutes;
         this.isConfirmedMail = isConfirmedMail;

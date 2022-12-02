@@ -23,15 +23,16 @@ public class Driver extends User implements Serializable {
 
     }
 
-    public Driver(String name, String lastName, String profilePicture, String phoneNumber, String email, String password, Set<Document> documents, Set<Ride> rides, Vehicle vehicle) {
-        super(name, lastName, profilePicture, phoneNumber, email, password);
+
+    public Driver(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, Set<Document> documents, Set<Ride> rides, Vehicle vehicle) {
+        super(name, surname, profilePicture, telephoneNumber, email, password);
         this.documents = documents;
         this.rides = rides;
         this.vehicle = vehicle;
     }
 
-    public Driver(String name, String lastName, String profilePicture, String phoneNumber, String email, String password, boolean isBlocked, boolean isActive, Set<Document> documents, Set<Ride> rides, Vehicle vehicle) {
-        super(name, lastName, profilePicture, phoneNumber, email, password, isBlocked, isActive);
+    public Driver(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, boolean isBlocked, boolean isActive, String address, Set<Document> documents, Set<Ride> rides, Vehicle vehicle) {
+        super(name, surname, profilePicture, telephoneNumber, email, password, isBlocked, isActive, address);
         this.documents = documents;
         this.rides = rides;
         this.vehicle = vehicle;

@@ -11,17 +11,16 @@ public class Document implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String picture;
+    @Column
+    private String name;
+
+    @Column
+    private String documentImage;
 
     @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     private Driver driver;
 
     public Document() {
-    }
-
-    public Document(String picture, Driver driver) {
-        this.picture = picture;
-        this.driver = driver;
     }
 
     public Long getId() {
@@ -32,12 +31,20 @@ public class Document implements Serializable {
         this.id = id;
     }
 
-    public String getPicture() {
-        return picture;
+    public String getName() {
+        return name;
     }
 
-    public void setPicture(String picture) {
-        this.picture = picture;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDocumentImage() {
+        return documentImage;
+    }
+
+    public void setDocumentImage(String documentImage) {
+        this.documentImage = documentImage;
     }
 
     public Driver getDriver() {
@@ -45,6 +52,12 @@ public class Document implements Serializable {
     }
 
     public void setDriver(Driver driver) {
+        this.driver = driver;
+    }
+
+    public Document(String name, String documentImage, Driver driver) {
+        this.name = name;
+        this.documentImage = documentImage;
         this.driver = driver;
     }
 }

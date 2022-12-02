@@ -16,13 +16,13 @@ public class User implements Serializable {
     private String name;
 
     @Column
-    private String lastName;
+    private String surname;
 
     @Column
     private String profilePicture;
 
     @Column
-    private String phoneNumber;
+    private String telephoneNumber;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -36,29 +36,43 @@ public class User implements Serializable {
     @Column
     private boolean isActive;
 
+    @Column
+    private String address;
+
+
     public User() {
     }
 
-    public User(String name, String lastName, String profilePicture, String phoneNumber, String email, String password) {
+    public User(String name, String surname, String profilePicture, String telephoneNumber, String email, String password) {
         this.name = name;
-        this.lastName = lastName;
+        this.surname = surname;
         this.profilePicture = profilePicture;
-        this.phoneNumber = phoneNumber;
+        this.telephoneNumber = telephoneNumber;
         this.email = email;
         this.password = password;
-        this.isActive = false;
-        this.isBlocked = false;
+        this.isBlocked = isBlocked;
+        isActive = false;
+        isBlocked = false;
     }
 
-    public User(String name, String lastName, String profilePicture, String phoneNumber, String email, String password, boolean isBlocked, boolean isActive) {
+    public User(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, boolean isBlocked, boolean isActive, String address) {
         this.name = name;
-        this.lastName = lastName;
+        this.surname = surname;
         this.profilePicture = profilePicture;
-        this.phoneNumber = phoneNumber;
+        this.telephoneNumber = telephoneNumber;
         this.email = email;
         this.password = password;
         this.isBlocked = isBlocked;
         this.isActive = isActive;
+        this.address = address;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public Long getId() {
@@ -77,12 +91,12 @@ public class User implements Serializable {
         this.name = name;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getSurname() {
+        return surname;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setSurname(String surname) {
+        this.surname = surname;
     }
 
     public String getProfilePicture() {
@@ -93,12 +107,12 @@ public class User implements Serializable {
         this.profilePicture = profilePicture;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public String getTelephoneNumber() {
+        return telephoneNumber;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void setTelephoneNumber(String telephoneNumber) {
+        this.telephoneNumber = telephoneNumber;
     }
 
     public String getEmail() {
