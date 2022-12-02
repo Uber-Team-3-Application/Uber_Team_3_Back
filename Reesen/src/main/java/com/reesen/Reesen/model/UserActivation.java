@@ -19,7 +19,8 @@ public class UserActivation implements Serializable {
     @Column
     private Long lifespan;
 
-    @OneToOne(cascade = CascadeType.REFRESH)
+    @OneToOne(cascade = {CascadeType.REFRESH})
+    @JoinColumn(name = "userId")
     private User user;
 
     public UserActivation() {

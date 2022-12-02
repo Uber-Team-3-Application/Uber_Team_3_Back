@@ -14,7 +14,8 @@ public class Remark implements Serializable {
     @Column
     private String message;
 
-    @OneToOne(cascade = CascadeType.REFRESH)
+    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId")
     private User user;
 
     public Remark() {

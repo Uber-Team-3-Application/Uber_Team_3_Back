@@ -5,19 +5,20 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Entity
-public class FavouriteRoutes implements Serializable {
+public class FavoriteRoute implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = {CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "routeId")
     private Route route;
 
-    public FavouriteRoutes(){
+    public FavoriteRoute(){
 
     }
-    public FavouriteRoutes(Route route) {
+    public FavoriteRoute(Route route) {
         this.route = route;
     }
 

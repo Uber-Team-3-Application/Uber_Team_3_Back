@@ -18,7 +18,8 @@ public class WorkingHours implements Serializable {
     @Column
     private Date endTime;
 
-    @ManyToOne(cascade = CascadeType.REFRESH)
+    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "driverId")
     private Driver driver;
 
     public WorkingHours() {

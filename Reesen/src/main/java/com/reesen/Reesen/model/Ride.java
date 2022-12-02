@@ -22,24 +22,24 @@ public class Ride implements Serializable {
     @Column
     private double totalPrice;
 
-    @ManyToOne(cascade = {CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     private Driver driver;
 
-    @ManyToMany(cascade = {CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     private Set<Passenger> passengers;
 
     @Column
     private double estimatedTime;
 
 
-    @OneToMany(cascade = {CascadeType.REFRESH})
+    @OneToMany(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     private Set<Review> review;
 
     @Enumerated(EnumType.STRING)
     @Column
     private RideStatus status;
 
-    @OneToMany(cascade = {CascadeType.REFRESH})
+    @OneToMany(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     private Set<Deduction> deductions;
 
     @Column
@@ -51,10 +51,10 @@ public class Ride implements Serializable {
     @Column
     private boolean isPetAccessible;
 
-    @ManyToOne(cascade = {CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     private VehicleType vehicleType;
 
-    @OneToMany(cascade = {CascadeType.REFRESH})
+    @OneToMany(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     private Set<Path> paths;
 
     public Ride() {

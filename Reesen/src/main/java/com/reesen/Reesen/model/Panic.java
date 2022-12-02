@@ -19,11 +19,14 @@ public class Panic implements Serializable {
     @Column(nullable = false)
     private String reason;
 
-    @OneToOne(cascade = {CascadeType.REFRESH})
+    @OneToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "rideId")
     private Ride ride;
 
 
-    @OneToOne(cascade = {CascadeType.REFRESH})
+
+    @OneToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId")
     private User user;
 
     public Panic() {

@@ -13,7 +13,7 @@ public class Document implements Serializable {
 
     private String picture;
 
-    @ManyToOne(cascade = {CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     private Driver driver;
 
     public Document() {

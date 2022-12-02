@@ -3,7 +3,6 @@ package com.reesen.Reesen.model;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
-import java.util.Date;
 
 @Entity
 public class Path implements Serializable {
@@ -12,7 +11,8 @@ public class Path implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = {CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "routeId")
     private Route route;
 
     @Column

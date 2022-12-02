@@ -11,18 +11,32 @@ public class Route implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = {CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "startLocationId")
     private Location startLocation;
 
-    @ManyToOne(cascade = {CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "endLocationId")
     private Location endLocation;
+
+    @Column
+    private double distanceKm;
 
     public Route() {
     }
 
-    public Route(Location startLocation, Location endLocation) {
+    public Route(Location startLocation, Location endLocation, double distanceKm) {
         this.startLocation = startLocation;
         this.endLocation = endLocation;
+        this.distanceKm = distanceKm;
+    }
+
+    public double getDistanceKm() {
+        return distanceKm;
+    }
+
+    public void setDistanceKm(double distanceKm) {
+        this.distanceKm = distanceKm;
     }
 
     public Long getId() {

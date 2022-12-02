@@ -10,8 +10,7 @@ public class Vehicle implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(cascade = CascadeType.REFRESH)
-    @Column(nullable = false)
+    @OneToOne(cascade = {CascadeType.REFRESH}, mappedBy = "vehicle", fetch = FetchType.LAZY)
     private Driver driver;
 
     @Column(nullable = false)
@@ -29,11 +28,13 @@ public class Vehicle implements Serializable {
     @Column
     private boolean isPetAccessible;
 
-    @ManyToOne(cascade = {CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "currentLocationId")
     private Location currentLocation;
 
 
-    @ManyToOne(cascade = {CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "vehicleTypeId")
     private VehicleType type;
 
 

@@ -20,10 +20,10 @@ public class Review implements Serializable {
     @Column(nullable = true)
     private String comment;
 
-    @ManyToOne(cascade = {CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     private Passenger passenger;
 
-    @ManyToOne(cascade = {CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     private Ride ride;
 
     public Review(){

@@ -8,13 +8,15 @@ import java.util.Set;
 @Entity
 public class Driver extends User implements Serializable {
 
-    @OneToMany(cascade = {CascadeType.ALL})
+    @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "driver", fetch = FetchType.LAZY)
     private Set<Document> documents;
 
-    @OneToMany(cascade = {CascadeType.REFRESH})
+
+    @OneToMany(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     private Set<Ride> rides;
 
-    @OneToOne(cascade = {CascadeType.ALL})
+    @OneToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @JoinColumn(name="vehicleId")
     private Vehicle vehicle;
 
     public Driver(){
