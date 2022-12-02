@@ -2,12 +2,15 @@ package com.reesen.Reesen.model;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+
 @Entity
-public class User {
+@Inheritance(strategy = InheritanceType.JOINED)
+public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column
     private String name;
@@ -21,10 +24,10 @@ public class User {
     @Column
     private String phoneNumber;
 
-    @Column
+    @Column(nullable = false)
     private String email;
 
-    @Column
+    @Column(nullable = false)
     private String password;
 
     @Column
@@ -58,11 +61,11 @@ public class User {
         this.isActive = isActive;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

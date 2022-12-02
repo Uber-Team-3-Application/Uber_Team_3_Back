@@ -4,15 +4,18 @@ package com.reesen.Reesen.model;
 import com.reesen.Reesen.Enums.VehicleName;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+
 @Entity
-public class VehicleType {
+public class VehicleType implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     @Column
     private double pricePerKm;
 
+    @Enumerated(EnumType.STRING)
     @Column
     private VehicleName name;
 
@@ -24,11 +27,11 @@ public class VehicleType {
         this.name = name;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

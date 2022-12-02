@@ -1,14 +1,199 @@
 package com.reesen.Reesen.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.reesen.Reesen.Enums.RideStatus;
+import jakarta.persistence.*;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.Set;
 
 @Entity
-public class Ride {
+public class Ride implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
+    @Column
+    private Date timeOfStart;
+
+    @Column
+    private Date timeOfEnd;
+
+    @Column
+    private double totalPrice;
+
+    @ManyToOne(cascade = {CascadeType.REFRESH})
+    private Driver driver;
+
+    @ManyToMany(cascade = {CascadeType.REFRESH})
+    private Set<Passenger> passengers;
+
+    @Column
+    private double estimatedTime;
+
+
+    @OneToMany(cascade = {CascadeType.REFRESH})
+    private Set<Review> review;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private RideStatus status;
+
+    @OneToMany(cascade = {CascadeType.REFRESH})
+    private Set<Deduction> deductions;
+
+    @Column
+    private boolean isPanicPressed;
+
+    @Column
+    private boolean isBabyAccessible;
+
+    @Column
+    private boolean isPetAccessible;
+
+    @ManyToOne(cascade = {CascadeType.REFRESH})
+    private VehicleType vehicleType;
+
+    @OneToMany(cascade = {CascadeType.REFRESH})
+    private Set<Path> paths;
+
+    public Ride() {
+    }
+
+    public Ride(Date timeOfStart, Date timeOfEnd, double totalPrice, Driver driver, Set<Passenger> passengers, double estimatedTime, Set<Review> review, RideStatus status, Set<Deduction> deductions, boolean isPanicPressed, boolean isBabyAccessible, boolean isPetAccessible, VehicleType vehicleType, Set<Path> paths) {
+        this.timeOfStart = timeOfStart;
+        this.timeOfEnd = timeOfEnd;
+        this.totalPrice = totalPrice;
+        this.driver = driver;
+        this.passengers = passengers;
+        this.estimatedTime = estimatedTime;
+        this.review = review;
+        this.status = status;
+        this.deductions = deductions;
+        this.isPanicPressed = isPanicPressed;
+        this.isBabyAccessible = isBabyAccessible;
+        this.isPetAccessible = isPetAccessible;
+        this.vehicleType = vehicleType;
+        this.paths = paths;
+    }
+
+    public Set<Path> getPaths() {
+        return paths;
+    }
+
+    public void setPaths(Set<Path> paths) {
+        this.paths = paths;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Date getTimeOfStart() {
+        return timeOfStart;
+    }
+
+    public void setTimeOfStart(Date timeOfStart) {
+        this.timeOfStart = timeOfStart;
+    }
+
+    public Date getTimeOfEnd() {
+        return timeOfEnd;
+    }
+
+    public void setTimeOfEnd(Date timeOfEnd) {
+        this.timeOfEnd = timeOfEnd;
+    }
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public Driver getDriver() {
+        return driver;
+    }
+
+    public void setDriver(Driver driver) {
+        this.driver = driver;
+    }
+
+    public Set<Passenger> getPassengers() {
+        return passengers;
+    }
+
+    public void setPassengers(Set<Passenger> passengers) {
+        this.passengers = passengers;
+    }
+
+    public double getEstimatedTime() {
+        return estimatedTime;
+    }
+
+    public void setEstimatedTime(double estimatedTime) {
+        this.estimatedTime = estimatedTime;
+    }
+
+    public Set<Review> getReview() {
+        return review;
+    }
+
+    public void setReview(Set<Review> review) {
+        this.review = review;
+    }
+
+    public RideStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(RideStatus status) {
+        this.status = status;
+    }
+
+    public Set<Deduction> getDeductions() {
+        return deductions;
+    }
+
+    public void setDeductions(Set<Deduction> deductions) {
+        this.deductions = deductions;
+    }
+
+    public boolean isPanicPressed() {
+        return isPanicPressed;
+    }
+
+    public void setPanicPressed(boolean panicPressed) {
+        isPanicPressed = panicPressed;
+    }
+
+    public boolean isBabyAccessible() {
+        return isBabyAccessible;
+    }
+
+    public void setBabyAccessible(boolean babyAccessible) {
+        isBabyAccessible = babyAccessible;
+    }
+
+    public boolean isPetAccessible() {
+        return isPetAccessible;
+    }
+
+    public void setPetAccessible(boolean petAccessible) {
+        isPetAccessible = petAccessible;
+    }
+
+    public VehicleType getVehicleType() {
+        return vehicleType;
+    }
+
+    public void setVehicleType(VehicleType vehicleType) {
+        this.vehicleType = vehicleType;
+    }
 }

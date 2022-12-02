@@ -22,7 +22,7 @@ public class DriverService {
         return this.driverRepository.save(driver);
     }
 
-    public Driver findOne(Integer id) {
+    public Driver findOne(Long id) {
         return this.driverRepository.findById(id).orElseGet(null);
     }
 }

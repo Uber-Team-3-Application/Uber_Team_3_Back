@@ -3,19 +3,63 @@ package com.reesen.Reesen.model;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.io.Serializable;
+import java.util.Date;
 
 @Entity
-public class UserActivation {
+public class UserActivation implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column
-    private LocalDateTime dateOfCreation;
+    private Date dateOfCreation;
 
     @Column
-    private Integer lifespan;
+    private Long lifespan;
 
+    @OneToOne(cascade = CascadeType.REFRESH)
+    private User user;
+
+    public UserActivation() {
+    }
+
+    public UserActivation(Date dateOfCreation, Long lifespan, User user) {
+        this.dateOfCreation = dateOfCreation;
+        this.lifespan = lifespan;
+        this.user = user;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Date getDateOfCreation() {
+        return dateOfCreation;
+    }
+
+    public void setDateOfCreation(Date dateOfCreation) {
+        this.dateOfCreation = dateOfCreation;
+    }
+
+    public Long getLifespan() {
+        return lifespan;
+    }
+
+    public void setLifespan(Long lifespan) {
+        this.lifespan = lifespan;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }
