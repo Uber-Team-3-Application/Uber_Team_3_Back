@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "api/driver")
 public class DriverController {
-    private DriverService driverService;
+    private final DriverService driverService;
 
     @Autowired
     public DriverController(DriverService driverService){
@@ -40,7 +40,7 @@ public class DriverController {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<Driver> updateDriver(@RequestBody Driver driver, @PathVariable Long id){
+    public ResponseEntity<Driver> updateDriver(@RequestBody Driver driver, @PathVariable Integer id){
         Driver updatedDriver = driverService.findOne(id);
         /*
         *  Here we set data

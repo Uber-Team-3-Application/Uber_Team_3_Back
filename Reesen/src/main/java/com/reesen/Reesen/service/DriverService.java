@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class DriverService {
-    private DriverRepository driverRepository;
+    private final DriverRepository driverRepository;
 
     @Autowired
     public DriverService(DriverRepository driverRepository){
@@ -22,7 +22,7 @@ public class DriverService {
         return this.driverRepository.save(driver);
     }
 
-    public Driver findOne(Long id) {
+    public Driver findOne(Integer id) {
         return this.driverRepository.findById(id).orElseGet(null);
     }
 }
