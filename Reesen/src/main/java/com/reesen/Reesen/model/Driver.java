@@ -1,16 +1,63 @@
 package com.reesen.Reesen.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.Set;
 
 @Entity
-public class Driver implements Serializable {
+public class Driver extends User implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "driver", fetch = FetchType.LAZY)
+    private Set<Document> documents;
+
+
+    @OneToMany(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    private Set<Ride> rides;
+
+    @OneToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @JoinColumn(name="vehicleId")
+    private Vehicle vehicle;
+
+    public Driver(){
+
+    }
+
+    public Driver(String name, String lastName, String profilePicture, String phoneNumber, String email, String password, Set<Document> documents, Set<Ride> rides, Vehicle vehicle) {
+        super(name, lastName, profilePicture, phoneNumber, email, password);
+        this.documents = documents;
+        this.rides = rides;
+        this.vehicle = vehicle;
+    }
+
+    public Driver(String name, String lastName, String profilePicture, String phoneNumber, String email, String password, boolean isBlocked, boolean isActive, Set<Document> documents, Set<Ride> rides, Vehicle vehicle) {
+        super(name, lastName, profilePicture, phoneNumber, email, password, isBlocked, isActive);
+        this.documents = documents;
+        this.rides = rides;
+        this.vehicle = vehicle;
+    }
+
+    public Set<Document> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(Set<Document> documents) {
+        this.documents = documents;
+    }
+
+    public Set<Ride> getRides() {
+        return rides;
+    }
+
+    public void setRides(Set<Ride> rides) {
+        this.rides = rides;
+    }
+
+    public Vehicle getVehicle() {
+        return vehicle;
+    }
+
+    public void setVehicle(Vehicle vehicle) {
+        this.vehicle = vehicle;
+    }
 }

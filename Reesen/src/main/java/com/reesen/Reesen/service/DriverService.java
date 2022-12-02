@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class DriverService {
-    private DriverRepository driverRepository;
+    private final DriverRepository driverRepository;
 
     @Autowired
     public DriverService(DriverRepository driverRepository){

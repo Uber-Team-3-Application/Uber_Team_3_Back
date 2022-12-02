@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "api/driver")
 public class DriverController {
-    private DriverService driverService;
+    private final DriverService driverService;
 
     @Autowired
     public DriverController(DriverService driverService){
@@ -30,12 +30,12 @@ public class DriverController {
     }
 
     @GetMapping(value = "/{page}/{size}")
-    public ResponseEntity<List<Driver>> getDrivers(@PathVariable Integer page, @PathVariable Integer size){
+    public ResponseEntity<List<Driver>> getDrivers(@PathVariable Long page, @PathVariable Long size){
         return new ResponseEntity<List<Driver>>(new ArrayList<>(), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Driver> getDriver(@PathVariable Integer id){
+    public ResponseEntity<Driver> getDriver(@PathVariable Long id){
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
