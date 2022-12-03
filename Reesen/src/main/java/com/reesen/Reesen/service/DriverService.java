@@ -14,13 +14,10 @@ public class DriverService {
         this.driverRepository = driverRepository;
     }
 
-    public Driver add(Driver driver) {
+    public Driver save(Driver driver) {
         return this.driverRepository.save(driver);
     }
 
-    public Driver update(Driver driver) {
-        return this.driverRepository.save(driver);
-    }
 
     public Driver findOne(Long id) {
         return this.driverRepository.findById(id).orElseGet(null);
