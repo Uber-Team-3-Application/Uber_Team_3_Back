@@ -10,6 +10,10 @@ import com.reesen.Reesen.service.DocumentService;
 import com.reesen.Reesen.service.DriverService;
 import com.reesen.Reesen.service.VehicleService;
 import com.reesen.Reesen.service.WorkingHoursService;
+import com.reesen.Reesen.service.interfaces.IDocumentService;
+import com.reesen.Reesen.service.interfaces.IDriverService;
+import com.reesen.Reesen.service.interfaces.IVehicleService;
+import com.reesen.Reesen.service.interfaces.IWorkingHoursService;
 import org.hibernate.jdbc.Work;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,16 +35,16 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "api/driver")
 public class DriverController {
-    private final DriverService driverService;
-    private final DocumentService documentService;
-    private final VehicleService vehicleService;
-    private final WorkingHoursService workingHoursService;
+    private final IDriverService driverService;
+    private final IDocumentService documentService;
+    private final IVehicleService vehicleService;
+    private final IWorkingHoursService workingHoursService;
 
     @Autowired
-    public DriverController(DriverService driverService,
-                            DocumentService documentService,
-                            VehicleService vehicleService,
-                            WorkingHoursService workingHoursService){
+    public DriverController(IDriverService driverService,
+                            IDocumentService documentService,
+                            IVehicleService vehicleService,
+                            IWorkingHoursService workingHoursService){
         this.driverService = driverService;
         this.documentService = documentService;
         this.vehicleService = vehicleService;
