@@ -4,6 +4,7 @@ import com.reesen.Reesen.model.Driver;
 
 public class DriverDTO {
 
+    private Long id;
     private String name;
     private String surname;
     private String profilePicture;
@@ -17,6 +18,7 @@ public class DriverDTO {
 
 
     public DriverDTO(Driver driver){
+        this.id = driver.getId();
         this.name = driver.getName();
         this.surname = driver.getSurname();
         this.profilePicture = driver.getProfilePicture();
@@ -25,6 +27,14 @@ public class DriverDTO {
         this.address = driver.getAddress();
         this.password = driver.getPassword();
 
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {

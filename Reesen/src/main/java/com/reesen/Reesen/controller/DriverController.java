@@ -3,13 +3,14 @@ package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.DocumentDTO;
 import com.reesen.Reesen.dto.DriverDTO;
+import com.reesen.Reesen.dto.VehicleDTO;
 import com.reesen.Reesen.model.Document;
 import com.reesen.Reesen.model.Driver;
+import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.service.DocumentService;
 import com.reesen.Reesen.service.DriverService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -74,6 +75,35 @@ public class DriverController {
         driver = driverService.save(driver);
         return new ResponseEntity<>(new DriverDTO(driver), HttpStatus.CREATED);
     }
+
+    @PostMapping(value = "/{id}/documents")
+    public ResponseEntity<DocumentDTO> addDocument(@RequestBody DocumentDTO documentDTO, @PathVariable("id") Long driverId){
+
+        // Find driver by id
+        Driver driver = this.driverService.findOne(driverId);
+        if(driver == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(driver.getId() != driverId) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Document document = new Document();
+        document.setDocumentImage(documentDTO.getDocumentImage());
+        document.setName(documentDTO.getName());
+
+        // adding driver to document
+        document.setDriver(driver);
+
+
+        // adding document to driver
+        driver.getDocuments().add(document);
+
+
+        //saving both
+        this.documentService.save(document);
+        this.driverService.save(driver);
+
+        return new ResponseEntity<>(new DocumentDTO(document), HttpStatus.CREATED);
+
+    }
+
     /**
      *
      *  GET MAPPINGS
@@ -94,13 +124,28 @@ public class DriverController {
         return new ResponseEntity<>(new DriverDTO(driver), HttpStatus.OK);
     }
 
+            /**
+             *
+             *  GET DOCUMENTS
+             *
+             * **/
 
     @GetMapping(value = "/{id}/documents")
     public ResponseEntity<DocumentDTO> getDocument(@PathVariable("id") Long id){
         Document document = this.documentService.findOne(id);
-        if(document != null) return new ResponseEntity<>(new DocumentDTO(document), HttpStatus.OK);
+        if(document == null) return new ResponseEntity<>(new DocumentDTO(document), HttpStatus.OK);
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
+    }
+
+            /*
+            *
+            *  GET VEHICLE
+            *
+            * **/
+    @GetMapping(value = "/{id}/vehicle")
+    public ResponseEntity<VehicleDTO> getVehicle(@PathVariable("id") Long id){
+        Vehicle vehicle = this.vehicleService.findOne(id);
     }
 
     /**

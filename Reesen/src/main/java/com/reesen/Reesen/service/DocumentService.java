@@ -22,4 +22,7 @@ public class DocumentService {
         return this.documentRepository.findById(id).orElseGet(null);
     }
 
+    public Document save(Document document) {
+        return this.documentRepository.save(document);
+    }
 }
