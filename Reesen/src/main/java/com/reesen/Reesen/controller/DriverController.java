@@ -9,6 +9,7 @@ import com.reesen.Reesen.model.Driver;
 import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.service.DocumentService;
 import com.reesen.Reesen.service.DriverService;
+import com.reesen.Reesen.service.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,17 +18,25 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
+//TODO WORKING HOURS !!!!!!!!!!!!!!!!!!!!!!!!
+//TODO RIDE !!!!!!!!!!!!!!!!!!!!!!!!
+
+
 @CrossOrigin
 @RestController
 @RequestMapping(value = "api/driver")
 public class DriverController {
     private final DriverService driverService;
     private final DocumentService documentService;
+    private final VehicleService vehicleService;
 
     @Autowired
-    public DriverController(DriverService driverService, DocumentService documentService){
+    public DriverController(DriverService driverService, DocumentService documentService, VehicleService vehicleService){
         this.driverService = driverService;
         this.documentService = documentService;
+        this.vehicleService = vehicleService;
     }
 
 
@@ -54,6 +63,37 @@ public class DriverController {
         return new ResponseEntity<>(new DriverDTO(driver), HttpStatus.OK);
     }
 
+            /**
+             *
+             *  PUT Vehicle
+             *
+             * **/
+    @PutMapping(value = "/{id}/vehicle")
+    public ResponseEntity<VehicleDTO> updateVehicle(@RequestBody VehicleDTO vehicleDTO, @PathVariable Long driverId){
+
+        Driver driver = driverService.findOne(driverId);
+        if(driver == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Vehicle vehicle = driver.getVehicle();
+
+        if(vehicle == null){
+            vehicle = new Vehicle();
+        }
+        vehicle.setBabyAccessible(vehicleDTO.isBabyTransport());
+        vehicle.setPetAccessible(vehicleDTO.isPetTransport());
+        vehicle.setCurrentLocation(vehicleDTO.getCurrentLocation());
+        vehicle.setModel(vehicleDTO.getModel());
+        vehicle.setRegistrationPlate(vehicleDTO.getLicenseNumber());
+        vehicle.setPassengerSeats(vehicleDTO.getPassengerSeats());
+
+
+        vehicle = this.vehicleService.save(vehicle);
+        this.driverService.save(driver);
+
+
+        return new ResponseEntity<>(new VehicleDTO(vehicle), HttpStatus.OK);
+    }
+
 
     /**
      *
@@ -75,6 +115,12 @@ public class DriverController {
         driver = driverService.save(driver);
         return new ResponseEntity<>(new DriverDTO(driver), HttpStatus.CREATED);
     }
+
+            /**
+             *
+             *  POST Documents
+             *
+             * **/
 
     @PostMapping(value = "/{id}/documents")
     public ResponseEntity<DocumentDTO> addDocument(@RequestBody DocumentDTO documentDTO, @PathVariable("id") Long driverId){
@@ -103,6 +149,46 @@ public class DriverController {
         return new ResponseEntity<>(new DocumentDTO(document), HttpStatus.CREATED);
 
     }
+
+            /**
+             *
+             *  POST Vehicles
+             *
+             * **/
+
+
+    @PostMapping(value = "/{id}/vehicle")
+    public ResponseEntity<VehicleDTO> addVehicle(@RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId){
+
+        // Find driver by id
+        Driver driver = this.driverService.findOne(driverId);
+        if(driver == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(driver.getId() != driverId) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Vehicle vehicle = new Vehicle();
+        vehicle.setBabyAccessible(vehicleDTO.isBabyTransport());
+        vehicle.setPetAccessible(vehicleDTO.isPetTransport());
+        vehicle.setCurrentLocation(vehicleDTO.getCurrentLocation());
+        vehicle.setModel(vehicleDTO.getModel());
+        vehicle.setRegistrationPlate(vehicleDTO.getLicenseNumber());
+        vehicle.setPassengerSeats(vehicleDTO.getPassengerSeats());
+
+        // adding driver to document
+        vehicle.setDriver(driver);
+
+
+        // adding document to driver
+        driver.setVehicle(vehicle);
+
+
+        //saving both
+        this.vehicleService.save(vehicle);
+        this.driverService.save(driver);
+
+        return new ResponseEntity<>(new VehicleDTO(vehicle), HttpStatus.CREATED);
+
+    }
+
 
     /**
      *
@@ -133,7 +219,7 @@ public class DriverController {
     @GetMapping(value = "/{id}/documents")
     public ResponseEntity<DocumentDTO> getDocument(@PathVariable("id") Long id){
         Document document = this.documentService.findOne(id);
-        if(document == null) return new ResponseEntity<>(new DocumentDTO(document), HttpStatus.OK);
+        if(document != null) return new ResponseEntity<>(new DocumentDTO(document), HttpStatus.OK);
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
     }
@@ -146,6 +232,9 @@ public class DriverController {
     @GetMapping(value = "/{id}/vehicle")
     public ResponseEntity<VehicleDTO> getVehicle(@PathVariable("id") Long id){
         Vehicle vehicle = this.vehicleService.findOne(id);
+        if(vehicle != null) return new ResponseEntity<>(new VehicleDTO(vehicle), HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
     }
 
     /**
