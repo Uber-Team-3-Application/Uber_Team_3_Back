@@ -4,17 +4,24 @@ package com.reesen.Reesen.controller;
 import com.reesen.Reesen.dto.DocumentDTO;
 import com.reesen.Reesen.dto.DriverDTO;
 import com.reesen.Reesen.dto.VehicleDTO;
-import com.reesen.Reesen.model.Document;
-import com.reesen.Reesen.model.Driver;
-import com.reesen.Reesen.model.Vehicle;
+import com.reesen.Reesen.dto.WorkingHoursDTO;
+import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.service.DocumentService;
 import com.reesen.Reesen.service.DriverService;
 import com.reesen.Reesen.service.VehicleService;
+import com.reesen.Reesen.service.WorkingHoursService;
+import com.reesen.Reesen.service.interfaces.IDocumentService;
+import com.reesen.Reesen.service.interfaces.IDriverService;
+import com.reesen.Reesen.service.interfaces.IVehicleService;
+import com.reesen.Reesen.service.interfaces.IWorkingHoursService;
+import org.hibernate.jdbc.Work;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Date;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,15 +35,20 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "api/driver")
 public class DriverController {
-    private final DriverService driverService;
-    private final DocumentService documentService;
-    private final VehicleService vehicleService;
+    private final IDriverService driverService;
+    private final IDocumentService documentService;
+    private final IVehicleService vehicleService;
+    private final IWorkingHoursService workingHoursService;
 
     @Autowired
-    public DriverController(DriverService driverService, DocumentService documentService, VehicleService vehicleService){
+    public DriverController(IDriverService driverService,
+                            IDocumentService documentService,
+                            IVehicleService vehicleService,
+                            IWorkingHoursService workingHoursService){
         this.driverService = driverService;
         this.documentService = documentService;
         this.vehicleService = vehicleService;
+        this.workingHoursService = workingHoursService;
     }
 
 
@@ -196,8 +208,12 @@ public class DriverController {
      *
      * **/
 
-    @GetMapping(value = "/{page}/{size}")
-    public ResponseEntity<List<Driver>> getDrivers(@PathVariable Long page, @PathVariable Long size){
+    @GetMapping
+    public ResponseEntity<List<Driver>> getDrivers(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size
+    ){
+        // TODO IMPLEMENT
         return new ResponseEntity<List<Driver>>(new ArrayList<>(), HttpStatus.OK);
     }
 
@@ -254,6 +270,70 @@ public class DriverController {
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
+
+
+    @PostMapping(value = "/{id}/working-hours")
+    public ResponseEntity<WorkingHoursDTO> createWorkingHours(@PathVariable("id") Long driverId){
+
+        Driver driver = this.driverService.findOne(driverId);
+        if(driver == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        WorkingHours workingHours = new WorkingHours();
+        workingHours.setStartTime(Date.from(Instant.now()));
+        workingHours.setEndTime(Date.from(Instant.now()));
+        workingHours.setDriver(driver);
+
+        workingHours = this.workingHoursService.save(workingHours);
+        return new ResponseEntity<>(new WorkingHoursDTO(workingHours), HttpStatus.CREATED);
+    }
+
+    @GetMapping(value = "/{id}/working-hours")
+    public ResponseEntity<WorkingHours> getWorkingHours(
+            @PathVariable("id") Long driverId,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam("from") String from,
+            @RequestParam("to") String to
+    )
+    {
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    @GetMapping(value = "/{id}/ride")
+    public ResponseEntity<Ride> getRides(
+            @PathVariable("id") Long driverId,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam("sort") String sort,
+            @RequestParam("from") String from,
+            @RequestParam("to") String to){
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{driver-id}/working-hour/{working-hour-id}")
+    public ResponseEntity<Void> getDetailsAboutWorkingHours(
+            @PathVariable("driver-id") Long driverId,
+            @PathVariable("working-hour-id") Long workingHourId)
+    {
+        return new ResponseEntity<>(HttpStatus.OK);
+
+    }
+
+
+    @PutMapping(value = "/{driver-id}/working-hour/{working-hour-id}")
+    public ResponseEntity<Void> changeWorkingHours(
+            @PathVariable("driver-id") Long driverId,
+            @PathVariable("working-hour-id") Long workingHourId
+    ){
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+
+
 
 
 
