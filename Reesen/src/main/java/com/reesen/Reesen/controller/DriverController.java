@@ -1,7 +1,11 @@
 package com.reesen.Reesen.controller;
 
 
+import com.reesen.Reesen.dto.DocumentDTO;
+import com.reesen.Reesen.dto.DriverDTO;
+import com.reesen.Reesen.model.Document;
 import com.reesen.Reesen.model.Driver;
+import com.reesen.Reesen.service.DocumentService;
 import com.reesen.Reesen.service.DriverService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,17 +21,64 @@ import java.util.List;
 @RequestMapping(value = "api/driver")
 public class DriverController {
     private final DriverService driverService;
+    private final DocumentService documentService;
 
     @Autowired
-    public DriverController(DriverService driverService){
+    public DriverController(DriverService driverService, DocumentService documentService){
         this.driverService = driverService;
+        this.documentService = documentService;
     }
 
-    @PostMapping
-    public ResponseEntity<Driver> createDriver(@RequestBody Driver driver){
-        Driver newDriver = this.driverService.add(driver);
-        return new ResponseEntity<Driver>(newDriver, HttpStatus.CREATED);
+
+    /**
+     *
+     *  PUT MAPPINGS
+     *
+     * **/
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<DriverDTO> updateDriver(@RequestBody DriverDTO driverDTO, @PathVariable Long id){
+        Driver driver = driverService.findOne(id);
+
+        if(driver == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        driver.setPassword(driverDTO.getPassword());
+        driver.setEmail(driverDTO.getEmail());
+        driver.setName(driverDTO.getName());
+        driver.setSurname(driverDTO.getSurname());
+        driver.setProfilePicture(driverDTO.getProfilePicture());
+        driver.setTelephoneNumber(driverDTO.getTelephoneNumber());
+        driver.setAddress(driverDTO.getAddress());
+
+        driver = driverService.save(driver);
+        return new ResponseEntity<>(new DriverDTO(driver), HttpStatus.OK);
     }
+
+
+    /**
+     *
+     *  POST MAPPINGS
+     *
+     * **/
+    @PostMapping
+    public ResponseEntity<DriverDTO> createDriver(@RequestBody DriverDTO driverDTO){
+
+        Driver driver = new Driver();
+        driver.setName(driverDTO.getName());
+        driver.setSurname(driverDTO.getSurname());
+        driver.setProfilePicture(driverDTO.getProfilePicture());
+        driver.setTelephoneNumber(driverDTO.getTelephoneNumber());
+        driver.setEmail(driverDTO.getEmail());
+        driver.setAddress(driverDTO.getAddress());
+        driver.setPassword(driverDTO.getPassword());
+
+        driver = driverService.save(driver);
+        return new ResponseEntity<>(new DriverDTO(driver), HttpStatus.CREATED);
+    }
+    /**
+     *
+     *  GET MAPPINGS
+     *
+     * **/
 
     @GetMapping(value = "/{page}/{size}")
     public ResponseEntity<List<Driver>> getDrivers(@PathVariable Long page, @PathVariable Long size){
@@ -35,18 +86,41 @@ public class DriverController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Driver> getDriver(@PathVariable Long id){
-        return new ResponseEntity<>(null, HttpStatus.OK);
+    public ResponseEntity<DriverDTO> getDriver(@PathVariable Long id){
+
+        Driver driver = this.driverService.findOne(id);
+        if(driver == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        return new ResponseEntity<>(new DriverDTO(driver), HttpStatus.OK);
     }
 
-    @PutMapping(value = "/{id}")
-    public ResponseEntity<Driver> updateDriver(@RequestBody Driver driver, @PathVariable Long id){
-        Driver updatedDriver = driverService.findOne(id);
-        /*
-        *  Here we set data
-        * */
-        updatedDriver  = driverService.update(updatedDriver);
-        return new ResponseEntity<>(updatedDriver, HttpStatus.OK);
+
+    @GetMapping(value = "/{id}/documents")
+    public ResponseEntity<DocumentDTO> getDocument(@PathVariable("id") Long id){
+        Document document = this.documentService.findOne(id);
+        if(document != null) return new ResponseEntity<>(new DocumentDTO(document), HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
     }
+
+    /**
+     *
+     *  DELETE MAPPINGS
+     *
+     * **/
+
+    @DeleteMapping(value = "/{id}/documents")
+    public ResponseEntity<Void> deleteDocument(@PathVariable("id") Long id){
+
+        Document document = this.documentService.findOne(id);
+        if(document != null){
+            this.documentService.remove(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+
 
 }
