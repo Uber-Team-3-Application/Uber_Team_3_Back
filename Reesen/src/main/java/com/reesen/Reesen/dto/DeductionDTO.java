@@ -63,7 +63,6 @@ public class DeductionDTO {
 	public void setDeductionTime(Date deductionTime) {
 		this.deductionTime = deductionTime;
 	}
-	
-	
+
 
 }

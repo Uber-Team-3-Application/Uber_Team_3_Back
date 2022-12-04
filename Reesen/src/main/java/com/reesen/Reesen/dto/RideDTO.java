@@ -1,5 +1,6 @@
 package com.reesen.Reesen.dto;
 
+
 import java.util.Date;
 
 import com.reesen.Reesen.Enums.RideStatus;
@@ -8,21 +9,21 @@ import com.reesen.Reesen.model.VehicleType;
 
 public class RideDTO {
 
-    private Long id;
-    private Date timeOfStart;
-    private Date timeOfEnd;
-    private double totalPrice;
-    private Long driverId;
-    private double estimatedTime;
-    private RideStatus status;
-    private boolean isPanicPressed;
-    private boolean isBabyAccessible;
-    private boolean isPetAccessible;
-    private VehicleType vehicleType;
+	private Long id;
+	private Date timeOfStart;
+	private Date timeOfEnd;
+	private double totalPrice;
+	private Long driverId;
+	private double estimatedTime;
+	private RideStatus status;
+	private boolean isPanicPressed;
+	private boolean isBabyAccessible;
+	private boolean isPetAccessible;
+	private VehicleType vehicleType;
 
-    public RideDTO(){
+	public RideDTO() {
 
-    }
+	}
 
 	public RideDTO(Ride ride) {
 		this.id = ride.getId();
@@ -125,5 +126,6 @@ public class RideDTO {
 	public void setVehicleType(VehicleType vehicleType) {
 		this.vehicleType = vehicleType;
 	}
-
 }
+
+
