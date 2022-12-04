@@ -8,7 +8,7 @@ public class VehicleDTO {
 
     private Long id;
     private Long driverId;
-    private VehicleType vehicleType;
+    private String vehicleType;
     private String model;
     private String licenseNumber;
     private Location currentLocation;
@@ -24,7 +24,7 @@ public class VehicleDTO {
     public VehicleDTO(Vehicle vehicle){
         this.id = vehicle.getId();
         this.driverId = vehicle.getDriver().getId();
-        this.vehicleType = vehicle.getType();
+        this.vehicleType = vehicle.getType().getName().toString();
         this.model = vehicle.getModel();
         this.licenseNumber = vehicle.getRegistrationPlate();
         this.currentLocation = vehicle.getCurrentLocation();
@@ -50,11 +50,11 @@ public class VehicleDTO {
         this.driverId = driverId;
     }
 
-    public VehicleType getVehicleType() {
+    public String getVehicleType() {
         return vehicleType;
     }
 
-    public void setVehicleType(VehicleType vehicleType) {
+    public void setVehicleType(String vehicleType) {
         this.vehicleType = vehicleType;
     }
 
