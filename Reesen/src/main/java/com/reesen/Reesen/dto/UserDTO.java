@@ -5,13 +5,17 @@ public class UserDTO {
     private String email;
     private String type;
 
-    public UserDTO() {
-    }
-
     public UserDTO(String email, String type) {
         this.email = email;
         this.type = type;
     }
+
+    public UserDTO(Long id, String email, String type) {
+        this.id = id;
+    public UserDTO() {
+    }
+
+
 
     public Long getId() {
         return id;
