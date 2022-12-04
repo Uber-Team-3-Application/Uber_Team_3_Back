@@ -2,32 +2,72 @@ package com.reesen.Reesen.dto;
 
 import java.util.Date;
 
+import com.reesen.Reesen.model.Deduction;
+
 public class DeductionDTO {
 
-    private String reason;
-    private Date timeOfRejection;
+	private Long id;
+	private Long userId;
+	private Long rideId;
+	private String reason;
+	private Date deductionTime;
 
-    public DeductionDTO(String reason, Date timeOfRejection) {
-        this.reason = reason;
-        this.timeOfRejection = timeOfRejection;
-    }
+	public DeductionDTO() {
 
-    public DeductionDTO() {
-    }
+	}
+	public DeductionDTO(String reason, Date deductionTime){
+		this.reason = reason;
+		this.deductionTime = deductionTime;
+	}
+	public DeductionDTO(Deduction deduction) {
+		this.id = deduction.getId();
+		this.userId = deduction.getUser().getId();
+		this.rideId = deduction.getRide().getId();
+		this.reason = deduction.getReason();
+		this.deductionTime = deduction.getDeductionTime();
+	}
 
-    public String getReason() {
-        return reason;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public Date getTimeOfRejection() {
-        return timeOfRejection;
-    }
+	public Long getUserId() {
+		return userId;
+	}
 
-    public void setTimeOfRejection(Date timeOfRejection) {
-        this.timeOfRejection = timeOfRejection;
-    }
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	public Long getRideId() {
+		return rideId;
+	}
+
+	public void setRideId(Long rideId) {
+		this.rideId = rideId;
+	}
+
+	public String getReason() {
+		return reason;
+	}
+
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
+
+	public Date getDeductionTime() {
+		return deductionTime;
+	}
+
+	public void setDeductionTime(Date deductionTime) {
+		this.deductionTime = deductionTime;
+	}
 }
+	
+	
+
+
