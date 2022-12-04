@@ -54,4 +54,99 @@ public class DriverRideMockup {
 
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Set<Location> getLocations() {
+        return locations;
+    }
+
+    public void setLocations(Set<Location> locations) {
+        this.locations = locations;
+    }
+
+    public Set<DeductionDTO> getRejections() {
+        return rejections;
+    }
+
+    public void setRejections(Set<DeductionDTO> rejections) {
+        this.rejections = rejections;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    public double getTotalCost() {
+        return totalCost;
+    }
+
+    public void setTotalCost(double totalCost) {
+        this.totalCost = totalCost;
+    }
+
+    public UserDTO getDriver() {
+        return driver;
+    }
+
+    public void setDriver(UserDTO driver) {
+        this.driver = driver;
+    }
+
+    public Set<UserDTO> getPassengers() {
+        return passengers;
+    }
+
+    public void setPassengers(Set<UserDTO> passengers) {
+        this.passengers = passengers;
+    }
+
+    public int getEstimatedTimeInMinutes() {
+        return estimatedTimeInMinutes;
+    }
+
+    public void setEstimatedTimeInMinutes(int estimatedTimeInMinutes) {
+        this.estimatedTimeInMinutes = estimatedTimeInMinutes;
+    }
+
+    public String getVehicleType() {
+        return vehicleType;
+    }
+
+    public void setVehicleType(String vehicleType) {
+        this.vehicleType = vehicleType;
+    }
+
+    public boolean isBabyTransport() {
+        return babyTransport;
+    }
+
+    public void setBabyTransport(boolean babyTransport) {
+        this.babyTransport = babyTransport;
+    }
+
+    public boolean isPetTransport() {
+        return petTransport;
+    }
+
+    public void setPetTransport(boolean petTransport) {
+        this.petTransport = petTransport;
+    }
 }

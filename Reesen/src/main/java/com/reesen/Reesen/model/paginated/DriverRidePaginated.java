@@ -10,10 +10,6 @@ public class DriverRidePaginated {
     private int totalCount;
     private Set<DriverRideMockup> results;
 
-    public DriverRidePaginated(int totalCount, Set<DriverRideMockup> results) {
-        this.totalCount = totalCount;
-        this.results = results;
-    }
 
     public DriverRidePaginated(int totalCount) {
         this.totalCount = totalCount;

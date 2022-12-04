@@ -338,7 +338,7 @@ public class DriverController {
             @RequestParam("sort") String sort,
             @RequestParam("from") String from,
             @RequestParam("to") String to){
-        
+
         //TODO ERROR 500
 
         DriverRidePaginated driverRidePaginated = new DriverRidePaginated(243);
