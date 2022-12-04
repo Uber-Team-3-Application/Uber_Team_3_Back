@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 @Entity
+@Table(name="Drivers")
 public class Driver extends User implements Serializable {
 
     @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "driver", fetch = FetchType.LAZY)
