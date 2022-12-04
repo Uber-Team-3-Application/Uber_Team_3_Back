@@ -24,7 +24,7 @@ public class VehicleType implements Serializable {
 
     public VehicleType(double pricePerKm, VehicleName name) {
         this.pricePerKm = pricePerKm;
-        this.name = name;
+        this.name = VehicleName.getVehicleName(name.toString());
     }
 
     public Long getId() {
