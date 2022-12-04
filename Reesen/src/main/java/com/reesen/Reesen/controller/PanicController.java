@@ -1,6 +1,7 @@
 package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.PanicDTO;
+import com.reesen.Reesen.dto.PanicRideDTO;
 import com.reesen.Reesen.dto.PanicTotalDTO;
 import com.reesen.Reesen.dto.UserDTO;
 import com.reesen.Reesen.model.Ride;
@@ -14,6 +15,9 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Instant;
+import java.util.Date;
 
 @CrossOrigin
 @RestController
@@ -35,6 +39,8 @@ public class PanicController {
 
         PanicDTO panicDTO = new PanicDTO();
         panicDTO.setId(Long.parseLong("10"));
+        panicDTO.setTime(Date.from(Instant.now()));
+        panicDTO.setReason("Driver is drinking while driving");
 
         panicDTO.setUser(new User(
                 "Pera",
@@ -43,7 +49,26 @@ public class PanicController {
                 "+381123123",
                 "pera.peric@email.com",
                 "Bulevar Oslobodjenja 74"));
-        
+
+        PanicRideDTO panicRideDTO = new PanicRideDTO();
+        panicRideDTO.setDriver(new UserDTO(
+                Long.parseLong("123"),
+                "user@example.com",
+                "VOZAC"));
+
+        panicRideDTO.addPassenger(new UserDTO(
+                Long.parseLong("123"),
+                "user@example.com",
+                "PUTNIK"));
+
+        panicRideDTO.setBabyTransport(true);
+        panicRideDTO.setPetTransport(true);
+        panicRideDTO.setEstimatedTimeInMinutes(5);
+        panicRideDTO.setStartTime(Date.from(Instant.now()));
+        panicRideDTO.setEndTime(Date.from(Instant.now()));
+        panicRideDTO.setTotalCost(1235);
+
+        panicDTO.setRide(panicRideDTO);
 
         panicTotalDTO.addPanicDTO(panicDTO);
 
