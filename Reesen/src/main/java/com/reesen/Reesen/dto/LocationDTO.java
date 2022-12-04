@@ -3,40 +3,39 @@ package com.reesen.Reesen.dto;
 import com.reesen.Reesen.model.Location;
 
 public class LocationDTO {
-	private Long id;
-	private double geographicWidth;
-	private double geographicLength;
+	private String address;
+	private double latitude;
+	private double longitude;
 	
     public LocationDTO() {
     }
 
     public LocationDTO(Location location) {
-    	this.id = location.getId();
-        this.geographicWidth = location.getGeographicWidth();
-        this.geographicLength = location.getGeographicLength();
+        this.latitude = location.getGeographicWidth();
+        this.longitude = location.getGeographicLength();
     }
 
-    public Long getId() {
-        return id;
+    public String getAddress() {
+        return address;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public double getGeographicWidth() {
-        return geographicWidth;
+    public double getLatitude() {
+        return latitude;
     }
 
-    public void setGeographicWidth(double geographicWidth) {
-        this.geographicWidth = geographicWidth;
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
     }
 
-    public double getGeographicLength() {
-        return geographicLength;
+    public double getLongitude() {
+        return longitude;
     }
 
-    public void setGeographicLength(double geographicLength) {
-        this.geographicLength = geographicLength;
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 }

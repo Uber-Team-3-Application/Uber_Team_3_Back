@@ -1,16 +1,11 @@
 package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.*;
-import com.reesen.Reesen.model.Message;
-import com.reesen.Reesen.model.Remark;
-import com.reesen.Reesen.model.Ride;
-import com.reesen.Reesen.model.User;
+import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.paginated.MessagePaginated;
 import com.reesen.Reesen.model.paginated.RemarkPaginated;
 import com.reesen.Reesen.model.paginated.RidePaginated;
-import com.reesen.Reesen.service.interfaces.IMessageService;
-import com.reesen.Reesen.service.interfaces.IRemarkService;
-import com.reesen.Reesen.service.interfaces.IUserService;
+import com.reesen.Reesen.service.interfaces.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,17 +19,23 @@ public class UserController {
     private final IUserService userService;
     private final IMessageService messageService;
     private final IRemarkService remarkService;
+    private final IDriverService driverService;
+    private final IPassengerService passengerService;
 
-    public UserController(IUserService userService, IMessageService messageService, IRemarkService remarkService) {
+    public UserController(IUserService userService, IMessageService messageService, IRemarkService remarkService,
+                          IDriverService driverService, IPassengerService passengerService) {
         this.userService = userService;
         this.messageService = messageService;
         this.remarkService = remarkService;
+        this.driverService = driverService;
+        this.passengerService = passengerService;
+
     }
 
     //TODO: IMPLEMENT
     @GetMapping("/{id}/ride")
     public ResponseEntity<RidePaginated> getRide(
-            @PathVariable("id") Long userId,
+            @PathVariable("id") Long id,
             @RequestParam("page") int page,
             @RequestParam("size") int size,
             @RequestParam("sort") String sort,
@@ -43,7 +44,24 @@ public class UserController {
     ) {
 
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        User user = userService.findOne(id);
+        Set<RideDTO> rides = new HashSet<>();
+        if (driverService.findOne(id) != null) {
+            for (Ride ride : ((Driver)user).getRides()) {
+                RideDTO rideDTO = new RideDTO(ride);
+                rides.add(rideDTO);
+            }
+        }
+        else {
+            if (passengerService.findOne(id) != null) {
+                for (Ride ride : ((Passenger)user).getRides()) {
+                    RideDTO rideDTO = new RideDTO(ride);
+                    rides.add(rideDTO);
+                }
+            }
+        }
+        RidePaginated ridePaginated = new RidePaginated(rides.size(), rides);
+        return new ResponseEntity<>(ridePaginated, HttpStatus.OK);
     }
 
 
