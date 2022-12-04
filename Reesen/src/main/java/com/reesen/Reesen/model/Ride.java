@@ -2,7 +2,6 @@ package com.reesen.Reesen.model;
 
 import com.reesen.Reesen.Enums.RideStatus;
 import jakarta.persistence.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -42,7 +41,6 @@ public class Ride implements Serializable {
 
 
     @OneToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
-    @Column
     private Deduction deduction;
 
     @Column

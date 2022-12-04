@@ -7,6 +7,6 @@ import java.util.Set;
 
 public interface IMessageService {
     Message save(Message message);
-    Set<Message> findBySenderAndReceiver(User sender, User receiver);
+    Set<Message> getMessagesBySender(User sender);
 
 }

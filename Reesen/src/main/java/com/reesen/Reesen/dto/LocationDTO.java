@@ -13,6 +13,7 @@ public class LocationDTO {
     public LocationDTO(Location location) {
         this.latitude = location.getGeographicWidth();
         this.longitude = location.getGeographicLength();
+        this.address = location.getAddress();
     }
 
     public String getAddress() {

@@ -12,6 +12,9 @@ public class Location implements Serializable {
     private Long id;
 
     @Column
+    private String address;
+
+    @Column
     private double geographicWidth;
 
     @Column
@@ -20,9 +23,18 @@ public class Location implements Serializable {
     public Location() {
     }
 
-    public Location(double geographicWidth, double geographicLength) {
+    public Location(double geographicWidth, double geographicLength, String address) {
         this.geographicWidth = geographicWidth;
         this.geographicLength = geographicLength;
+        this.address = address;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public Long getId() {

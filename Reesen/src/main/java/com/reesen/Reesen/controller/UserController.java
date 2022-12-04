@@ -2,14 +2,11 @@ package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.*;
-import com.reesen.Reesen.model.paginated.MessagePaginated;
-import com.reesen.Reesen.model.paginated.RemarkPaginated;
-import com.reesen.Reesen.model.paginated.RidePaginated;
+import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.service.interfaces.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.*;
 
 @CrossOrigin
@@ -32,9 +29,8 @@ public class UserController {
 
     }
 
-    //TODO: IMPLEMENT
     @GetMapping("/{id}/ride")
-    public ResponseEntity<RidePaginated> getRide(
+    public ResponseEntity<Paginated<RideDTO>> getRide(
             @PathVariable("id") Long id,
             @RequestParam("page") int page,
             @RequestParam("size") int size,
@@ -42,8 +38,6 @@ public class UserController {
             @RequestParam("from") String from,
             @RequestParam("to") String to
     ) {
-
-
         User user = userService.findOne(id);
         Set<RideDTO> rides = new HashSet<>();
         if (driverService.findOne(id) != null) {
@@ -60,42 +54,49 @@ public class UserController {
                 }
             }
         }
-        RidePaginated ridePaginated = new RidePaginated(rides.size(), rides);
+        // TODO: VRATI MOCKUP
+
+        Paginated<RideDTO> ridePaginated = new Paginated<>(243, rides);
         return new ResponseEntity<>(ridePaginated, HttpStatus.OK);
+
     }
 
 
-    // TODO: IMPLEMENT
     @GetMapping()
-    public ResponseEntity<List<User>> getUsers(
+    public ResponseEntity<Paginated<User>> getUsers(
             @RequestParam("page") int page,
             @RequestParam("size") int size
     ) {
 
-        return new ResponseEntity<List<User>>(new ArrayList<>(), HttpStatus.OK);
+        Paginated<User> userPaginated = new Paginated<>(243);
+
+        Set<User> users = new HashSet<>(); // ovo izbrisati
+        // TODO: VRATI MOCKUP
+        /// ovo ostaviti:   Set<User> users =  this.userService.getUsers();
+
+        userPaginated.setResults(users);
+        return new ResponseEntity<Paginated<User>>(userPaginated, HttpStatus.OK);
     }
 
 
-    // TODO: IMPLEMENT
+    // TODO: TOKENS
     @PostMapping("api/login")
-    public ResponseEntity<UserDTO> logIn(@RequestBody UserDTO userDTO) {
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<Void> logIn(@RequestBody UserDTO userDTO) {
+        return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
 
     @GetMapping("/{id}/message")
-    public ResponseEntity<MessagePaginated> getUserMessages(
-            @PathVariable Long id,
-            @RequestParam("userId") Long userId) {
+    public ResponseEntity<Paginated<MessageDTO>> getUserMessages(
+            @PathVariable Long id) {
 
         User sender = this.userService.findOne(id);
-        User receiver = this.userService.findOne(userId);
-        Set<Message> messages = messageService.findBySenderAndReceiver(sender, receiver);
+        Set<Message> messages = messageService.getMessagesBySender(sender);
         Set<MessageDTO> retVal = new HashSet<>();
         for (Message message : messages) {
             retVal.add(new MessageDTO(message));
         }
-        return new ResponseEntity<>(new MessagePaginated(retVal.size(), retVal), HttpStatus.OK);
+        return new ResponseEntity<>(new Paginated<MessageDTO>(243, retVal), HttpStatus.OK);
     }
 
 
@@ -144,7 +145,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/note")
-    public ResponseEntity<RemarkPaginated> getNotes(
+    public ResponseEntity<Paginated<RemarkDTO>> getNotes(
             @PathVariable Long id,
             @RequestParam int page,
             @RequestParam int size
@@ -156,7 +157,8 @@ public class UserController {
         for (Remark remark : remarks) {
             remarksDto.add(new RemarkDTO(remark));
         }
-        RemarkPaginated remarksDTO = new RemarkPaginated(remarks.size(), remarksDto);
+
+        Paginated<RemarkDTO> remarksDTO = new Paginated<>(243, remarksDto);
         return new ResponseEntity<>(remarksDTO, HttpStatus.OK);
     }
 

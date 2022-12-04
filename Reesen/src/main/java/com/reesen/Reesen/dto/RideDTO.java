@@ -3,24 +3,23 @@ package com.reesen.Reesen.dto;
 
 import java.util.Date;
 
-import java.util.Date;
 import java.util.Set;
 
-import com.reesen.Reesen.model.Ride;
-import com.reesen.Reesen.model.VehicleType;
+import com.reesen.Reesen.Enums.VehicleName;
+import com.reesen.Reesen.model.*;
 
 public class RideDTO {
 
 	private Long id;
-	private Set<LocationDTO> locations; //
- 	private DeductionDTO rejection;     //
+	private Set<LocationDTO> locations;
+	private DeductionDTO rejection;
  	private Date startTime;
  	private Date endTime;
  	private double totalCost;
  	private UserDTO driver;
- 	private Set<UserDTO> passengers;   //
+ 	private Set<UserDTO> passengers;
  	private double estimatedTimeInMinutes;
- 	private VehicleType vehicleType;
+ 	private VehicleTypeDTO vehicleType;
  	private boolean babyTransport;
  	private boolean petTransport;
 
@@ -31,10 +30,42 @@ public class RideDTO {
 		this.endTime = ride.getTimeOfEnd();
 		this.totalCost = ride.getTotalPrice();
 		this.estimatedTimeInMinutes = ride.getEstimatedTime();
-		this.vehicleType = ride.getVehicleType();
 		this.babyTransport = ride.isBabyAccessible();
 		this.petTransport = ride.isPetAccessible();
+		setLocations(ride);
+		setPassengers(ride);
+		setVehicleType(ride);
+		this.rejection = new DeductionDTO(ride.getDeduction().getReason(), ride.getDeduction().getDeductionTime());
+	}
 
+	private void setLocations(Ride ride) {
+		for (Path path : ride.getPaths()) {
+			this.locations.add(new LocationDTO(path.getRoute().getStartLocation()));
+			this.locations.add(new LocationDTO(path.getRoute().getEndLocation()));
+		}
+	}
+
+	private void setPassengers(Ride ride) {
+		for (Passenger passenger : ride.getPassengers()) {
+			passengers.add(new UserDTO(passenger.getId(), passenger.getEmail(), "VOZAC")); // TREBA PUTNIK
+		}
+	}
+
+	private void setVehicleType(Ride ride) {
+		if (ride.getVehicleType().getName() == VehicleName.VAN)
+			this.vehicleType = VehicleTypeDTO.KOMBI;
+		else if (ride.getVehicleType().getName() == VehicleName.LUXURY)
+			this.vehicleType = VehicleTypeDTO.LUKSUZNO;
+		else if (ride.getVehicleType().getName() == VehicleName.STANDARD)
+			this.vehicleType = VehicleTypeDTO.STANDARDNO;
+	}
+
+	public DeductionDTO getRejection() {
+		return rejection;
+	}
+
+	public void setRejection(DeductionDTO rejection) {
+		this.rejection = rejection;
 	}
 
 	public Long getId() {
@@ -51,14 +82,6 @@ public class RideDTO {
 
 	public void setLocations(Set<LocationDTO> locations) {
 		this.locations = locations;
-	}
-
-	public DeductionDTO getRejection() {
-		return rejection;
-	}
-
-	public void setRejection(DeductionDTO rejection) {
-		this.rejection = rejection;
 	}
 
 	public Date getStartTime() {
@@ -109,11 +132,11 @@ public class RideDTO {
 		this.estimatedTimeInMinutes = estimatedTimeInMinutes;
 	}
 
-	public VehicleType getVehicleType() {
+	public VehicleTypeDTO getVehicleType() {
 		return vehicleType;
 	}
 
-	public void setVehicleType(VehicleType vehicleType) {
+	public void setVehicleType(VehicleTypeDTO vehicleType) {
 		this.vehicleType = vehicleType;
 	}
 

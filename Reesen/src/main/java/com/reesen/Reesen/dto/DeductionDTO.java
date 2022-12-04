@@ -13,7 +13,6 @@ public class DeductionDTO {
 
 	}
 
-
 	public DeductionDTO(String reason, Date timeOfRejection) {
 		this.reason = reason;
 		this.timeOfRejection = timeOfRejection;

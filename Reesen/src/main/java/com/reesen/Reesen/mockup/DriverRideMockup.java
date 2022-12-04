@@ -1,11 +1,8 @@
 package com.reesen.Reesen.mockup;
 
 import com.reesen.Reesen.dto.DeductionDTO;
-import com.reesen.Reesen.dto.DriverDTO;
-import com.reesen.Reesen.dto.PassengerDTO;
 import com.reesen.Reesen.dto.UserDTO;
 import com.reesen.Reesen.model.Location;
-import com.reesen.Reesen.model.VehicleType;
 
 import java.time.Instant;
 import java.util.Date;
@@ -32,7 +29,7 @@ public class DriverRideMockup {
         locations = new HashSet<>();
         passengers = new HashSet<>();
         rejections = new HashSet<>();
-        locations.add(new Location(45.267136, 19.833549));
+        locations.add(new Location(45.267136, 19.833549, "Bulevar Oslobodjenja 61"));
         rejections.add(
                 new DeductionDTO(
                         "Ride is canceled due to previous problems with the passenger",
