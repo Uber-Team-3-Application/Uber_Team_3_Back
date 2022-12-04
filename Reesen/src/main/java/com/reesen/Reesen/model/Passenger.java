@@ -8,7 +8,7 @@ import java.util.Set;
 @Entity
 public class Passenger extends User implements Serializable{
 
-    @ManyToMany(mappedBy = "ride", cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     private Set<Ride> rides;
 
     @OneToMany(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)

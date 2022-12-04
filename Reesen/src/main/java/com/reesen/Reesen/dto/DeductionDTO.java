@@ -15,7 +15,10 @@ public class DeductionDTO {
 	public DeductionDTO() {
 
 	}
-
+	public DeductionDTO(String reason, Date deductionTime){
+		this.reason = reason;
+		this.deductionTime = deductionTime;
+	}
 	public DeductionDTO(Deduction deduction) {
 		this.id = deduction.getId();
 		this.userId = deduction.getUser().getId();
@@ -63,6 +66,7 @@ public class DeductionDTO {
 	public void setDeductionTime(Date deductionTime) {
 		this.deductionTime = deductionTime;
 	}
+}
 	
 	
 
