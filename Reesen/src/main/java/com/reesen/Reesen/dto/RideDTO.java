@@ -2,6 +2,8 @@ package com.reesen.Reesen.dto;
 
 
 import java.util.Date;
+
+import java.util.Date;
 import java.util.Set;
 
 import com.reesen.Reesen.model.Ride;
@@ -130,6 +132,7 @@ public class RideDTO {
 	public void setPetTransport(boolean petTransport) {
 		this.petTransport = petTransport;
 	}
+
 }
 
 
