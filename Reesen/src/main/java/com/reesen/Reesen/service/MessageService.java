@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class MessageService implements IMessageService {
@@ -25,7 +26,7 @@ public class MessageService implements IMessageService {
     }
 
     @Override
-    public List<Message> findBySenderAndReceiver(User sender, User receiver) {
+    public Set<Message> findBySenderAndReceiver(User sender, User receiver) {
         return this.messageRepository.findMessagesBySenderAndReceiver(sender, receiver);
     }
 }

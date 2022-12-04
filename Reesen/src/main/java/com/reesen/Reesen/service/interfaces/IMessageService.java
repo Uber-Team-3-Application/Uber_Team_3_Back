@@ -3,10 +3,10 @@ package com.reesen.Reesen.service.interfaces;
 import com.reesen.Reesen.model.Message;
 import com.reesen.Reesen.model.User;
 
-import java.util.List;
+import java.util.Set;
 
 public interface IMessageService {
     Message save(Message message);
-    List<Message> findBySenderAndReceiver(User sender, User receiver);
+    Set<Message> findBySenderAndReceiver(User sender, User receiver);
 
 }

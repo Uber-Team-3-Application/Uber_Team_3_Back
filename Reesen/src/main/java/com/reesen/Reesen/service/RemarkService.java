@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class RemarkService implements IRemarkService {
@@ -30,7 +31,7 @@ public class RemarkService implements IRemarkService {
     }
 
     @Override
-    public List<Remark> getRemarksByUser(User user) {
+    public Set<Remark> getRemarksByUser(User user) {
         return this.remarkRepository.getRemarksByUser(user);
     }
 

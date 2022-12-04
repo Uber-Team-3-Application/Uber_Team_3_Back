@@ -5,17 +5,17 @@ import com.reesen.Reesen.model.Message;
 import com.reesen.Reesen.model.Remark;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.User;
+import com.reesen.Reesen.model.paginated.MessagePaginated;
+import com.reesen.Reesen.model.paginated.RemarkPaginated;
+import com.reesen.Reesen.model.paginated.RidePaginated;
 import com.reesen.Reesen.service.interfaces.IMessageService;
 import com.reesen.Reesen.service.interfaces.IRemarkService;
 import com.reesen.Reesen.service.interfaces.IUserService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @CrossOrigin
 @RestController
@@ -33,7 +33,7 @@ public class UserController {
 
     //TODO: IMPLEMENT
     @GetMapping("/{id}/ride")
-    public ResponseEntity<Ride> getRide(
+    public ResponseEntity<RidePaginated> getRide(
             @PathVariable("id") Long userId,
             @RequestParam("page") int page,
             @RequestParam("size") int size,
@@ -41,6 +41,8 @@ public class UserController {
             @RequestParam("from") String from,
             @RequestParam("to") String to
     ) {
+
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -64,18 +66,18 @@ public class UserController {
 
 
     @GetMapping("/{id}/message")
-    public ResponseEntity<MessagesDTO> getUserMessages(
+    public ResponseEntity<MessagePaginated> getUserMessages(
             @PathVariable Long id,
             @RequestParam("userId") Long userId) {
 
         User sender = this.userService.findOne(id);
         User receiver = this.userService.findOne(userId);
-        List<Message> messages = messageService.findBySenderAndReceiver(sender, receiver);
-        List<MessageDTO> retVal = new ArrayList<>();
+        Set<Message> messages = messageService.findBySenderAndReceiver(sender, receiver);
+        Set<MessageDTO> retVal = new HashSet<>();
         for (Message message : messages) {
             retVal.add(new MessageDTO(message));
         }
-        return new ResponseEntity<>(new MessagesDTO(retVal.size(), retVal), HttpStatus.OK);
+        return new ResponseEntity<>(new MessagePaginated(retVal.size(), retVal), HttpStatus.OK);
     }
 
 
@@ -118,25 +120,28 @@ public class UserController {
         User user = userService.findOne(id);
         Remark remark = new Remark(remarkDTO.getMessage(), user);
         remarkService.save(remark);
-        RemarkDTO remarkDto = new RemarkDTO(id, new Date(), remark.getMessage());
+        RemarkDTO remarkDto = new RemarkDTO(id, new Date(), remark.getMessage()); // KOJI DATUM SE PROSLEDJUJE ????
 
         return new ResponseEntity<>(remarkDto, HttpStatus.OK);
     }
 
     @GetMapping("/{id}/note")
-    public ResponseEntity<RemarksDTO> getNotes(
+    public ResponseEntity<RemarkPaginated> getNotes(
             @PathVariable Long id,
             @RequestParam int page,
             @RequestParam int size
     ) {
 
         User user = userService.findOne(id);
-        List<Remark> remarks = remarkService.getRemarksByUser(user);
-        List<RemarkDTO> remarksDto = new ArrayList<>();
+        Set<Remark> remarks = remarkService.getRemarksByUser(user);
+        Set<RemarkDTO> remarksDto = new HashSet<>();
         for (Remark remark : remarks) {
             remarksDto.add(new RemarkDTO(remark));
         }
-        RemarksDTO remarksDTO = new RemarksDTO(remarks.size(), remarksDto);
+        RemarkPaginated remarksDTO = new RemarkPaginated(remarks.size(), remarksDto);
         return new ResponseEntity<>(remarksDTO, HttpStatus.OK);
     }
+
+
+
 }
