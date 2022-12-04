@@ -1,5 +1,7 @@
 package com.reesen.Reesen.dto;
 
+import com.reesen.Reesen.model.User;
+
 public class UserDTO {
     private Long id;
     private String email;
@@ -15,11 +17,6 @@ public class UserDTO {
         this.email = email;
         this.type = type;
     }
-
-    public UserDTO() {
-    }
-
-
 
     public Long getId() {
         return id;
