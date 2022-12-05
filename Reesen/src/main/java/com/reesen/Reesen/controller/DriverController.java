@@ -6,7 +6,6 @@ import com.reesen.Reesen.mockup.DocumentMockup;
 import com.reesen.Reesen.mockup.DriverMockup;
 import com.reesen.Reesen.mockup.DriverRideMockup;
 import com.reesen.Reesen.mockup.VehicleMockup;
-import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.paginated.DriverPaginated;
 import com.reesen.Reesen.model.paginated.DriverRidePaginated;
 import com.reesen.Reesen.model.paginated.WorkingHoursPaginated;
@@ -18,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -202,8 +200,7 @@ public class DriverController {
             @RequestParam("page") int page,
             @RequestParam("size") int size
     ){
-        DriverPaginated driverPaginated = new DriverPaginated(243);
-        //driverPaginated.addDriver(DriverMockup.getDriver());
+        DriverPaginated driverPaginated = this.driverService.getDriverPaginated();
         return new ResponseEntity<>(driverPaginated, HttpStatus.OK);
     }
 
@@ -212,7 +209,6 @@ public class DriverController {
 
         //Driver driver = this.driverService.findOne(id);
         //if(driver == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
         return new ResponseEntity<>(DriverMockup.getDriver(), HttpStatus.OK);
     }
 

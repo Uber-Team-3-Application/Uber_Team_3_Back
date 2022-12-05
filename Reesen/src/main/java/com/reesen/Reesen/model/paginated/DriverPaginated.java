@@ -1,13 +1,13 @@
 package com.reesen.Reesen.model.paginated;
 
-import com.reesen.Reesen.dto.DriverDTO;
+import com.reesen.Reesen.dto.CreatedDriverDTO;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class DriverPaginated {
     private int totalCount;
-    private Set<DriverDTO> results;
+    private Set<CreatedDriverDTO> results;
 
     public DriverPaginated(){
 
@@ -16,12 +16,12 @@ public class DriverPaginated {
         this.totalCount = totalCount;
         this.results = new HashSet<>();
     }
-    public DriverPaginated(int totalCount, Set<DriverDTO> results) {
+    public DriverPaginated(int totalCount, Set<CreatedDriverDTO> results) {
         this.totalCount = totalCount;
         this.results = results;
     }
 
-    public void addDriver(DriverDTO driver){
+    public void addDriver(CreatedDriverDTO driver){
         this.results.add(driver);
     }
     public int getTotalCount() {
@@ -32,11 +32,11 @@ public class DriverPaginated {
         this.totalCount = totalCount;
     }
 
-    public Set<DriverDTO> getResults() {
+    public Set<CreatedDriverDTO> getResults() {
         return results;
     }
 
-    public void setResults(Set<DriverDTO> results) {
+    public void setResults(Set<CreatedDriverDTO> results) {
         this.results = results;
     }
 }
