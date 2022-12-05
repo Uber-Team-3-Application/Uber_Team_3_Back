@@ -10,6 +10,12 @@ public class LocationDTO {
     public LocationDTO() {
     }
 
+    public LocationDTO(String address, double latitude, double longitude) {
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
     public LocationDTO(Location location) {
         this.latitude = location.getGeographicWidth();
         this.longitude = location.getGeographicLength();
