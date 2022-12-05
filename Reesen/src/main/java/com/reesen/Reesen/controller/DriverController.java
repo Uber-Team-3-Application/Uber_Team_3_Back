@@ -21,6 +21,7 @@ import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.Set;
 
 @CrossOrigin
 @RestController
@@ -49,24 +50,18 @@ public class DriverController {
      *
      * **/
     @PutMapping(value = "/{id}")
-    public ResponseEntity<DriverDTO> updateDriver(@RequestBody DriverDTO driverDTO, @PathVariable Long id){
-        //Driver driver = driverService.findOne(id);
+    public ResponseEntity<CreatedDriverDTO> updateDriver(@RequestBody DriverDTO driverDTO, @PathVariable Long id){
 
-        //if(driver == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        CreatedDriverDTO driver = new CreatedDriverDTO();
 
-        DriverDTO driver = new DriverDTO();
-
-        driver.setPassword(driverDTO.getPassword());
         driver.setEmail(driverDTO.getEmail());
         driver.setName(driverDTO.getName());
         driver.setSurname(driverDTO.getSurname());
         driver.setProfilePicture(driverDTO.getProfilePicture());
         driver.setTelephoneNumber(driverDTO.getTelephoneNumber());
         driver.setAddress(driverDTO.getAddress());
+        driver.setId(driverDTO.getId());
 
-        driver.setId(Long.parseLong("123"));
-
-        //driver = driverService.save(driver);
         return new ResponseEntity<>(driver, HttpStatus.OK);
     }
 
@@ -122,28 +117,6 @@ public class DriverController {
 
     @PostMapping(value = "/{id}/documents")
     public ResponseEntity<DocumentDTO> addDocument(@RequestBody DocumentDTO documentDTO, @PathVariable("id") Long driverId){
-
-        // Find driver by id
-        /*Driver driver = this.driverService.findOne(driverId);
-        if(driver == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(driver.getId() != driverId) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
-        Document document = new Document();
-        document.setDocumentImage(documentDTO.getDocumentImage());
-        document.setName(documentDTO.getName());
-
-        // adding driver to document
-        document.setDriver(driver);
-
-
-        // adding document to driver
-        driver.getDocuments().add(document);
-
-
-        //saving both
-        this.documentService.save(document);
-        this.driverService.save(driver);*/
-
         return new ResponseEntity<>(DocumentMockup.getDocumentDTO(), HttpStatus.OK);
 
     }
@@ -219,11 +192,8 @@ public class DriverController {
              * **/
 
     @GetMapping(value = "/{id}/documents")
-    public ResponseEntity<DocumentDTO> getDocument(@PathVariable("id") Long id){
-        //Driver driver = this.driverService.findOne(id);
-        //if(driver != null) return new ResponseEntity<>(new DriverDTO(driver), HttpStatus.OK);
-        //return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        return new ResponseEntity<>(DocumentMockup.getDocumentDTO(), HttpStatus.OK);
+    public ResponseEntity<Set<DocumentDTO>> getDocument(@PathVariable("id") Long id){
+        return new ResponseEntity<>(DocumentMockup.getDocumentsDTO(), HttpStatus.OK);
 
     }
 
@@ -247,10 +217,8 @@ public class DriverController {
      * **/
 
     @DeleteMapping(value = "/{id}/documents")
-    public ResponseEntity<Void> deleteDocuments(@PathVariable("id") Long id){
-        //Driver driver = this.driverService.findOne(id);
-
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<String> deleteDocuments(@PathVariable("id") Long id){
+        return new ResponseEntity<>("Driver deleted successfully", HttpStatus.NO_CONTENT);
     }
 
 
