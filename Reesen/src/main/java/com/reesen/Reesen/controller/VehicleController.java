@@ -21,8 +21,7 @@ public class VehicleController {
     }
 
     @PutMapping(value = "/{vehicleId}/location")
-    public ResponseEntity<LocationDTO> updateLocation(@RequestBody VehicleDTO vehicleDTO, @PathVariable Long vehicleId){
-        LocationDTO locationDTO = new LocationDTO();
+    public ResponseEntity<LocationDTO> updateLocation(@RequestBody LocationDTO locationDTO, @PathVariable Long vehicleId){
         locationDTO.setId(Long.parseLong("1"));
         locationDTO.setAddress("Poso Kuca");
         locationDTO.setLongitude(46.123);

@@ -1,11 +1,8 @@
 package com.reesen.Reesen.mockup;
 
 import com.reesen.Reesen.dto.DeductionDTO;
-import com.reesen.Reesen.dto.DriverDTO;
-import com.reesen.Reesen.dto.PassengerDTO;
 import com.reesen.Reesen.dto.UserDTO;
 import com.reesen.Reesen.model.Location;
-import com.reesen.Reesen.model.VehicleType;
 
 import java.time.Instant;
 import java.util.Date;
