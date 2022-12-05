@@ -32,7 +32,7 @@ public class DriverRideMockup {
         locations = new HashSet<>();
         passengers = new HashSet<>();
         rejections = new HashSet<>();
-        locations.add(new Location(45.267136, 19.833549));
+        locations.add(new Location("Kuca Poso", 45.267136, 19.833549));
         rejections.add(
                 new DeductionDTO(
                         "Ride is canceled due to previous problems with the passenger",
