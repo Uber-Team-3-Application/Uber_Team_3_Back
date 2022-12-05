@@ -51,13 +51,13 @@ public class PanicService implements IPanicService {
         PanicRideDTO panicRideDTO = new PanicRideDTO();
         panicRideDTO.setDriver(new UserDTO(
                 Long.parseLong("123"),
-                "user@example.com",
-                "VOZAC"));
+                "user@example.com"
+                ));
 
         panicRideDTO.addPassenger(new UserDTO(
                 Long.parseLong("123"),
-                "user@example.com",
-                "PUTNIK"));
+                "user@example.com"
+                ));
 
         panicRideDTO.setBabyTransport(true);
         panicRideDTO.setPetTransport(true);
@@ -65,6 +65,7 @@ public class PanicService implements IPanicService {
         panicRideDTO.setStartTime(Date.from(Instant.now()));
         panicRideDTO.setEndTime(Date.from(Instant.now()));
         panicRideDTO.setTotalCost(1235);
+        panicRideDTO.setVehicleType("STANDARDNO");
 
         PanicLocationDTO panicLocationDTO = new PanicLocationDTO(new Location("Bulevar oslobodjenja 46", 45.267136, 19.833549));
         panicRideDTO.addLocation(panicLocationDTO);

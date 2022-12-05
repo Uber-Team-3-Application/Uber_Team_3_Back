@@ -36,10 +36,9 @@ public class DriverRideMockup {
         startTime = Date.from(Instant.now());
         endTime = Date.from(Instant.now());
         totalCost = 1235;
-        driver = new UserDTO("user@example.com", "VOZAC");
-        driver.setId(Long.parseLong("123"));
+        driver = new UserDTO(Long.parseLong("123"), "user@example.com");
 
-        UserDTO passenger = new UserDTO(Long.parseLong("123"), "user@example.com", "PUTNIK");
+        UserDTO passenger = new UserDTO(Long.parseLong("123"), "user@example.com");
         passengers.add(passenger);
         estimatedTimeInMinutes = 5;
         vehicleType = "STANDARDNO";

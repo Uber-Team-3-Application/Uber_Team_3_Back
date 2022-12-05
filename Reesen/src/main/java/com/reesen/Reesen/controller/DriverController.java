@@ -208,9 +208,8 @@ public class DriverController {
         return new ResponseEntity<>(driverRidePaginated, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{driver-id}/working-hour/{working-hour-id}")
+    @GetMapping(value = "/working-hour/{working-hour-id}")
     public ResponseEntity<WorkingHoursDTO> getDetailsAboutWorkingHours(
-            @PathVariable("driver-id") Long driverId,
             @PathVariable("working-hour-id") Long workingHourId)
     {
         WorkingHoursDTO workingHoursDTO = new WorkingHoursDTO();
@@ -221,9 +220,8 @@ public class DriverController {
     }
 
 
-    @PutMapping(value = "/{driver-id}/working-hour/{working-hour-id}")
+    @PutMapping(value = "/working-hour/{working-hour-id}")
     public ResponseEntity<WorkingHoursDTO> changeWorkingHours(
-            @PathVariable("driver-id") Long driverId,
             @PathVariable("working-hour-id") Long workingHourId
     ){
         WorkingHoursDTO workingHoursDTO = new WorkingHoursDTO();
