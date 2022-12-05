@@ -1,12 +1,16 @@
 package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.*;
+import com.reesen.Reesen.mockup.*;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.service.interfaces.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Instant;
 import java.util.*;
 
 @CrossOrigin
@@ -19,6 +23,7 @@ public class UserController {
     private final IDriverService driverService;
     private final IPassengerService passengerService;
 
+    @Autowired
     public UserController(IUserService userService, IMessageService messageService, IRemarkService remarkService,
                           IDriverService driverService, IPassengerService passengerService) {
         this.userService = userService;
@@ -30,138 +35,139 @@ public class UserController {
     }
 
     @GetMapping("/{id}/ride")
-    public ResponseEntity<Paginated<RideDTO>> getRide(
-            @PathVariable("id") Long id,
+    public ResponseEntity<Paginated<RideDTOWithoutRejection>> getRide(
+            @PathVariable("id") int id,
             @RequestParam("page") int page,
             @RequestParam("size") int size,
             @RequestParam("sort") String sort,
             @RequestParam("from") String from,
             @RequestParam("to") String to
     ) {
-        User user = userService.findOne(id);
-        Set<RideDTO> rides = new HashSet<>();
-        if (driverService.findOne(id) != null) {
-            for (Ride ride : ((Driver)user).getRides()) {
-                RideDTO rideDTO = new RideDTO(ride);
-                rides.add(rideDTO);
-            }
-        }
-        else {
-            if (passengerService.findOne(id) != null) {
-                for (Ride ride : ((Passenger)user).getRides()) {
-                    RideDTO rideDTO = new RideDTO(ride);
-                    rides.add(rideDTO);
-                }
-            }
-        }
-        // TODO: VRATI MOCKUP
-
-        Paginated<RideDTO> ridePaginated = new Paginated<>(243, rides);
+//        User user = userService.findOne(id);
+//        Set<RideDTOWithoutRejection> rides = new HashSet<>();
+//        if (driverService.findOne(id) != null) {
+//            for (Ride ride : ((Driver)user).getRides()) {
+//                RideDTOWithoutRejection rideDTO = new RideDTOWithoutRejection(ride);
+//                rides.add(rideDTO);
+//            }
+//        }
+//        else {
+//            if (passengerService.findOne(id) != null) {
+//                for (Ride ride : ((Passenger)user).getRides()) {
+//                    RideDTOWithoutRejection rideDTO = new RideDTOWithoutRejection(ride);
+//                    rides.add(rideDTO);
+//                }
+//            }
+//        }
+        Set<RideDTOWithoutRejection> rides = new HashSet<>();
+        rides.add(RideMockupForUserGet.getRide());
+        Paginated<RideDTOWithoutRejection> ridePaginated = new Paginated<>(243, rides);
         return new ResponseEntity<>(ridePaginated, HttpStatus.OK);
 
     }
 
 
     @GetMapping()
-    public ResponseEntity<Paginated<User>> getUsers(
+    public ResponseEntity<Paginated<UserFullDTO>> getUsers(
             @RequestParam("page") int page,
             @RequestParam("size") int size
     ) {
 
-        Paginated<User> userPaginated = new Paginated<>(243);
-
-        Set<User> users = new HashSet<>(); // ovo izbrisati
-        // TODO: VRATI MOCKUP
-        /// ovo ostaviti:   Set<User> users =  this.userService.getUsers();
+        Paginated<UserFullDTO> userPaginated = new Paginated<>(243);
+        Set<UserFullDTO> users = new HashSet<>();
+        users.add(UserMockup.getUser());
 
         userPaginated.setResults(users);
-        return new ResponseEntity<Paginated<User>>(userPaginated, HttpStatus.OK);
+        return new ResponseEntity<>(userPaginated, HttpStatus.OK);
     }
 
 
-    // TODO: TOKENS
     @PostMapping("api/login")
-    public ResponseEntity<Void> logIn(@RequestBody UserDTO userDTO) {
-        return new ResponseEntity<Void>(HttpStatus.OK);
+    public ResponseEntity<TokenDTO> logIn(@RequestBody UserDTO userDTO) {
+        return new ResponseEntity<>(TokenMockup.getToken(), HttpStatus.OK);
     }
 
 
     @GetMapping("/{id}/message")
-    public ResponseEntity<Paginated<MessageDTO>> getUserMessages(
-            @PathVariable Long id) {
+    public ResponseEntity<Paginated<MessageFullDTO>> getUserMessages(
+            @PathVariable int id) {
 
-        User sender = this.userService.findOne(id);
-        Set<Message> messages = messageService.getMessagesBySender(sender);
-        Set<MessageDTO> retVal = new HashSet<>();
-        for (Message message : messages) {
-            retVal.add(new MessageDTO(message));
-        }
-        return new ResponseEntity<>(new Paginated<MessageDTO>(243, retVal), HttpStatus.OK);
+//        User sender = this.userService.findOne(id);
+//        Set<Message> messages = messageService.getMessagesBySender(sender);
+//        Set<MessageDTO> retVal = new HashSet<>();
+//        for (Message message : messages) {
+//            retVal.add(new MessageDTO(message));
+//        }
+        Set<MessageFullDTO> messages = new HashSet<>();
+        messages.add(MessageMockup.getMessage());
+        return new ResponseEntity<>(new Paginated<>(243, messages), HttpStatus.OK);
     }
 
 
     @PostMapping("/{id}/message")
-    public ResponseEntity<MessageDTO> sendMessageToTheUser(
-            @PathVariable Long id,
-            @RequestBody MessageDTO messageDTO
+    public ResponseEntity<MessageFullDTO> sendMessageToTheUser(
+            @PathVariable int id,
+            @RequestBody MessageDTO messageDto
     ) {
-        User sender = this.userService.findOne(id);
-        User receiver = this.userService.findOne(messageDTO.getReceiverId());
-
-        Message message = new Message(sender, receiver, messageDTO.getMessage(), messageDTO.getTimeOfSending(), messageDTO.getType());
-        message = this.messageService.save(message);
-        return new ResponseEntity<>(new MessageDTO(message), HttpStatus.CREATED);
+//        User sender = this.userService.findOne(id);
+//        User receiver = this.userService.findOne(messageDto.getReceiverId());
+//
+//        Message message = new Message(sender, receiver, messageDto.getMessage(), Date.from(Instant.now()), messageDto.getType());
+//        message = this.messageService.save(message);
+        return new ResponseEntity<>(MessageMockup.getMessage(), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}/block")
-    public ResponseEntity<Void> blockUser(@PathVariable Long id) {
-        User user = this.userService.findOne(id);
-        user.setBlocked(true);
-        userService.save(user);
+    public ResponseEntity<Void> blockUser(@PathVariable int id) {
+//        User user = this.userService.findOne((long) id);
+//        user.setBlocked(true);
+//        userService.save(user);
         return new ResponseEntity<>(HttpStatus.OK);
 
     }
 
     @PutMapping("/{id}/unblock")
-    public ResponseEntity<Void> unblockUser(@PathVariable Long id) {
-        User user = this.userService.findOne(id);
-        user.setBlocked(false);
-        userService.save(user);
+    public ResponseEntity<Void> unblockUser(@PathVariable int id) {
+//        User user = this.userService.findOne((long) id);
+//        user.setBlocked(false);
+//        userService.save(user);
         return new ResponseEntity<>(HttpStatus.OK);
 
     }
 
     @PostMapping("/{id}/note")
     public ResponseEntity<RemarkDTO> createNote(
-            @PathVariable Long id,
-            @RequestBody RemarkDTO remarkDTO
+            @PathVariable int id,
+            @RequestBody MessageSingleDTO message
     ) {
-        User user = userService.findOne(id);
-        Remark remark = new Remark(remarkDTO.getMessage(), user);
-        remarkService.save(remark);
-        RemarkDTO remarkDto = new RemarkDTO(id, new Date(), remark.getMessage()); // KOJI DATUM SE PROSLEDJUJE ????
+//        User user = userService.findOne(id);
+//        Remark remark = new Remark(remarkDTO.getMessage(), user);
+//        remarkService.save(remark);
+//        RemarkDTO remarkDto = new RemarkDTO(id, Date.from(Instant.now()), remark.getMessage()); // KOJI DATUM SE PROSLEDJUJE ????
 
+        RemarkDTO remarkDto = new RemarkDTO(Long.parseLong("10"), Date.from(Instant.now()), message.getMessage());
         return new ResponseEntity<>(remarkDto, HttpStatus.OK);
     }
 
     @GetMapping("/{id}/note")
     public ResponseEntity<Paginated<RemarkDTO>> getNotes(
-            @PathVariable Long id,
+            @PathVariable int id,
             @RequestParam int page,
             @RequestParam int size
     ) {
 
-        User user = userService.findOne(id);
-        Set<Remark> remarks = remarkService.getRemarksByUser(user);
-        Set<RemarkDTO> remarksDto = new HashSet<>();
-        for (Remark remark : remarks) {
-            remarksDto.add(new RemarkDTO(remark));
-        }
+//        User user = userService.findOne(id);
+//        Set<Remark> remarks = remarkService.getRemarksByUser(user);
+//        Set<RemarkDTO> remarksDto = new HashSet<>();
+//        for (Remark remark : remarks) {
+//            remarksDto.add(new RemarkDTO(remark));
+//        }
 
-        Paginated<RemarkDTO> remarksDTO = new Paginated<>(243, remarksDto);
+        HashSet<RemarkDTO> set = new HashSet<>();
+        set.add(new RemarkDTO(Long.parseLong("10"), Date.from(Instant.now()), "The passenger has requested and after that aborted the ride"));
+        Paginated<RemarkDTO> remarksDTO = new Paginated<>(243, set);
         return new ResponseEntity<>(remarksDTO, HttpStatus.OK);
     }
-
 
 
 }

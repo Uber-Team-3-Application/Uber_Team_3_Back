@@ -23,6 +23,9 @@ public class RideDTO {
  	private boolean babyTransport;
  	private boolean petTransport;
 
+	 public RideDTO() {
+
+	 }
 
 	public RideDTO(Ride ride) {
 		this.id = ride.getId();
@@ -47,7 +50,7 @@ public class RideDTO {
 
 	private void setPassengers(Ride ride) {
 		for (Passenger passenger : ride.getPassengers()) {
-			passengers.add(new UserDTO(passenger.getId(), passenger.getEmail(), "VOZAC")); // TREBA PUTNIK
+			passengers.add(new UserDTO(passenger.getId(), passenger.getEmail()));
 		}
 	}
 
