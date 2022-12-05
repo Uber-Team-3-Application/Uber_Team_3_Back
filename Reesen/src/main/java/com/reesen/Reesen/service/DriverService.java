@@ -38,6 +38,7 @@ public class DriverService implements IDriverService {
         driver.setAddress(driverDTO.getAddress());
         driver.setPassword(driverDTO.getPassword());
         driver.setId(Long.parseLong("123"));
+        this.driverRepository.save(driver);
         return new CreatedDriverDTO(driver);
     }
 }

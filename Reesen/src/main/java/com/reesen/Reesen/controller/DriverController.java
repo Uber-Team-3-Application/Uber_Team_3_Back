@@ -203,12 +203,12 @@ public class DriverController {
             @RequestParam("size") int size
     ){
         DriverPaginated driverPaginated = new DriverPaginated(243);
-        driverPaginated.addDriver(DriverMockup.getDriver());
+        //driverPaginated.addDriver(DriverMockup.getDriver());
         return new ResponseEntity<>(driverPaginated, HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<DriverDTO> getDriver(@PathVariable Long id){
+    public ResponseEntity<CreatedDriverDTO> getDriver(@PathVariable Long id){
 
         //Driver driver = this.driverService.findOne(id);
         //if(driver == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
