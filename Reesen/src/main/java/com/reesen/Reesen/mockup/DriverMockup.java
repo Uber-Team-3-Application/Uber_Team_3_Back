@@ -5,9 +5,9 @@ import com.reesen.Reesen.dto.DriverDTO;
 import com.reesen.Reesen.model.Driver;
 
 public class DriverMockup {
-    public static CreatedDriverDTO getDriver(){
+    public static CreatedDriverDTO getDriver(Long id){
         CreatedDriverDTO driver = new CreatedDriverDTO();
-        driver.setId(Long.parseLong("10"));
+        driver.setId(id);
         driver.setName("Pera");
         driver.setSurname("Perić");
         driver.setProfilePicture("U3dhZ2dlciByb2Nrcw==");

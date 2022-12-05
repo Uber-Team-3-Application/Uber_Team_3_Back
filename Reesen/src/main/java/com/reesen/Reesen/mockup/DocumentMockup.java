@@ -8,12 +8,12 @@ import java.util.Set;
 public class DocumentMockup {
 
 
-    public static Set<DocumentDTO> getDocumentsDTO(){
+    public static Set<DocumentDTO> getDocumentsDTO(Long id){
         DocumentDTO documentDTO = new DocumentDTO();
         documentDTO.setId(Long.parseLong("123"));
         documentDTO.setName("Vozacka dozvola");
         documentDTO.setDocumentImage("U3dhZ2dlciByb2Nrcw=");
-        documentDTO.setDriverId(Long.parseLong("10"));
+        documentDTO.setDriverId(id);
         Set<DocumentDTO> documents = new HashSet<>();
         documents.add(documentDTO);
         return documents;

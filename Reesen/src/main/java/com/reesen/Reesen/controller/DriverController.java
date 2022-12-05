@@ -3,7 +3,6 @@ package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.mockup.*;
-import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.model.paginated.DriverPaginated;
 import com.reesen.Reesen.model.paginated.DriverRidePaginated;
 import com.reesen.Reesen.model.paginated.WorkingHoursPaginated;
@@ -51,14 +50,13 @@ public class DriverController {
     public ResponseEntity<CreatedDriverDTO> updateDriver(@RequestBody DriverDTO driverDTO, @PathVariable Long id){
 
         CreatedDriverDTO driver = new CreatedDriverDTO();
-
         driver.setEmail(driverDTO.getEmail());
         driver.setName(driverDTO.getName());
         driver.setSurname(driverDTO.getSurname());
         driver.setProfilePicture(driverDTO.getProfilePicture());
         driver.setTelephoneNumber(driverDTO.getTelephoneNumber());
         driver.setAddress(driverDTO.getAddress());
-        driver.setId(driverDTO.getId());
+        driver.setId(id);
 
         return new ResponseEntity<>(driver, HttpStatus.OK);
     }
@@ -70,10 +68,8 @@ public class DriverController {
              * **/
     @PutMapping(value = "/{id}/vehicle")
     public ResponseEntity<VehicleDTO> updateVehicle(@RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId){
-
         return new ResponseEntity<>(VehicleMockup.getVehicleDTO(), HttpStatus.OK);
     }
-
 
     /**
      *
@@ -130,10 +126,7 @@ public class DriverController {
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<CreatedDriverDTO> getDriver(@PathVariable Long id){
-
-        //Driver driver = this.driverService.findOne(id);
-        //if(driver == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        return new ResponseEntity<>(DriverMockup.getDriver(), HttpStatus.OK);
+        return new ResponseEntity<>(DriverMockup.getDriver(id), HttpStatus.OK);
     }
 
             /**
@@ -144,10 +137,9 @@ public class DriverController {
 
     @GetMapping(value = "/{id}/documents")
     public ResponseEntity<Set<DocumentDTO>> getDocument(@PathVariable("id") Long id){
-        return new ResponseEntity<>(DocumentMockup.getDocumentsDTO(), HttpStatus.OK);
+        return new ResponseEntity<>(DocumentMockup.getDocumentsDTO(id), HttpStatus.OK);
 
     }
-
             /*
             *
             *  GET VEHICLE
@@ -157,25 +149,21 @@ public class DriverController {
     public ResponseEntity<VehicleDTO> getVehicle(@PathVariable("id") Long id){
         return new ResponseEntity<>(VehicleMockup.getVehicleDTO(), HttpStatus.OK);
     }
-
     /**
      *
      *  DELETE MAPPINGS
      *
      * **/
-
     @DeleteMapping(value = "/{id}/documents")
     public ResponseEntity<String> deleteDocuments(@PathVariable("id") Long id){
         return new ResponseEntity<>("Driver deleted successfully", HttpStatus.NO_CONTENT);
     }
 
-
-
     @PostMapping(value = "/{id}/working-hours")
     public ResponseEntity<WorkingHoursDTO> createWorkingHours(@PathVariable("id") Long driverId){
 
         WorkingHoursDTO workingHours = new WorkingHoursDTO();
-        workingHours.setId(driverId);
+        workingHours.setId(Long.parseLong("123"));
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         java.util.Date date = null;
         try {
@@ -212,9 +200,9 @@ public class DriverController {
             @RequestParam("from") String from,
             @RequestParam("to") String to)
     {
-        
+
         DriverRidePaginated driverRidePaginated = new DriverRidePaginated(243);
-        DriverRideMockup ride = new DriverRideMockup();
+        DriverRideMockup ride = new DriverRideMockup(driverId);
         driverRidePaginated.addDriverRide(ride);
 
         return new ResponseEntity<>(driverRidePaginated, HttpStatus.OK);
@@ -226,11 +214,10 @@ public class DriverController {
             @PathVariable("working-hour-id") Long workingHourId)
     {
         WorkingHoursDTO workingHoursDTO = new WorkingHoursDTO();
-        workingHoursDTO.setId(Long.parseLong("10"));
+        workingHoursDTO.setId(workingHourId);
         workingHoursDTO.setStart(Date.from(Instant.now()));
         workingHoursDTO.setEnd(Date.from(Instant.now()));
         return new ResponseEntity<>(workingHoursDTO, HttpStatus.OK);
-
     }
 
 
@@ -240,7 +227,7 @@ public class DriverController {
             @PathVariable("working-hour-id") Long workingHourId
     ){
         WorkingHoursDTO workingHoursDTO = new WorkingHoursDTO();
-        workingHoursDTO.setId(Long.parseLong("10"));
+        workingHoursDTO.setId(workingHourId);
         workingHoursDTO.setStart(Date.from(Instant.now()));
         workingHoursDTO.setEnd(Date.from(Instant.now()));
 
