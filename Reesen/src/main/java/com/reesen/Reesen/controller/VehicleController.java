@@ -20,7 +20,7 @@ public class VehicleController {
         this.vehicleService = vehicleService;
     }
 
-    @PutMapping(value = "/{vehicle-id}/location")
+    @PutMapping(value = "/{vehicleId}/location")
     public ResponseEntity<LocationDTO> updateLocation(@RequestBody VehicleDTO vehicleDTO, @PathVariable Long vehicleId){
         LocationDTO locationDTO = new LocationDTO();
         locationDTO.setId(Long.parseLong("1"));

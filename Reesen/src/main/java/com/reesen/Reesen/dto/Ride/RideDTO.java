@@ -1,4 +1,4 @@
-package com.reesen.Reesen.dto;
+package com.reesen.Reesen.dto.Ride;
 
 import java.util.Date;
 
