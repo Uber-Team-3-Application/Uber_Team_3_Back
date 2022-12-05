@@ -2,6 +2,7 @@ package com.reesen.Reesen.mockup;
 
 import com.reesen.Reesen.dto.DeductionDTO;
 import com.reesen.Reesen.dto.UserDTO;
+import com.reesen.Reesen.dto.UserTypeDTO;
 import com.reesen.Reesen.model.Location;
 
 import java.time.Instant;
@@ -39,10 +40,10 @@ public class DriverRideMockup {
         startTime = Date.from(Instant.now());
         endTime = Date.from(Instant.now());
         totalCost = 1235;
-        driver = new UserDTO("user@example.com", "VOZAC");
+        driver = new UserDTO("user@example.com");
         driver.setId(Long.parseLong("123"));
 
-        UserDTO passenger = new UserDTO(Long.parseLong("123"), "user@example.com", "PUTNIK");
+        UserDTO passenger = new UserDTO(Long.parseLong("123"), "user@example.com");
         passengers.add(passenger);
         estimatedTimeInMinutes = 5;
         vehicleType = "STANDARDNO";
