@@ -2,10 +2,8 @@ package com.reesen.Reesen.controller;
 
 
 import com.reesen.Reesen.dto.*;
-import com.reesen.Reesen.mockup.DocumentMockup;
-import com.reesen.Reesen.mockup.DriverMockup;
-import com.reesen.Reesen.mockup.DriverRideMockup;
-import com.reesen.Reesen.mockup.VehicleMockup;
+import com.reesen.Reesen.mockup.*;
+import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.model.paginated.DriverPaginated;
 import com.reesen.Reesen.model.paginated.DriverRidePaginated;
 import com.reesen.Reesen.model.paginated.WorkingHoursPaginated;
@@ -73,26 +71,6 @@ public class DriverController {
     @PutMapping(value = "/{id}/vehicle")
     public ResponseEntity<VehicleDTO> updateVehicle(@RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId){
 
-       /* Driver driver = driverService.findOne(driverId);
-        if(driver == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
-        Vehicle vehicle = driver.getVehicle();
-
-        if(vehicle == null){
-            vehicle = new Vehicle();
-        }
-        vehicle.setBabyAccessible(vehicleDTO.isBabyTransport());
-        vehicle.setPetAccessible(vehicleDTO.isPetTransport());
-        vehicle.setCurrentLocation(vehicleDTO.getCurrentLocation());
-        vehicle.setModel(vehicleDTO.getModel());
-        vehicle.setRegistrationPlate(vehicleDTO.getLicenseNumber());
-        vehicle.setPassengerSeats(vehicleDTO.getPassengerSeats());
-
-
-        vehicle = this.vehicleService.save(vehicle);
-        this.driverService.save(driver);*/
-
-
         return new ResponseEntity<>(VehicleMockup.getVehicleDTO(), HttpStatus.OK);
     }
 
@@ -130,34 +108,7 @@ public class DriverController {
 
     @PostMapping(value = "/{id}/vehicle")
     public ResponseEntity<VehicleDTO> addVehicle(@RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId){
-
-        // Find driver by id
-        //Driver driver = this.driverService.findOne(driverId);
-        //if(driver == null || driver.getId() != driverId) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
-/*        Vehicle vehicle = new Vehicle();
-        vehicle.setBabyAccessible(vehicleDTO.isBabyTransport());
-        vehicle.setPetAccessible(vehicleDTO.isPetTransport());
-        vehicle.setCurrentLocation(vehicleDTO.getCurrentLocation());
-        vehicle.setModel(vehicleDTO.getModel());
-        vehicle.setRegistrationPlate(vehicleDTO.getLicenseNumber());
-        vehicle.setPassengerSeats(vehicleDTO.getPassengerSeats());*/
-
-        // adding driver to document
-        //vehicle.setDriver(driver);
-
-
-        // adding document to driver
-        //driver.setVehicle(vehicle);
-
-
-        //saving both
-        //this.vehicleService.save(vehicle);
-        //this.driverService.save(driver);
-
-
         return new ResponseEntity<>(VehicleMockup.getVehicleDTO(), HttpStatus.OK);
-
     }
 
 
@@ -204,9 +155,6 @@ public class DriverController {
             * **/
     @GetMapping(value = "/{id}/vehicle")
     public ResponseEntity<VehicleDTO> getVehicle(@PathVariable("id") Long id){
-        //Vehicle vehicle = this.vehicleService.findOne(id);
-        //if(vehicle != null) return new ResponseEntity<>(new VehicleDTO(vehicle), HttpStatus.OK);
-        //return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(VehicleMockup.getVehicleDTO(), HttpStatus.OK);
     }
 
@@ -226,17 +174,8 @@ public class DriverController {
     @PostMapping(value = "/{id}/working-hours")
     public ResponseEntity<WorkingHoursDTO> createWorkingHours(@PathVariable("id") Long driverId){
 
-       /* Driver driver = this.driverService.findOne(driverId);
-        if(driver == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
-        WorkingHours workingHours = new WorkingHours();
-        workingHours.setStartTime(Date.from(Instant.now()));
-        workingHours.setEndTime(Date.from(Instant.now()));
-        workingHours.setDriver(driver);
-
-        workingHours = this.workingHoursService.save(workingHours);*/
         WorkingHoursDTO workingHours = new WorkingHoursDTO();
-        workingHours.setId(Long.parseLong("10"));
+        workingHours.setId(driverId);
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         java.util.Date date = null;
         try {
@@ -259,20 +198,7 @@ public class DriverController {
             @RequestParam("to") String to
     )
     {
-        WorkingHoursPaginated workingHoursPaginated = new WorkingHoursPaginated(243);
-        WorkingHoursDTO workingHoursDTO = new WorkingHoursDTO();
-        workingHoursDTO.setId(Long.parseLong("10"));
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        java.util.Date date = null;
-        try {
-            date = sdf.parse("10-10-2022");
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        workingHoursDTO.setStart(date);
-        workingHoursDTO.setEnd(date);
-        workingHoursPaginated.addWorkingHours(workingHoursDTO);
-
+        WorkingHoursPaginated workingHoursPaginated = WorkingHoursMockup.getWorkingHours();
         return new ResponseEntity<>(workingHoursPaginated, HttpStatus.OK);
     }
 
@@ -284,10 +210,9 @@ public class DriverController {
             @RequestParam("size") int size,
             @RequestParam("sort") String sort,
             @RequestParam("from") String from,
-            @RequestParam("to") String to){
-
-        //TODO ERROR 500
-
+            @RequestParam("to") String to)
+    {
+        
         DriverRidePaginated driverRidePaginated = new DriverRidePaginated(243);
         DriverRideMockup ride = new DriverRideMockup();
         driverRidePaginated.addDriverRide(ride);

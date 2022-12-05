@@ -1,9 +1,6 @@
 package com.reesen.Reesen.mockup;
 
-import com.reesen.Reesen.dto.DeductionDTO;
-import com.reesen.Reesen.dto.DriverDTO;
-import com.reesen.Reesen.dto.PassengerDTO;
-import com.reesen.Reesen.dto.UserDTO;
+import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.Location;
 import com.reesen.Reesen.model.VehicleType;
 
@@ -15,8 +12,8 @@ import java.util.Set;
 public class DriverRideMockup {
 
     private  Long id;
-    private  Set<Location> locations;
-    private  Set<DeductionDTO> rejections;
+    private  Set<CurrentLocationDTO> locations;
+    private  DeductionDTO rejection;
     private  Date startTime;
     private  Date endTime;
     private  double totalCost;
@@ -31,14 +28,11 @@ public class DriverRideMockup {
         id = Long.parseLong("10");
         locations = new HashSet<>();
         passengers = new HashSet<>();
-        rejections = new HashSet<>();
-        locations.add(new Location("Kuca Poso", 45.267136, 19.833549));
-        rejections.add(
-                new DeductionDTO(
+        Location location = new Location("Kuca Poso", 45.267136, 19.833549);
+        locations.add(new CurrentLocationDTO(location));
+        rejection = new DeductionDTO(
                         "Ride is canceled due to previous problems with the passenger",
-                        Date.from(Instant.now())
-
-        ));
+                        Date.from(Instant.now()));
         startTime = Date.from(Instant.now());
         endTime = Date.from(Instant.now());
         totalCost = 1235;
@@ -62,20 +56,20 @@ public class DriverRideMockup {
         this.id = id;
     }
 
-    public Set<Location> getLocations() {
+    public Set<CurrentLocationDTO> getLocations() {
         return locations;
     }
 
-    public void setLocations(Set<Location> locations) {
+    public void setLocations(Set<CurrentLocationDTO> locations) {
         this.locations = locations;
     }
 
-    public Set<DeductionDTO> getRejections() {
-        return rejections;
+    public DeductionDTO getRejection() {
+        return rejection;
     }
 
-    public void setRejections(Set<DeductionDTO> rejections) {
-        this.rejections = rejections;
+    public void setRejection(DeductionDTO rejections) {
+        this.rejection = rejections;
     }
 
     public Date getStartTime() {
