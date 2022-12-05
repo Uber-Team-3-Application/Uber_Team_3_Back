@@ -1,10 +1,7 @@
 package com.reesen.Reesen.controller;
 
 
-import com.reesen.Reesen.dto.DocumentDTO;
-import com.reesen.Reesen.dto.DriverDTO;
-import com.reesen.Reesen.dto.VehicleDTO;
-import com.reesen.Reesen.dto.WorkingHoursDTO;
+import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.mockup.DocumentMockup;
 import com.reesen.Reesen.mockup.DriverMockup;
 import com.reesen.Reesen.mockup.DriverRideMockup;
@@ -26,11 +23,6 @@ import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-
-
-//TODO WORKING HOURS !!!!!!!!!!!!!!!!!!!!!!!!
-//TODO RIDE !!!!!!!!!!!!!!!!!!!!!!!!
-
 
 @CrossOrigin
 @RestController
@@ -118,19 +110,10 @@ public class DriverController {
      *
      * **/
     @PostMapping
-    public ResponseEntity<DriverDTO> createDriver(@RequestBody DriverDTO driverDTO){
+    public ResponseEntity<CreatedDriverDTO> createDriver(@RequestBody DriverDTO driverDTO){
 
-        Driver driver = new Driver();
-        driver.setName(driverDTO.getName());
-        driver.setSurname(driverDTO.getSurname());
-        driver.setProfilePicture(driverDTO.getProfilePicture());
-        driver.setTelephoneNumber(driverDTO.getTelephoneNumber());
-        driver.setEmail(driverDTO.getEmail());
-        driver.setAddress(driverDTO.getAddress());
-        driver.setPassword(driverDTO.getPassword());
-        driver.setId(Long.parseLong("123"));
-        //driver = driverService.save(driver);
-        return new ResponseEntity<>(new DriverDTO(driver), HttpStatus.CREATED);
+        CreatedDriverDTO createdDriverDTO = this.driverService.createDriverDTO(driverDTO);
+        return new ResponseEntity<>(createdDriverDTO, HttpStatus.OK);
     }
 
             /**
