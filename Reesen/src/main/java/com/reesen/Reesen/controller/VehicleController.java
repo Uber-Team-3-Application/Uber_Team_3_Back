@@ -20,6 +20,7 @@ public class VehicleController {
         this.vehicleService = vehicleService;
     }
 
+<<<<<<< Updated upstream
     @PutMapping(value = "/{vehicle-id}/location")
     public ResponseEntity<LocationDTO> updateLocation(@RequestBody VehicleDTO vehicleDTO, @PathVariable Long vehicleId){
         LocationDTO locationDTO = new LocationDTO();
@@ -28,5 +29,10 @@ public class VehicleController {
         locationDTO.setLongitude(46.123);
         locationDTO.setLatitude(65.028);
         return new ResponseEntity<>(locationDTO, HttpStatus.OK);
+=======
+    @PutMapping(value = "/{vehicleId}/location")
+    public ResponseEntity<String> updateLocation(@RequestBody LocationDTO locationDTO, @PathVariable Long vehicleId){
+        return new ResponseEntity<>("Coordinates successfully updated", HttpStatus.OK);
+>>>>>>> Stashed changes
     }
 }
