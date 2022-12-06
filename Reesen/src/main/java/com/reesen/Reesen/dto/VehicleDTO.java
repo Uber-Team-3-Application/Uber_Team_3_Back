@@ -18,7 +18,6 @@ public class VehicleDTO {
 
     public VehicleDTO(){
 
-
     }
 
     public VehicleDTO(Vehicle vehicle){

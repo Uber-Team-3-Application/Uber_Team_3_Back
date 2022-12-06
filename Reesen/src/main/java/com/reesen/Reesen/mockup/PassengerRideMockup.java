@@ -1,20 +1,21 @@
 package com.reesen.Reesen.mockup;
 
 import com.reesen.Reesen.dto.DeductionDTO;
+import com.reesen.Reesen.dto.RouteDTO;
 import com.reesen.Reesen.dto.UserDTO;
 import com.reesen.Reesen.model.Location;
+import com.reesen.Reesen.model.Route;
 
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-public class DriverRideMockup {
-
+public class PassengerRideMockup {
     private  Long id;
-    private  Set<Location> locations;
+    private Set<RouteDTO> locations;
     private  Set<DeductionDTO> rejections;
-    private  Date startTime;
+    private Date startTime;
     private  Date endTime;
     private  double totalCost;
     private UserDTO driver;
@@ -24,18 +25,22 @@ public class DriverRideMockup {
     private  boolean babyTransport;
     private  boolean petTransport;
 
-    public DriverRideMockup(){
+    public PassengerRideMockup(){
         id = Long.parseLong("10");
         locations = new HashSet<>();
         passengers = new HashSet<>();
         rejections = new HashSet<>();
-        locations.add(new Location("Kuca Poso", 45.267136, 19.833549));
+        locations.add(
+                new RouteDTO(
+                        new Location("Kuca Poso", 45.267136, 19.833549),
+                        new Location("Poso Kuca", 45.267136, 19.833549)
+                ));
         rejections.add(
                 new DeductionDTO(
                         "Ride is canceled due to previous problems with the passenger",
                         Date.from(Instant.now())
 
-        ));
+                ));
         startTime = Date.from(Instant.now());
         endTime = Date.from(Instant.now());
         totalCost = 1235;
@@ -59,11 +64,11 @@ public class DriverRideMockup {
         this.id = id;
     }
 
-    public Set<Location> getLocations() {
+    public Set<RouteDTO> getLocations() {
         return locations;
     }
 
-    public void setLocations(Set<Location> locations) {
+    public void setLocations(Set<RouteDTO> locations) {
         this.locations = locations;
     }
 

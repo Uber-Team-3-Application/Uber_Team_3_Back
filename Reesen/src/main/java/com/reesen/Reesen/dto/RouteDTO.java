@@ -1,23 +1,27 @@
 package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.model.Route;
+import com.reesen.Reesen.model.Location;
 
 public class RouteDTO {
 	
     private Long id;
-    private Long startLocationId;
-    private Long endLocationId;
-    private double distanceKm;
+    private Location departure;
+    private Location destination;
     
 	public RouteDTO() {
 
 	}
-	
+
+	public RouteDTO(Location departure, Location destination) {
+		this.departure = departure;
+		this.destination = destination;
+	}
+
 	public RouteDTO(Route route) {
 		this.id = route.getId();
-		this.startLocationId = route.getStartLocation().getId();
-		this.endLocationId = route.getEndLocation().getId();
-		this.distanceKm = route.getDistanceKm();
+		this.departure = route.getDeparture();
+		this.destination = route.getDestination();
 	}
 
 	public Long getId() {
@@ -28,27 +32,18 @@ public class RouteDTO {
 		this.id = id;
 	}
 
-	public Long getStartLocationId() {
-		return startLocationId;
+	public Location getDeparture() {
+		return departure;
 	}
 
-	public void setStartLocationId(Long startLocationId) {
-		this.startLocationId = startLocationId;
+	public void setDeparture(Location startLocationId) {
+		this.departure = startLocationId;
 	}
 
-	public Long getEndLocationId() {
-		return endLocationId;
+	public Location getDestination() { return destination;}
+
+	public void setDestination(Location destination) {
+		this.destination = destination;
 	}
 
-	public void setEndLocationId(Long endLocationId) {
-		this.endLocationId = endLocationId;
-	}
-
-	public double getDistanceKm() {
-		return distanceKm;
-	}
-
-	public void setDistanceKm(double distanceKm) {
-		this.distanceKm = distanceKm;
-	}    
 }
