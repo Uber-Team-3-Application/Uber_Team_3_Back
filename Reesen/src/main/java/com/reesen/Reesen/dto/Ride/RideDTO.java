@@ -6,12 +6,16 @@ import java.util.Date;
 import java.util.Set;
 
 import com.reesen.Reesen.Enums.VehicleName;
+import com.reesen.Reesen.dto.DeductionDTO;
+import com.reesen.Reesen.dto.RouteDTO;
+import com.reesen.Reesen.dto.UserDTO;
+import com.reesen.Reesen.dto.VehicleTypeDTO;
 import com.reesen.Reesen.model.*;
 
 public class RideDTO {
 
 	private Long id;
-	private Set<LocationDTO> locations;
+	private Set<RouteDTO> locations;
 	private DeductionDTO rejection;
  	private Date startTime;
  	private Date endTime;
@@ -35,18 +39,11 @@ public class RideDTO {
 		this.estimatedTimeInMinutes = ride.getEstimatedTime();
 		this.babyTransport = ride.isBabyAccessible();
 		this.petTransport = ride.isPetAccessible();
-		setLocations(ride);
 		setPassengers(ride);
 		setVehicleType(ride);
 		this.rejection = new DeductionDTO(ride.getDeduction().getReason(), ride.getDeduction().getDeductionTime());
 	}
 
-	private void setLocations(Ride ride) {
-		for (Path path : ride.getPaths()) {
-			this.locations.add(new LocationDTO(path.getRoute().getStartLocation()));
-			this.locations.add(new LocationDTO(path.getRoute().getEndLocation()));
-		}
-	}
 
 	private void setPassengers(Ride ride) {
 		for (Passenger passenger : ride.getPassengers()) {
@@ -79,11 +76,11 @@ public class RideDTO {
 		this.id = id;
 	}
 
-	public Set<LocationDTO> getLocations() {
+	public Set<RouteDTO> getLocations() {
 		return locations;
 	}
 
-	public void setLocations(Set<LocationDTO> locations) {
+	public void setLocations(Set<RouteDTO> locations) {
 		this.locations = locations;
 	}
 

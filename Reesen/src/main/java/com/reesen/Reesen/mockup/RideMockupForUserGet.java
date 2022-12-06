@@ -1,6 +1,8 @@
 package com.reesen.Reesen.mockup;
 
 import com.reesen.Reesen.dto.*;
+import com.reesen.Reesen.dto.Ride.RideDTO;
+import com.reesen.Reesen.model.Location;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -14,8 +16,11 @@ public class RideMockupForUserGet {
         RideDTO rideDTO = new RideDTO();
         rideDTO.setId(Long.parseLong("10"));
 
-        HashSet<LocationDTO> set = new HashSet<>();
-        set.add(new LocationDTO("Bulevar oslobodjenja 46", 45.267135, 19.833549));
+        HashSet<RouteDTO> set = new HashSet<>();
+        RouteDTO routeDTO = new RouteDTO();;
+        routeDTO.setDeparture(new LocationDTO("Bulevar oslobodjenja 46", 45.267135, 19.833549));
+        routeDTO.setDestination(new LocationDTO("Bulevar oslobodjenja 46", 45.267135, 19.833549));
+        set.add(routeDTO);
         rideDTO.setLocations(set);
 
         rideDTO.setStartTime(Date.from(Instant.now()));

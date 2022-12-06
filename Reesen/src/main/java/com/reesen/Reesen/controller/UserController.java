@@ -1,6 +1,7 @@
 package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.*;
+import com.reesen.Reesen.dto.Ride.RideDTO;
 import com.reesen.Reesen.mockup.*;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.paginated.Paginated;
