@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
+@Table
 @Entity
 public class Deduction implements Serializable {
 

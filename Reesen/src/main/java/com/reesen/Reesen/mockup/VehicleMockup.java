@@ -14,7 +14,7 @@ public class VehicleMockup {
         vehicleDTO.setVehicleType("STANDARDNO");
         vehicleDTO.setModel("VW GOLF 2");
         vehicleDTO.setLicenseNumber("NS 123-AB");
-        vehicleDTO.setCurrentLocation(new Location(45.267136, 19.833549));
+        vehicleDTO.setCurrentLocation(new Location("Kuca Poso", 45.267136, 19.833549));
         vehicleDTO.setPassengerSeats(4);
         vehicleDTO.setBabyTransport(true);
         vehicleDTO.setPetTransport(true);
