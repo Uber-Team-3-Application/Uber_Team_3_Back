@@ -13,6 +13,13 @@ public class UserDTO {
         this.type = type;
     }
 
+    public UserDTO(String email, String type) {
+        this.id = id;
+        this.email = email;
+        this.type = type;
+    }
+
+
 
     public Long getId() {
         return id;

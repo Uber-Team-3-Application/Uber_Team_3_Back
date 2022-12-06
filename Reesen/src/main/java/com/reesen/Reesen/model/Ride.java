@@ -55,12 +55,12 @@ public class Ride implements Serializable {
     private VehicleType vehicleType;
 
     @OneToMany(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
-    private Set<Path> paths;
+    private Set<Route> locations;
 
     public Ride() {
     }
 
-    public Ride(Date timeOfStart, Date timeOfEnd, double totalPrice, Driver driver, Set<Passenger> passengers, double estimatedTime, Set<Review> review, RideStatus status, Set<Deduction> deductions, boolean isPanicPressed, boolean isBabyAccessible, boolean isPetAccessible, VehicleType vehicleType, Set<Path> paths) {
+    public Ride(Date timeOfStart, Date timeOfEnd, double totalPrice, Driver driver, Set<Passenger> passengers, double estimatedTime, Set<Review> review, RideStatus status, Set<Deduction> deductions, boolean isPanicPressed, boolean isBabyAccessible, boolean isPetAccessible, VehicleType vehicleType, Set<Route> locations) {
         this.timeOfStart = timeOfStart;
         this.timeOfEnd = timeOfEnd;
         this.totalPrice = totalPrice;
@@ -74,15 +74,16 @@ public class Ride implements Serializable {
         this.isBabyAccessible = isBabyAccessible;
         this.isPetAccessible = isPetAccessible;
         this.vehicleType = vehicleType;
-        this.paths = paths;
+        this.locations = locations;
     }
 
-    public Set<Path> getPaths() {
-        return paths;
+
+    public Set<Route> getLocations() {
+        return locations;
     }
 
-    public void setPaths(Set<Path> paths) {
-        this.paths = paths;
+    public void setLocations(Set<Route> locations) {
+        this.locations = locations;
     }
 
     public Long getId() {
