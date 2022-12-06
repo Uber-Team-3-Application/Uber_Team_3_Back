@@ -71,6 +71,23 @@ public class DriverController {
         return new ResponseEntity<>(VehicleMockup.getVehicleDTO(), HttpStatus.OK);
     }
 
+            /**
+             *
+             *  PUT Working Hours
+             *
+             * **/
+
+    @PutMapping(value = "/working-hour/{working-hour-id}")
+    public ResponseEntity<WorkingHoursDTO> changeWorkingHours(
+            @PathVariable("working-hour-id") Long workingHourId
+    ){
+        WorkingHoursDTO workingHoursDTO = new WorkingHoursDTO();
+        workingHoursDTO.setId(workingHourId);
+        workingHoursDTO.setStart(Date.from(Instant.now()));
+        workingHoursDTO.setEnd(Date.from(Instant.now()));
+
+        return new ResponseEntity<>(workingHoursDTO, HttpStatus.OK);
+    }
     /**
      *
      *  POST MAPPINGS
@@ -106,7 +123,28 @@ public class DriverController {
     public ResponseEntity<VehicleDTO> addVehicle(@RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId){
         return new ResponseEntity<>(VehicleMockup.getVehicleDTO(), HttpStatus.OK);
     }
+            /**
+             *
+             *  POST Working Hours
+             *
+             * **/
+    @PostMapping(value = "/{id}/working-hours")
+    public ResponseEntity<WorkingHoursDTO> createWorkingHours(@PathVariable("id") Long driverId){
 
+        WorkingHoursDTO workingHours = new WorkingHoursDTO();
+        workingHours.setId(Long.parseLong("123"));
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        java.util.Date date = null;
+        try {
+            date = sdf.parse("10-10-2022");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        workingHours.setStart(date);
+        workingHours.setEnd(date);
+
+        return new ResponseEntity<>(workingHours, HttpStatus.OK);
+    }
 
     /**
      *
@@ -149,33 +187,11 @@ public class DriverController {
     public ResponseEntity<VehicleDTO> getVehicle(@PathVariable("id") Long id){
         return new ResponseEntity<>(VehicleMockup.getVehicleDTO(), HttpStatus.OK);
     }
-    /**
-     *
-     *  DELETE MAPPINGS
-     *
-     * **/
-    @DeleteMapping(value = "/{id}/documents")
-    public ResponseEntity<String> deleteDocuments(@PathVariable("id") Long id){
-        return new ResponseEntity<>("Driver deleted successfully", HttpStatus.NO_CONTENT);
-    }
-
-    @PostMapping(value = "/{id}/working-hours")
-    public ResponseEntity<WorkingHoursDTO> createWorkingHours(@PathVariable("id") Long driverId){
-
-        WorkingHoursDTO workingHours = new WorkingHoursDTO();
-        workingHours.setId(Long.parseLong("123"));
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        java.util.Date date = null;
-        try {
-            date = sdf.parse("10-10-2022");
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        workingHours.setStart(date);
-        workingHours.setEnd(date);
-
-        return new ResponseEntity<>(workingHours, HttpStatus.OK);
-    }
+            /*
+             *
+             *  GET Working Hours
+             *
+             * **/
 
     @GetMapping(value = "/{id}/working-hours")
     public ResponseEntity<WorkingHoursPaginated> getWorkingHours(
@@ -189,7 +205,22 @@ public class DriverController {
         WorkingHoursPaginated workingHoursPaginated = WorkingHoursMockup.getWorkingHours();
         return new ResponseEntity<>(workingHoursPaginated, HttpStatus.OK);
     }
+    @GetMapping(value = "/working-hour/{working-hour-id}")
+    public ResponseEntity<WorkingHoursDTO> getDetailsAboutWorkingHours(
+            @PathVariable("working-hour-id") Long workingHourId)
+    {
+        WorkingHoursDTO workingHoursDTO = new WorkingHoursDTO();
+        workingHoursDTO.setId(workingHourId);
+        workingHoursDTO.setStart(Date.from(Instant.now()));
+        workingHoursDTO.setEnd(Date.from(Instant.now()));
+        return new ResponseEntity<>(workingHoursDTO, HttpStatus.OK);
+    }
 
+    /*
+     *
+     *  GET Rides
+     *
+     * **/
 
     @GetMapping(value = "/{id}/ride")
     public ResponseEntity<DriverRidePaginated> getRides(
@@ -208,34 +239,14 @@ public class DriverController {
         return new ResponseEntity<>(driverRidePaginated, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/working-hour/{working-hour-id}")
-    public ResponseEntity<WorkingHoursDTO> getDetailsAboutWorkingHours(
-            @PathVariable("working-hour-id") Long workingHourId)
-    {
-        WorkingHoursDTO workingHoursDTO = new WorkingHoursDTO();
-        workingHoursDTO.setId(workingHourId);
-        workingHoursDTO.setStart(Date.from(Instant.now()));
-        workingHoursDTO.setEnd(Date.from(Instant.now()));
-        return new ResponseEntity<>(workingHoursDTO, HttpStatus.OK);
+    /**
+     *
+     *  DELETE MAPPINGS
+     *
+     * **/
+    @DeleteMapping(value = "/{id}/documents")
+    public ResponseEntity<String> deleteDocuments(@PathVariable("id") Long id){
+        return new ResponseEntity<>("Driver deleted successfully", HttpStatus.NO_CONTENT);
     }
-
-
-    @PutMapping(value = "/working-hour/{working-hour-id}")
-    public ResponseEntity<WorkingHoursDTO> changeWorkingHours(
-            @PathVariable("working-hour-id") Long workingHourId
-    ){
-        WorkingHoursDTO workingHoursDTO = new WorkingHoursDTO();
-        workingHoursDTO.setId(workingHourId);
-        workingHoursDTO.setStart(Date.from(Instant.now()));
-        workingHoursDTO.setEnd(Date.from(Instant.now()));
-
-        return new ResponseEntity<>(workingHoursDTO, HttpStatus.OK);
-    }
-
-
-
-
-
-
 
 }
