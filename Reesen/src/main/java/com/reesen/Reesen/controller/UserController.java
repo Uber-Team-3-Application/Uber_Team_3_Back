@@ -35,7 +35,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/ride")
-    public ResponseEntity<Paginated<RideDTOWithoutRejection>> getRide(
+    public ResponseEntity<Paginated<RideDTO>> getRide(
             @PathVariable("id") int id,
             @RequestParam("page") int page,
             @RequestParam("size") int size,
@@ -59,9 +59,9 @@ public class UserController {
 //                }
 //            }
 //        }
-        Set<RideDTOWithoutRejection> rides = new HashSet<>();
+        Set<RideDTO> rides = new HashSet<>();
         rides.add(RideMockupForUserGet.getRide());
-        Paginated<RideDTOWithoutRejection> ridePaginated = new Paginated<>(243, rides);
+        Paginated<RideDTO> ridePaginated = new Paginated<>(243, rides);
         return new ResponseEntity<>(ridePaginated, HttpStatus.OK);
 
     }

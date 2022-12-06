@@ -10,8 +10,8 @@ import java.util.Date;
 import java.util.HashSet;
 
 public class RideMockupForUserGet {
-    public static RideDTOWithoutRejection getRide()  {
-        RideDTOWithoutRejection rideDTO = new RideDTOWithoutRejection();
+    public static RideDTO getRide()  {
+        RideDTO rideDTO = new RideDTO();
         rideDTO.setId(Long.parseLong("10"));
 
         HashSet<LocationDTO> set = new HashSet<>();
@@ -31,6 +31,7 @@ public class RideMockupForUserGet {
         rideDTO.setVehicleType(VehicleTypeDTO.STANDARDNO);
         rideDTO.setBabyTransport(true);
         rideDTO.setPetTransport(true);
+        rideDTO.setRejection(new DeductionDTO("Ride is canceled due to previous problems with the passenger", Date.from(Instant.now())));
 
         return rideDTO;
     }

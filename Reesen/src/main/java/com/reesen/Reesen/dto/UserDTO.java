@@ -1,6 +1,6 @@
 package com.reesen.Reesen.dto;
 
-import com.reesen.Reesen.model.User;
+
 
 public class UserDTO {
     private Long id;
