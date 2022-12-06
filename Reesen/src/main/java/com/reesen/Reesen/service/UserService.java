@@ -6,6 +6,9 @@ import com.reesen.Reesen.service.interfaces.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Service
 public class UserService implements IUserService {
 
@@ -24,5 +27,10 @@ public class UserService implements IUserService {
     @Override
     public User findOne(Long id) {
         return this.userRepository.findById(id).orElseGet(null);
+    }
+
+    @Override
+    public Set<User> getUsers() {
+        return new HashSet<>(this.userRepository.findAll());
     }
 }

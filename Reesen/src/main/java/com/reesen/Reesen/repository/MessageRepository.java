@@ -9,5 +9,5 @@ import java.util.Set;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
-    Set<Message> findMessagesBySenderAndReceiver(User sender, User receiver);
+    Set<Message> getMessagesBySender(User sender);
 }

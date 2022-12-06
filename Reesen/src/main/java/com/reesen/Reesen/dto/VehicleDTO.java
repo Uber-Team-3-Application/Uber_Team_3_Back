@@ -2,7 +2,6 @@ package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.model.Location;
 import com.reesen.Reesen.model.Vehicle;
-import com.reesen.Reesen.model.VehicleType;
 
 public class VehicleDTO {
 

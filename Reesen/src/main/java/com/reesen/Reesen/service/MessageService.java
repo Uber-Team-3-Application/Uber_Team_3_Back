@@ -26,7 +26,9 @@ public class MessageService implements IMessageService {
     }
 
     @Override
-    public Set<Message> findBySenderAndReceiver(User sender, User receiver) {
-        return this.messageRepository.findMessagesBySenderAndReceiver(sender, receiver);
+    public Set<Message> getMessagesBySender(User sender) {
+        return this.messageRepository.getMessagesBySender(sender);
     }
+
+
 }

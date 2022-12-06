@@ -1,9 +1,6 @@
 package com.reesen.Reesen.controller;
 
-import com.reesen.Reesen.dto.PanicDTO;
-import com.reesen.Reesen.dto.PanicRideDTO;
-import com.reesen.Reesen.dto.PanicTotalDTO;
-import com.reesen.Reesen.dto.UserDTO;
+import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.User;
 import com.reesen.Reesen.service.interfaces.IPanicService;
@@ -53,13 +50,11 @@ public class PanicController {
         PanicRideDTO panicRideDTO = new PanicRideDTO();
         panicRideDTO.setDriver(new UserDTO(
                 Long.parseLong("123"),
-                "user@example.com",
-                "VOZAC"));
+                "user@example.com"));
 
         panicRideDTO.addPassenger(new UserDTO(
                 Long.parseLong("123"),
-                "user@example.com",
-                "PUTNIK"));
+                "user@example.com"));
 
         panicRideDTO.setBabyTransport(true);
         panicRideDTO.setPetTransport(true);

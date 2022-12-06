@@ -27,6 +27,8 @@ public class PassengerDTO {
 		this.isConfirmedMail = passenger.isConfirmedMail();
 		this.amountOfMoney = passenger.getAmountOfMoney();
 	}
+
+
 	
 	public PassengerDTO() {}
 

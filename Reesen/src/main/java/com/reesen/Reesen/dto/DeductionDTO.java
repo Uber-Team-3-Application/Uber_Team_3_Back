@@ -6,49 +6,16 @@ import com.reesen.Reesen.model.Deduction;
 
 public class DeductionDTO {
 
-	private Long id;
-	private Long userId;
-	private Long rideId;
 	private String reason;
-	private Date deductionTime;
+	private Date timeOfRejection;
 
 	public DeductionDTO() {
 
 	}
-	public DeductionDTO(String reason, Date deductionTime){
+
+	public DeductionDTO(String reason, Date timeOfRejection) {
 		this.reason = reason;
-		this.deductionTime = deductionTime;
-	}
-	public DeductionDTO(Deduction deduction) {
-		this.id = deduction.getId();
-		this.userId = deduction.getUser().getId();
-		this.rideId = deduction.getRide().getId();
-		this.reason = deduction.getReason();
-		this.deductionTime = deduction.getDeductionTime();
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public Long getUserId() {
-		return userId;
-	}
-
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}
-
-	public Long getRideId() {
-		return rideId;
-	}
-
-	public void setRideId(Long rideId) {
-		this.rideId = rideId;
+		this.timeOfRejection = timeOfRejection;
 	}
 
 	public String getReason() {
@@ -59,15 +26,14 @@ public class DeductionDTO {
 		this.reason = reason;
 	}
 
-	public Date getDeductionTime() {
-		return deductionTime;
+	public Date getTimeOfRejection() {
+		return timeOfRejection;
 	}
 
-	public void setDeductionTime(Date deductionTime) {
-		this.deductionTime = deductionTime;
+	public void setTimeOfRejection(Date timeOfRejection) {
+		this.timeOfRejection = timeOfRejection;
 	}
+
+
 }
-	
-	
-
 
