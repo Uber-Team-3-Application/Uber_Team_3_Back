@@ -1,9 +1,6 @@
 package com.reesen.Reesen.controller;
 
-import com.reesen.Reesen.dto.PanicDTO;
-import com.reesen.Reesen.dto.PanicRideDTO;
-import com.reesen.Reesen.dto.PanicTotalDTO;
-import com.reesen.Reesen.dto.UserDTO;
+import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.User;
 import com.reesen.Reesen.service.interfaces.IPanicService;

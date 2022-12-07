@@ -37,8 +37,7 @@ public class DeductionDTO {
 	public void setTimeOfRejection(Date deductionTime) {
 		this.timeOfRejection = deductionTime;
 	}
-}
-	
-	
 
+
+}
 

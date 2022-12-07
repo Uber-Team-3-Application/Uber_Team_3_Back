@@ -1,4 +1,4 @@
-package com.reesen.Reesen.dto;
+package com.reesen.Reesen.dto.Passenger;
 
 import com.reesen.Reesen.model.Passenger;
 
@@ -27,6 +27,8 @@ public class PassengerDTO {
 		this.isConfirmedMail = passenger.isConfirmedMail();
 		this.amountOfMoney = passenger.getAmountOfMoney();
 	}
+
+
 	
 	public PassengerDTO() {}
 

@@ -123,6 +123,35 @@ public class DriverController {
     public ResponseEntity<VehicleDTO> addVehicle(@RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId){
         return new ResponseEntity<>(VehicleMockup.getVehicleDTO(), HttpStatus.OK);
     }
+
+
+    /**
+     *
+     *  GET MAPPINGS
+     *
+     * **/
+
+
+    @GetMapping
+    public ResponseEntity<Paginated<DriverDTO>> getDrivers(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size
+    ){
+
+        Paginated<DriverDTO> driverPaginated = new Paginated<>(243);
+        driverPaginated.add(DriverMockup.getDriver());
+        return new ResponseEntity<>(driverPaginated, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<DriverDTO> getDriver(@PathVariable Long id){
+
+        //Driver driver = this.driverService.findOne(id);
+        //if(driver == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        return new ResponseEntity<>(DriverMockup.getDriver(), HttpStatus.OK);
+    }
+
             /**
              *
              *  POST Working Hours
@@ -194,7 +223,7 @@ public class DriverController {
              * **/
 
     @GetMapping(value = "/{id}/working-hours")
-    public ResponseEntity<WorkingHoursPaginated> getWorkingHours(
+    public ResponseEntity<Paginated<WorkingHoursDTO>> getWorkingHours(
             @PathVariable("id") Long driverId,
             @RequestParam("page") int page,
             @RequestParam("size") int size,
@@ -202,7 +231,20 @@ public class DriverController {
             @RequestParam("to") String to
     )
     {
-        WorkingHoursPaginated workingHoursPaginated = WorkingHoursMockup.getWorkingHours();
+        Paginated<WorkingHoursDTO> workingHoursPaginated = new Paginated<WorkingHoursDTO>(243);
+        WorkingHoursDTO workingHoursDTO = new WorkingHoursDTO();
+        workingHoursDTO.setId(Long.parseLong("10"));
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        java.util.Date date = null;
+        try {
+            date = sdf.parse("10-10-2022");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        workingHoursDTO.setStart(date);
+        workingHoursDTO.setEnd(date);
+        workingHoursPaginated.add(workingHoursDTO);
+
         return new ResponseEntity<>(workingHoursPaginated, HttpStatus.OK);
     }
     @GetMapping(value = "/working-hour/{working-hour-id}")
@@ -223,7 +265,7 @@ public class DriverController {
      * **/
 
     @GetMapping(value = "/{id}/ride")
-    public ResponseEntity<DriverRidePaginated> getRides(
+    public ResponseEntity<Paginated<DriverRideMockup>> getRides(
             @PathVariable("id") Long driverId,
             @RequestParam("page") int page,
             @RequestParam("size") int size,
@@ -232,9 +274,9 @@ public class DriverController {
             @RequestParam("to") String to)
     {
 
-        DriverRidePaginated driverRidePaginated = new DriverRidePaginated(243);
-        DriverRideMockup ride = new DriverRideMockup(driverId);
-        driverRidePaginated.addDriverRide(ride);
+        Paginated<DriverRideMockup> driverRidePaginated = new Paginated<DriverRideMockup>(243);
+        DriverRideMockup ride = new DriverRideMockup(123);
+        driverRidePaginated.add(ride);
 
         return new ResponseEntity<>(driverRidePaginated, HttpStatus.OK);
     }

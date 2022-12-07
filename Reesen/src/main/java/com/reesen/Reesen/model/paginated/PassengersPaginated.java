@@ -1,25 +1,26 @@
 package com.reesen.Reesen.model.paginated;
 
-import com.reesen.Reesen.mockup.DriverRideMockup;
+import com.reesen.Reesen.dto.Passenger.PassengerDTO;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class DriverRidePaginated {
-
+public class PassengersPaginated {
     private int totalCount;
-    private Set<DriverRideMockup> results;
+    private Set<PassengerDTO> results;
 
+    public PassengersPaginated(){
 
-    public DriverRidePaginated(int totalCount) {
+    }
+
+    public PassengersPaginated(int totalCount) {
         this.totalCount = totalCount;
         this.results = new HashSet<>();
     }
 
-    public void addDriverRide(DriverRideMockup ride){
-        this.results.add(ride);
+    public void addPassenger(PassengerDTO passenger){
+        this.results.add(passenger);
     }
-
     public int getTotalCount() {
         return totalCount;
     }
@@ -28,11 +29,12 @@ public class DriverRidePaginated {
         this.totalCount = totalCount;
     }
 
-    public Set<DriverRideMockup> getResults() {
+    public Set<PassengerDTO> getResults() {
         return results;
     }
 
-    public void setResults(Set<DriverRideMockup> results) {
+    public void setResults(Set<PassengerDTO> results) {
         this.results = results;
     }
+
 }
