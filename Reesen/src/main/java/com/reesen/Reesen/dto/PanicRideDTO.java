@@ -18,8 +18,8 @@ public class PanicRideDTO {
     private String vehicleType;
     private boolean babyTransport;
     private boolean petTransport;
-    private Set<RouteDTO> locations;
     private DeductionDTO rejection;
+    private Set<RouteDTO> locations;
 
     public PanicRideDTO(){
         this.passengers = new HashSet<>();
