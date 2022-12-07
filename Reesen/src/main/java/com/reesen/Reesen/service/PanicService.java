@@ -58,7 +58,7 @@ public class PanicService implements IPanicService {
                 Long.parseLong("123"),
                 "user@example.com"
                 ));
-
+        panicRideDTO.setId(Long.parseLong("123"));
         panicRideDTO.setBabyTransport(true);
         panicRideDTO.setPetTransport(true);
         panicRideDTO.setEstimatedTimeInMinutes(5);
@@ -67,9 +67,15 @@ public class PanicService implements IPanicService {
         panicRideDTO.setTotalCost(1235);
         panicRideDTO.setVehicleType("STANDARDNO");
 
-        PanicLocationDTO panicLocationDTO = new PanicLocationDTO(new Location(45.267136, 19.833549, "Bulevar oslobodjenja 46"));
-        panicRideDTO.addLocation(panicLocationDTO);
 
+        PanicLocationDTO panicLocationDTO = new PanicLocationDTO(new Location(45.267136, 19.833549, "Bulevar oslobodjenja 46"));
+        LocationDTO departure = new LocationDTO("Bulevar oslobodjenja 46", 45.267136, 19.833549);
+        LocationDTO destination = new LocationDTO("Bulevar oslobodjenja 46", 45.267136, 19.833549);
+
+        panicRideDTO.addLocation(new RouteDTO(departure, destination));
+        panicRideDTO.setRejection(
+                new DeductionDTO("Ride is canceled due to previous problems with the passenger",
+                        Date.from(Instant.now())));
         panicDTO.setRide(panicRideDTO);
         panicTotalDTO.addPanicDTO(panicDTO);
         return panicTotalDTO;
