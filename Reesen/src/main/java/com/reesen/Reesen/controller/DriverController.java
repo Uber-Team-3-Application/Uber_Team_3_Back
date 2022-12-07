@@ -135,7 +135,7 @@ public class DriverController {
              *  POST Working Hours
              *
              * **/
-    @PostMapping(value = "/{id}/working-hours")
+    @PostMapping(value = "/{id}/working-hour")
     public ResponseEntity<WorkingHoursDTO> createWorkingHours(@PathVariable("id") Long driverId){
 
         WorkingHoursDTO workingHours = new WorkingHoursDTO();
@@ -202,7 +202,7 @@ public class DriverController {
              *
              * **/
 
-    @GetMapping(value = "/{id}/working-hours")
+    @GetMapping(value = "/{id}/working-hour")
     public ResponseEntity<Paginated<WorkingHoursDTO>> getWorkingHours(
             @PathVariable("id") Long driverId,
             @RequestParam("page") int page,
@@ -227,6 +227,7 @@ public class DriverController {
 
         return new ResponseEntity<>(workingHoursPaginated, HttpStatus.OK);
     }
+
     @GetMapping(value = "/working-hour/{working-hour-id}")
     public ResponseEntity<WorkingHoursDTO> getDetailsAboutWorkingHours(
             @PathVariable("working-hour-id") Long workingHourId)
@@ -266,9 +267,9 @@ public class DriverController {
      *  DELETE MAPPINGS
      *
      * **/
-    @DeleteMapping(value = "/{id}/documents")
-    public ResponseEntity<String> deleteDocuments(@PathVariable("id") Long id){
-        return new ResponseEntity<>("Driver deleted successfully", HttpStatus.NO_CONTENT);
+    @DeleteMapping(value = "/document/{document-id}")
+    public ResponseEntity<String> deleteDocuments(@PathVariable("document-id") Long id){
+        return new ResponseEntity<>("Driver document deleted successfully", HttpStatus.NO_CONTENT);
     }
 
 }
