@@ -3,13 +3,11 @@ package com.reesen.Reesen.service;
 import com.reesen.Reesen.dto.CreatedDriverDTO;
 import com.reesen.Reesen.dto.DriverDTO;
 import com.reesen.Reesen.model.Driver;
-import com.reesen.Reesen.model.paginated.DriverPaginated;
+import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.repository.DriverRepository;
 import com.reesen.Reesen.service.interfaces.IDriverService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.awt.print.Pageable;
 
 @Service
 public class DriverService implements IDriverService {
@@ -41,13 +39,13 @@ public class DriverService implements IDriverService {
         driver.setAddress(driverDTO.getAddress());
         driver.setPassword(driverDTO.getPassword());
         driver.setId(Long.parseLong("123"));
-        this.driverRepository.save(driver);
+        //this.driverRepository.save(driver);
         return new CreatedDriverDTO(driver);
     }
 
     @Override
-    public DriverPaginated getDriverPaginated() {
-        DriverPaginated driverPaginated = new DriverPaginated(243);
+    public Paginated<CreatedDriverDTO> getDriverPaginated() {
+        Paginated<CreatedDriverDTO> driverPaginated = new Paginated<>(243);
         CreatedDriverDTO createdDriverDTO = new CreatedDriverDTO();
         createdDriverDTO.setId(Long.parseLong("123"));
         createdDriverDTO.setName("Pera");
@@ -56,7 +54,7 @@ public class DriverService implements IDriverService {
         createdDriverDTO.setTelephoneNumber("+381123123");
         createdDriverDTO.setEmail("pera.peric@email.com");
         createdDriverDTO.setAddress("Bulevar Oslobodjenja 74");
-        driverPaginated.addDriver(createdDriverDTO);
+        driverPaginated.addResult(createdDriverDTO);
         return driverPaginated;
     }
 }

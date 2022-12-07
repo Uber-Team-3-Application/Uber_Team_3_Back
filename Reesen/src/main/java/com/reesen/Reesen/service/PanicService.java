@@ -67,7 +67,7 @@ public class PanicService implements IPanicService {
         panicRideDTO.setTotalCost(1235);
         panicRideDTO.setVehicleType("STANDARDNO");
 
-        PanicLocationDTO panicLocationDTO = new PanicLocationDTO(new Location("Bulevar oslobodjenja 46", 45.267136, 19.833549));
+        PanicLocationDTO panicLocationDTO = new PanicLocationDTO(new Location(45.267136, 19.833549, "Bulevar oslobodjenja 46"));
         panicRideDTO.addLocation(panicLocationDTO);
 
         panicDTO.setRide(panicRideDTO);
