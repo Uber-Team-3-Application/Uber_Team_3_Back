@@ -1,15 +1,15 @@
 package com.reesen.Reesen.mockup;
 
 import com.reesen.Reesen.dto.WorkingHoursDTO;
-import com.reesen.Reesen.model.paginated.WorkingHoursPaginated;
+import com.reesen.Reesen.model.paginated.Paginated;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 public class WorkingHoursMockup {
 
-    public static WorkingHoursPaginated getWorkingHours(){
-        WorkingHoursPaginated workingHoursPaginated = new WorkingHoursPaginated(243);
+    public static Paginated<WorkingHoursDTO> getWorkingHours(){
+        Paginated<WorkingHoursDTO> workingHoursPaginated = new Paginated<WorkingHoursDTO>(243);
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         java.util.Date date = null;
@@ -22,7 +22,7 @@ public class WorkingHoursMockup {
         workingHoursDTO.setId(Long.parseLong("10"));
         workingHoursDTO.setStart(date);
         workingHoursDTO.setEnd(date);
-        workingHoursPaginated.addWorkingHours(workingHoursDTO);
+        workingHoursPaginated.addResult(workingHoursDTO);
         return workingHoursPaginated;
     }
 }

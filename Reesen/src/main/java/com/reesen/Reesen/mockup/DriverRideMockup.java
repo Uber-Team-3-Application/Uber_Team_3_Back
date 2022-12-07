@@ -27,7 +27,7 @@ public class DriverRideMockup {
         this.id = id;
         locations = new HashSet<>();
         passengers = new HashSet<>();
-        Location location = new Location("Bulevar Oslobodjenja 74", 45.267136, 19.833549);
+        Location location = new Location( 45.267136, 19.833549, "Bulevar Oslobodjenja 74");
         locations.add(new CurrentLocationDTO(location));
         rejection = new DeductionDTO(
                         "Ride is canceled due to previous problems with the passenger",
