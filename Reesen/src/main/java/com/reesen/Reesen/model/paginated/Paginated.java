@@ -12,6 +12,9 @@ public class Paginated<T> {
         this.totalCount = totalCount;
         this.results = new HashSet<>();
     }
+    public void addResult(T result){
+        this.results.add(result);
+    }
 
     public Paginated(int totalCount, Set<T> results) {
         this.totalCount = totalCount;

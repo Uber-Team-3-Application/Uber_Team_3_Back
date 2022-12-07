@@ -1,8 +1,6 @@
 package com.reesen.Reesen.mockup;
 
-import com.reesen.Reesen.dto.DeductionDTO;
-import com.reesen.Reesen.dto.UserDTO;
-import com.reesen.Reesen.dto.UserTypeDTO;
+import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.Location;
 
 import java.time.Instant;
@@ -13,8 +11,8 @@ import java.util.Set;
 public class DriverRideMockup {
 
     private  Long id;
-    private  Set<Location> locations;
-    private  Set<DeductionDTO> rejections;
+    private  Set<CurrentLocationDTO> locations;
+    private  DeductionDTO rejection;
     private  Date startTime;
     private  Date endTime;
     private  double totalCost;
@@ -25,24 +23,19 @@ public class DriverRideMockup {
     private  boolean babyTransport;
     private  boolean petTransport;
 
-    public DriverRideMockup(){
-        id = Long.parseLong("10");
+    public DriverRideMockup(Long id){
+        this.id = id;
         locations = new HashSet<>();
         passengers = new HashSet<>();
-        rejections = new HashSet<>();
-        locations.add(new Location( 45.267136, 19.833549, "Bulevar oslobodjenja 46"));
-        locations.add(new Location(45.267136, 19.833549, "Bulevar Oslobodjenja 61"));
-        rejections.add(
-                new DeductionDTO(
+        Location location = new Location("Bulevar Oslobodjenja 74", 45.267136, 19.833549);
+        locations.add(new CurrentLocationDTO(location));
+        rejection = new DeductionDTO(
                         "Ride is canceled due to previous problems with the passenger",
-                        Date.from(Instant.now())
-
-        ));
+                        Date.from(Instant.now()));
         startTime = Date.from(Instant.now());
         endTime = Date.from(Instant.now());
         totalCost = 1235;
-        driver = new UserDTO("user@example.com");
-        driver.setId(Long.parseLong("123"));
+        driver = new UserDTO(Long.parseLong("123"), "user@example.com");
 
         UserDTO passenger = new UserDTO(Long.parseLong("123"), "user@example.com");
         passengers.add(passenger);
@@ -61,20 +54,20 @@ public class DriverRideMockup {
         this.id = id;
     }
 
-    public Set<Location> getLocations() {
+    public Set<CurrentLocationDTO> getLocations() {
         return locations;
     }
 
-    public void setLocations(Set<Location> locations) {
+    public void setLocations(Set<CurrentLocationDTO> locations) {
         this.locations = locations;
     }
 
-    public Set<DeductionDTO> getRejections() {
-        return rejections;
+    public DeductionDTO getRejection() {
+        return rejection;
     }
 
-    public void setRejections(Set<DeductionDTO> rejections) {
-        this.rejections = rejections;
+    public void setRejection(DeductionDTO rejections) {
+        this.rejection = rejections;
     }
 
     public Date getStartTime() {
