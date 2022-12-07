@@ -3,9 +3,7 @@ package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.mockup.*;
-import com.reesen.Reesen.model.paginated.DriverPaginated;
-import com.reesen.Reesen.model.paginated.DriverRidePaginated;
-import com.reesen.Reesen.model.paginated.WorkingHoursPaginated;
+import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.service.interfaces.IDocumentService;
 import com.reesen.Reesen.service.interfaces.IDriverService;
 import com.reesen.Reesen.service.interfaces.IVehicleService;
@@ -132,26 +130,6 @@ public class DriverController {
      * **/
 
 
-    @GetMapping
-    public ResponseEntity<Paginated<DriverDTO>> getDrivers(
-            @RequestParam("page") int page,
-            @RequestParam("size") int size
-    ){
-
-        Paginated<DriverDTO> driverPaginated = new Paginated<>(243);
-        driverPaginated.add(DriverMockup.getDriver());
-        return new ResponseEntity<>(driverPaginated, HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<DriverDTO> getDriver(@PathVariable Long id){
-
-        //Driver driver = this.driverService.findOne(id);
-        //if(driver == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
-        return new ResponseEntity<>(DriverMockup.getDriver(), HttpStatus.OK);
-    }
-
             /**
              *
              *  POST Working Hours
@@ -181,15 +159,17 @@ public class DriverController {
      *
      * **/
 
-
     @GetMapping
-    public ResponseEntity<DriverPaginated> getDrivers(
+    public ResponseEntity<Paginated<CreatedDriverDTO>> getDrivers(
             @RequestParam("page") int page,
             @RequestParam("size") int size
     ){
-        DriverPaginated driverPaginated = this.driverService.getDriverPaginated();
+
+        Paginated<CreatedDriverDTO> driverPaginated = new Paginated<>(243);
+        driverPaginated.add(DriverMockup.getDriver(Long.parseLong("123")));
         return new ResponseEntity<>(driverPaginated, HttpStatus.OK);
     }
+
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<CreatedDriverDTO> getDriver(@PathVariable Long id){
@@ -275,7 +255,7 @@ public class DriverController {
     {
 
         Paginated<DriverRideMockup> driverRidePaginated = new Paginated<DriverRideMockup>(243);
-        DriverRideMockup ride = new DriverRideMockup(123);
+        DriverRideMockup ride = new DriverRideMockup(Long.parseLong("123"));
         driverRidePaginated.add(ride);
 
         return new ResponseEntity<>(driverRidePaginated, HttpStatus.OK);

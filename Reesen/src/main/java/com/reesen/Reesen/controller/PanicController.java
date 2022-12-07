@@ -1,8 +1,6 @@
 package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.*;
-import com.reesen.Reesen.model.Ride;
-import com.reesen.Reesen.model.User;
 import com.reesen.Reesen.service.interfaces.IPanicService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +10,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.Instant;
-import java.util.Date;
 
 @CrossOrigin
 @RestController

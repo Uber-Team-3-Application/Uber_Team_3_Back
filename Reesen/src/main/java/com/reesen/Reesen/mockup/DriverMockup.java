@@ -5,6 +5,7 @@ import com.reesen.Reesen.dto.DriverDTO;
 import com.reesen.Reesen.model.Driver;
 
 public class DriverMockup {
+
     public static CreatedDriverDTO getDriver(Long id){
         CreatedDriverDTO driver = new CreatedDriverDTO();
         driver.setId(id);
