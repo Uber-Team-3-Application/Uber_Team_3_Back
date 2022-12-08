@@ -69,7 +69,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<TokenDTO> logIn(@RequestBody LoginDTO login) {
-        return new ResponseEntity<>(TokenMockup.gwetToken(), HttpStatus.OK);
+        return new ResponseEntity<>(TokenMockup.getToken(), HttpStatus.OK);
     }
 
 
