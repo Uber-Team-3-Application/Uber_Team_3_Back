@@ -2,7 +2,6 @@ package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.model.Location;
 import com.reesen.Reesen.model.Vehicle;
-import com.reesen.Reesen.model.VehicleType;
 
 public class VehicleDTO {
 
@@ -11,7 +10,7 @@ public class VehicleDTO {
     private String vehicleType;
     private String model;
     private String licenseNumber;
-    private Location currentLocation;
+    private CurrentLocationDTO currentLocation;
     private int passengerSeats;
     private boolean babyTransport;
     private boolean petTransport;
@@ -26,11 +25,19 @@ public class VehicleDTO {
         this.vehicleType = vehicle.getType().getName().toString();
         this.model = vehicle.getModel();
         this.licenseNumber = vehicle.getRegistrationPlate();
-        this.currentLocation = vehicle.getCurrentLocation();
+        this.currentLocation = new CurrentLocationDTO(vehicle.getCurrentLocation());
         this.passengerSeats = vehicle.getPassengerSeats();
         this.babyTransport = vehicle.isBabyAccessible();
         this.petTransport = vehicle.isPetAccessible();
 
+    }
+
+    public CurrentLocationDTO getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public void setCurrentLocation(CurrentLocationDTO currentLocation) {
+        this.currentLocation = currentLocation;
     }
 
     public Long getId() {
@@ -73,13 +80,7 @@ public class VehicleDTO {
         this.licenseNumber = licenseNumber;
     }
 
-    public Location getCurrentLocation() {
-        return currentLocation;
-    }
 
-    public void setCurrentLocation(Location currentLocation) {
-        this.currentLocation = currentLocation;
-    }
 
     public int getPassengerSeats() {
         return passengerSeats;

@@ -2,28 +2,20 @@ package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.model.Location;
 
-public class LocationDTO {
+public class CurrentLocationDTO {
 
     private String address;
-	private double latitude;
-	private double longitude;
-	
-    public LocationDTO() {
+    private double latitude;
+    private double longitude;
+
+    public CurrentLocationDTO() {
     }
 
-    public LocationDTO(String address, double latitude, double longitude) {
-        this.address = address;
-        this.latitude = latitude;
-        this.longitude = longitude;
-    }
-
-    public LocationDTO(Location location) {
-
-        this.latitude = location.getLatitude();
-        this.longitude = location.getLongitude();
+    public CurrentLocationDTO(Location location) {
         this.address = location.getAddress();
+        this.latitude = location.getLongitude();
+        this.longitude = location.getLongitude();
     }
-
 
     public String getAddress() {
         return address;
@@ -45,5 +37,7 @@ public class LocationDTO {
         return longitude;
     }
 
-
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
 }

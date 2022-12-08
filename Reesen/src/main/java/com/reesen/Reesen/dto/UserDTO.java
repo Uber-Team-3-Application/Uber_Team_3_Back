@@ -1,25 +1,24 @@
 package com.reesen.Reesen.dto;
 
+
 public class UserDTO {
+
     private Long id;
     private String email;
-    private String type;
 
-    public UserDTO(String email, String type) {
+    public UserDTO(){
+        
+    }
+    public UserDTO(String email) {
         this.email = email;
-        this.type = type;
+
     }
 
-    public UserDTO(Long id, String email, String type) {
+    public UserDTO(Long id, String email) {
         this.id = id;
         this.email = email;
-        this.type = type;
+
     }
-
-    public UserDTO() {
-    }
-
-
 
     public Long getId() {
         return id;
@@ -37,11 +36,4 @@ public class UserDTO {
         this.email = email;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
 }
