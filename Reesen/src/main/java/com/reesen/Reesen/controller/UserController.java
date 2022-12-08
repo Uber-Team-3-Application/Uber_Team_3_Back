@@ -16,7 +16,7 @@ import java.util.*;
 
 @CrossOrigin
 @RestController
-@RequestMapping("api/user")
+@RequestMapping("api")
 public class UserController {
     private final IUserService userService;
     private final IMessageService messageService;
@@ -35,7 +35,7 @@ public class UserController {
 
     }
 
-    @GetMapping("/{id}/ride")
+    @GetMapping("/user/{id}/ride")
     public ResponseEntity<Paginated<RideDTO>> getRide(
             @PathVariable("id") int id,
             @RequestParam("page") int page,
@@ -52,7 +52,7 @@ public class UserController {
     }
 
 
-    @GetMapping()
+    @GetMapping("/user")
     public ResponseEntity<Paginated<UserFullDTO>> getUsers(
             @RequestParam("page") int page,
             @RequestParam("size") int size
@@ -67,13 +67,13 @@ public class UserController {
     }
 
 
-    @PostMapping("api/login")
-    public ResponseEntity<TokenDTO> logIn(@RequestBody UserDTO userDTO) {
-        return new ResponseEntity<>(TokenMockup.getToken(), HttpStatus.OK);
+    @PostMapping("/login")
+    public ResponseEntity<TokenDTO> logIn(@RequestBody LoginDTO login) {
+        return new ResponseEntity<>(TokenMockup.gwetToken(), HttpStatus.OK);
     }
 
 
-    @GetMapping("/{id}/message")
+    @GetMapping("/user/{id}/message")
     public ResponseEntity<Paginated<MessageFullDTO>> getUserMessages(
             @PathVariable int id) {
 
@@ -83,7 +83,7 @@ public class UserController {
     }
 
 
-    @PostMapping("/{id}/message")
+    @PostMapping("/user/{id}/message")
     public ResponseEntity<MessageFullDTO> sendMessageToTheUser(
             @PathVariable int id,
             @RequestBody MessageDTO messageDto
@@ -91,29 +91,30 @@ public class UserController {
         return new ResponseEntity<>(MessageMockup.getMessage(), HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}/block")
+    @PutMapping("/user/{id}/block")
     public ResponseEntity<Void> blockUser(@PathVariable int id) {
         return new ResponseEntity<>(HttpStatus.OK);
 
     }
 
-    @PutMapping("/{id}/unblock")
+    @PutMapping("/user/{id}/unblock")
     public ResponseEntity<Void> unblockUser(@PathVariable int id) {
         return new ResponseEntity<>(HttpStatus.OK);
 
     }
 
-    @PostMapping("/{id}/note")
+    @PostMapping("/user/{id}/note")
     public ResponseEntity<RemarkDTO> createNote(
             @PathVariable int id,
-            @RequestBody MessageSingleDTO message
+            @RequestBody String message
     ) {
 
-        RemarkDTO remarkDto = new RemarkDTO(Long.parseLong("10"), Date.from(Instant.now()), message.getMessage());
+
+        RemarkDTO remarkDto = new RemarkDTO(Long.parseLong("10"), Date.from(Instant.now()), MessageMockup.getMessageInfo());
         return new ResponseEntity<>(remarkDto, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}/note")
+    @GetMapping("/user/{id}/note")
     public ResponseEntity<Paginated<RemarkDTO>> getNotes(
             @PathVariable int id,
             @RequestParam int page,
