@@ -34,44 +34,7 @@ public class PanicController {
     @GetMapping
     public ResponseEntity<PanicTotalDTO> getPanicNotifications(){
 
-        PanicTotalDTO panicTotalDTO = new PanicTotalDTO();
-        panicTotalDTO.setTotalCount(243);
-
-        PanicDTO panicDTO = new PanicDTO();
-        panicDTO.setId(Long.parseLong("10"));
-        panicDTO.setTime(Date.from(Instant.now()));
-        panicDTO.setReason("Driver is drinking while driving");
-
-        panicDTO.setUser(new User(
-                "Pera",
-                "Peric",
-                "U3dhZ2dlciByb2Nrcw==",
-                "+381123123",
-                "pera.peric@email.com",
-                "Bulevar Oslobodjenja 74"));
-
-        PanicRideDTO panicRideDTO = new PanicRideDTO();
-        panicRideDTO.setDriver(new UserDTO(
-                Long.parseLong("123"),
-                "user@example.com",
-                "VOZAC"));
-
-        panicRideDTO.addPassenger(new UserDTO(
-                Long.parseLong("123"),
-                "user@example.com",
-                "PUTNIK"));
-
-        panicRideDTO.setBabyTransport(true);
-        panicRideDTO.setPetTransport(true);
-        panicRideDTO.setEstimatedTimeInMinutes(5);
-        panicRideDTO.setStartTime(Date.from(Instant.now()));
-        panicRideDTO.setEndTime(Date.from(Instant.now()));
-        panicRideDTO.setTotalCost(1235);
-
-        panicDTO.setRide(panicRideDTO);
-
-        panicTotalDTO.addPanicDTO(panicDTO);
-
+        PanicTotalDTO panicTotalDTO = this.panicService.getPanicTotalDTO();
         return new ResponseEntity<>(panicTotalDTO, HttpStatus.OK);
 
     }
