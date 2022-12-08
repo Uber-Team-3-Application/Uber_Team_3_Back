@@ -1,12 +1,13 @@
 package com.reesen.Reesen.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.reesen.Reesen.Enums.TypeOfMessage;
 import com.reesen.Reesen.model.Message;
 
 import java.util.Date;
 
-public class MessageFullDTO {
+public class    MessageFullDTO {
 
     private Long id;
     private Date timeOfSending;

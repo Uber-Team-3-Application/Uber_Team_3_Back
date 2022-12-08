@@ -1,5 +1,7 @@
 package com.reesen.Reesen.dto;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+
 public class ReviewWithPassengerDTO {
     private Long id;
     private int rating;
