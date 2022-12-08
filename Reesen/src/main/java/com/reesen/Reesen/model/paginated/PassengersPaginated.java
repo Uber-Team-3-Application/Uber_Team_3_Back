@@ -1,6 +1,6 @@
 package com.reesen.Reesen.model.paginated;
 
-import com.reesen.Reesen.dto.Passenger.PassengerDTO;
+import com.reesen.Reesen.dto.PassengerDTO;
 
 import java.util.HashSet;
 import java.util.Set;
