@@ -16,7 +16,7 @@ import java.util.*;
 
 @CrossOrigin
 @RestController
-@RequestMapping("api")
+@RequestMapping("api/user")
 public class UserController {
     private final IUserService userService;
     private final IMessageService messageService;
@@ -35,7 +35,7 @@ public class UserController {
 
     }
 
-    @GetMapping("/user/{id}/ride")
+    @GetMapping("/{id}/ride")
     public ResponseEntity<Paginated<RideDTO>> getRide(
             @PathVariable("id") int id,
             @RequestParam("page") int page,
@@ -52,7 +52,7 @@ public class UserController {
     }
 
 
-    @GetMapping("/user")
+    @GetMapping
     public ResponseEntity<Paginated<UserFullDTO>> getUsers(
             @RequestParam("page") int page,
             @RequestParam("size") int size
@@ -73,7 +73,7 @@ public class UserController {
     }
 
 
-    @GetMapping("/user/{id}/message")
+    @GetMapping("/{id}/message")
     public ResponseEntity<Paginated<MessageFullDTO>> getUserMessages(
             @PathVariable int id) {
 
@@ -83,43 +83,43 @@ public class UserController {
     }
 
 
-    @PostMapping("/user/{id}/message")
+    @PostMapping("/{id}/message")
     public ResponseEntity<MessageFullDTO> sendMessageToTheUser(
             @PathVariable int id,
             @RequestBody MessageDTO messageDto
     ) {
-        return new ResponseEntity<>(MessageMockup.getMessage(), HttpStatus.CREATED);
+        return new ResponseEntity<>(MessageMockup.getMessage(), HttpStatus.OK);
     }
 
-    @PutMapping("/user/{id}/block")
+    @PutMapping("/{id}/block")
     public ResponseEntity<Void> blockUser(@PathVariable int id) {
         return new ResponseEntity<>(HttpStatus.OK);
 
     }
 
-    @PutMapping("/user/{id}/unblock")
+    @PutMapping("/{id}/unblock")
     public ResponseEntity<Void> unblockUser(@PathVariable int id) {
         return new ResponseEntity<>(HttpStatus.OK);
 
     }
 
-    @PostMapping("/user/{id}/note")
+    @PostMapping("/{id}/note")
     public ResponseEntity<RemarkDTO> createNote(
             @PathVariable int id,
             @RequestBody String message
     ) {
 
-
         RemarkDTO remarkDto = new RemarkDTO(Long.parseLong("10"), Date.from(Instant.now()), MessageMockup.getMessageInfo());
         return new ResponseEntity<>(remarkDto, HttpStatus.OK);
     }
 
-    @GetMapping("/user/{id}/note")
+    @GetMapping("/{id}/note")
     public ResponseEntity<Paginated<RemarkDTO>> getNotes(
             @PathVariable int id,
             @RequestParam int page,
             @RequestParam int size
     ) {
+
         HashSet<RemarkDTO> set = new HashSet<>();
         set.add(new RemarkDTO(Long.parseLong("10"), Date.from(Instant.now()), "The passenger has requested and after that aborted the ride"));
         Paginated<RemarkDTO> remarksDTO = new Paginated<>(243, set);
