@@ -122,13 +122,7 @@ public class DriverController {
         return new ResponseEntity<>(VehicleMockup.getVehicleDTO(), HttpStatus.OK);
     }
 
-
-    /**
-     *
-     *  GET MAPPINGS
-     *
-     * **/
-
+    
 
             /**
              *
