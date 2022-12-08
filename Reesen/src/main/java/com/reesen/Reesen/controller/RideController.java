@@ -16,11 +16,6 @@ public class RideController {
     @PostMapping
     public ResponseEntity<RideDTO> createRide(@RequestBody RideDTO rideDTO){
         Ride ride = new Ride();
-        //ride.setRoutes(rideDTO.getRoutes());
-        //ride.setPassengers(rideDTO.getPassengers());
-        ride.setVehicleType(rideDTO.getVehicleType());
-        ride.setBabyAccessible(rideDTO.isBabyAccessible());
-        ride.setPetAccessible(rideDTO.isPetAccessible());
         return new ResponseEntity<>(new RideDTO(ride), HttpStatus.CREATED);
     }
 
@@ -64,19 +59,6 @@ public class RideController {
     @PutMapping(value = "/{id}/cancel")
     public ResponseEntity<RideDTO> cancelRide(@RequestBody RideDTO rideDTO, @PathVariable Long id, @PathVariable String reason){
         RideDTO ride = new RideDTO();
-        ride.setId(Long.parseLong("546"));
-        ride.setTimeOfStart(rideDTO.getTimeOfStart());
-        ride.setTimeOfEnd(rideDTO.getTimeOfEnd());
-        ride.setTotalPrice(rideDTO.getTotalPrice());
-        ride.setDriverId(rideDTO.getDriverId());
-       // ride.setPassengers(rideDTO.getPassengers());
-        ride.setEstimatedTime(rideDTO.getEstimatedTime());
-        ride.setVehicleType(rideDTO.getVehicleType());
-        ride.setBabyAccessible(rideDTO.isBabyAccessible());
-        ride.setPetAccessible(rideDTO.isPetAccessible());
-       // ride.setRejections(rideDTO.getRejections());
-      //  ride.setLocations(rideDTO.getLocations());
-        ride.setStatus(rideDTO.getStatus());
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
 }
