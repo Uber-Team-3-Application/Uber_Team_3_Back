@@ -1,6 +1,7 @@
 package com.reesen.Reesen.mockup;
 
 import com.reesen.Reesen.dto.DeductionDTO;
+import com.reesen.Reesen.dto.LocationDTO;
 import com.reesen.Reesen.dto.RouteDTO;
 import com.reesen.Reesen.dto.UserDTO;
 import com.reesen.Reesen.model.Location;
@@ -31,8 +32,8 @@ public class PassengerRideMockup {
         rejection = new HashSet<>();
         locations.add(
                 new RouteDTO(
-                        new Location("Kuca Poso", 45.267136, 19.833549),
-                        new Location("Poso Kuca", 45.267136, 19.833549)
+                        new LocationDTO("Kuca Poso", 45.267136, 19.833549),
+                        new LocationDTO("Poso Kuca", 45.267136, 19.833549)
                 ));
         rejection.add(
                 new DeductionDTO(
@@ -43,10 +44,9 @@ public class PassengerRideMockup {
         startTime = Date.from(Instant.now());
         endTime = Date.from(Instant.now());
         totalCost = 1235;
-        driver = new UserDTO("user@example.com", "VOZAC");
-        driver.setId(Long.parseLong("123"));
+        driver = new UserDTO(Long.parseLong("123"), "user@gmail.com");
 
-        UserDTO passenger = new UserDTO(Long.parseLong("123"), "user@example.com", "PUTNIK");
+        UserDTO passenger = new UserDTO(Long.parseLong("123"), "user@gmail.com");
         passengers.add(passenger);
         estimatedTimeInMinutes = 5;
         vehicleType = "STANDARDNO";

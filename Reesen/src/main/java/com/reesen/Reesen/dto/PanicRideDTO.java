@@ -8,6 +8,7 @@ import java.util.Set;
 
 public class PanicRideDTO {
 
+    private Long id;
     private Date startTime;
     private Date endTime;
     private double totalCost;
@@ -17,7 +18,8 @@ public class PanicRideDTO {
     private String vehicleType;
     private boolean babyTransport;
     private boolean petTransport;
-    private Set<PanicLocationDTO> locations;
+    private DeductionDTO rejection;
+    private Set<RouteDTO> locations;
 
     public PanicRideDTO(){
         this.passengers = new HashSet<>();
@@ -29,11 +31,12 @@ public class PanicRideDTO {
     }
 
 
-    public void addLocation(PanicLocationDTO location){
+    public void addLocation(RouteDTO location){
         this.locations.add(location);
     }
-    public PanicRideDTO(Date startTime, Date endTime, double totalCost, UserDTO driver, Set<UserDTO> passengers, int estimatedTimeInMinutes, String vehicleType, boolean babyTransport, boolean petTransport
-    , Set<PanicLocationDTO> locations) {
+    public PanicRideDTO(Long id, Date startTime, Date endTime, double totalCost, UserDTO driver, Set<UserDTO> passengers, int estimatedTimeInMinutes, String vehicleType, boolean babyTransport, boolean petTransport
+    , Set<RouteDTO> locations, DeductionDTO rejection) {
+        this.id = id;
         this.startTime = startTime;
         this.endTime = endTime;
         this.totalCost = totalCost;
@@ -44,13 +47,31 @@ public class PanicRideDTO {
         this.babyTransport = babyTransport;
         this.petTransport = petTransport;
         this.locations = locations;
+        this.rejection = rejection;
     }
 
-    public Set<PanicLocationDTO> getLocations() {
+    public DeductionDTO getRejection() {
+        return rejection;
+    }
+
+    public void setRejection(DeductionDTO rejection) {
+        this.rejection = rejection;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Set<RouteDTO> getLocations() {
         return locations;
     }
 
-    public void setLocations(Set<PanicLocationDTO> locations) {
+    public void setLocations(Set<RouteDTO> locations) {
+
         this.locations = locations;
     }
 

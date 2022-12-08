@@ -5,45 +5,32 @@ import com.reesen.Reesen.model.Location;
 
 public class RouteDTO {
 	
-    private Long id;
-    private Location departure;
-    private Location destination;
+    private LocationDTO departure;
+    private LocationDTO destination;
     
 	public RouteDTO() {
 
 	}
 
-	public RouteDTO(Location departure, Location destination) {
+	public RouteDTO(LocationDTO departure, LocationDTO destination) {
 		this.departure = departure;
 		this.destination = destination;
 	}
 
-	public RouteDTO(Route route) {
-		this.id = route.getId();
-		this.departure = route.getDeparture();
-		this.destination = route.getDestination();
-	}
 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public Location getDeparture() {
+	public LocationDTO getDeparture() {
 		return departure;
 	}
 
-	public void setDeparture(Location startLocationId) {
-		this.departure = startLocationId;
+	public void setDeparture(LocationDTO departure) {
+		this.departure = departure;
 	}
 
-	public Location getDestination() { return destination;}
+	public LocationDTO getDestination() {
+		return destination;
+	}
 
-	public void setDestination(Location destination) {
+	public void setDestination(LocationDTO destination) {
 		this.destination = destination;
 	}
-
 }

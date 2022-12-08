@@ -23,11 +23,12 @@ public class Location implements Serializable {
     public Location() {
     }
 
-    public Location(String address, double latitude, double longitude) {
+    public Location(double latitude, double longitude, String address) {
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
     }
+
 
     public Long getId() {
         return id;
