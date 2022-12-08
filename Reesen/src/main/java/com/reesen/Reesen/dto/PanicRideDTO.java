@@ -20,6 +20,7 @@ public class PanicRideDTO {
     private boolean petTransport;
     private DeductionDTO rejection;
     private Set<RouteDTO> locations;
+    private Set<PanicLocationDTO> locations;
 
     public PanicRideDTO(){
         this.passengers = new HashSet<>();
@@ -71,6 +72,7 @@ public class PanicRideDTO {
     }
 
     public void setLocations(Set<RouteDTO> locations) {
+
         this.locations = locations;
     }
 

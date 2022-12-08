@@ -59,6 +59,7 @@ public class PanicService implements IPanicService {
                 "user@example.com"
                 ));
         panicRideDTO.setId(Long.parseLong("123"));
+
         panicRideDTO.setBabyTransport(true);
         panicRideDTO.setPetTransport(true);
         panicRideDTO.setEstimatedTimeInMinutes(5);
