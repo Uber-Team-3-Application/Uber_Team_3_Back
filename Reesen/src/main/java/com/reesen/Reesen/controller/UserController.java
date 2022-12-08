@@ -44,22 +44,6 @@ public class UserController {
             @RequestParam("from") String from,
             @RequestParam("to") String to
     ) {
-//        User user = userService.findOne(id);
-//        Set<RideDTOWithoutRejection> rides = new HashSet<>();
-//        if (driverService.findOne(id) != null) {
-//            for (Ride ride : ((Driver)user).getRides()) {
-//                RideDTOWithoutRejection rideDTO = new RideDTOWithoutRejection(ride);
-//                rides.add(rideDTO);
-//            }
-//        }
-//        else {
-//            if (passengerService.findOne(id) != null) {
-//                for (Ride ride : ((Passenger)user).getRides()) {
-//                    RideDTOWithoutRejection rideDTO = new RideDTOWithoutRejection(ride);
-//                    rides.add(rideDTO);
-//                }
-//            }
-//        }
         Set<RideDTO> rides = new HashSet<>();
         rides.add(RideMockupForUserGet.getRide());
         Paginated<RideDTO> ridePaginated = new Paginated<>(243, rides);
@@ -93,12 +77,6 @@ public class UserController {
     public ResponseEntity<Paginated<MessageFullDTO>> getUserMessages(
             @PathVariable int id) {
 
-//        User sender = this.userService.findOne(id);
-//        Set<Message> messages = messageService.getMessagesBySender(sender);
-//        Set<MessageDTO> retVal = new HashSet<>();
-//        for (Message message : messages) {
-//            retVal.add(new MessageDTO(message));
-//        }
         Set<MessageFullDTO> messages = new HashSet<>();
         messages.add(MessageMockup.getMessage());
         return new ResponseEntity<>(new Paginated<>(243, messages), HttpStatus.OK);
@@ -110,28 +88,17 @@ public class UserController {
             @PathVariable int id,
             @RequestBody MessageDTO messageDto
     ) {
-//        User sender = this.userService.findOne(id);
-//        User receiver = this.userService.findOne(messageDto.getReceiverId());
-//
-//        Message message = new Message(sender, receiver, messageDto.getMessage(), Date.from(Instant.now()), messageDto.getType());
-//        message = this.messageService.save(message);
         return new ResponseEntity<>(MessageMockup.getMessage(), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}/block")
     public ResponseEntity<Void> blockUser(@PathVariable int id) {
-//        User user = this.userService.findOne((long) id);
-//        user.setBlocked(true);
-//        userService.save(user);
         return new ResponseEntity<>(HttpStatus.OK);
 
     }
 
     @PutMapping("/{id}/unblock")
     public ResponseEntity<Void> unblockUser(@PathVariable int id) {
-//        User user = this.userService.findOne((long) id);
-//        user.setBlocked(false);
-//        userService.save(user);
         return new ResponseEntity<>(HttpStatus.OK);
 
     }
@@ -141,10 +108,6 @@ public class UserController {
             @PathVariable int id,
             @RequestBody MessageSingleDTO message
     ) {
-//        User user = userService.findOne(id);
-//        Remark remark = new Remark(remarkDTO.getMessage(), user);
-//        remarkService.save(remark);
-//        RemarkDTO remarkDto = new RemarkDTO(id, Date.from(Instant.now()), remark.getMessage()); // KOJI DATUM SE PROSLEDJUJE ????
 
         RemarkDTO remarkDto = new RemarkDTO(Long.parseLong("10"), Date.from(Instant.now()), message.getMessage());
         return new ResponseEntity<>(remarkDto, HttpStatus.OK);
@@ -156,14 +119,6 @@ public class UserController {
             @RequestParam int page,
             @RequestParam int size
     ) {
-
-//        User user = userService.findOne(id);
-//        Set<Remark> remarks = remarkService.getRemarksByUser(user);
-//        Set<RemarkDTO> remarksDto = new HashSet<>();
-//        for (Remark remark : remarks) {
-//            remarksDto.add(new RemarkDTO(remark));
-//        }
-
         HashSet<RemarkDTO> set = new HashSet<>();
         set.add(new RemarkDTO(Long.parseLong("10"), Date.from(Instant.now()), "The passenger has requested and after that aborted the ride"));
         Paginated<RemarkDTO> remarksDTO = new Paginated<>(243, set);
