@@ -1,6 +1,6 @@
 package com.reesen.Reesen.mockup;
 
-import com.reesen.Reesen.dto.Passenger.PassengerDTO;
+import com.reesen.Reesen.dto.PassengerDTO;
 
 public class PassengerMockup {
     public static PassengerDTO passenger;

@@ -8,6 +8,7 @@ import java.util.Set;
 
 public class PanicRideDTO {
 
+    private Long id;
     private Date startTime;
     private Date endTime;
     private double totalCost;
@@ -17,16 +18,25 @@ public class PanicRideDTO {
     private String vehicleType;
     private boolean babyTransport;
     private boolean petTransport;
+    private DeductionDTO rejection;
+    private Set<RouteDTO> locations;
 
     public PanicRideDTO(){
         this.passengers = new HashSet<>();
+        this.locations = new HashSet<>();
     }
 
     public void addPassenger(UserDTO passenger){
         this.passengers.add(passenger);
     }
 
-    public PanicRideDTO(Date startTime, Date endTime, double totalCost, UserDTO driver, Set<UserDTO> passengers, int estimatedTimeInMinutes, String vehicleType, boolean babyTransport, boolean petTransport) {
+
+    public void addLocation(RouteDTO location){
+        this.locations.add(location);
+    }
+    public PanicRideDTO(Long id, Date startTime, Date endTime, double totalCost, UserDTO driver, Set<UserDTO> passengers, int estimatedTimeInMinutes, String vehicleType, boolean babyTransport, boolean petTransport
+    , Set<RouteDTO> locations, DeductionDTO rejection) {
+        this.id = id;
         this.startTime = startTime;
         this.endTime = endTime;
         this.totalCost = totalCost;
@@ -36,6 +46,33 @@ public class PanicRideDTO {
         this.vehicleType = vehicleType;
         this.babyTransport = babyTransport;
         this.petTransport = petTransport;
+        this.locations = locations;
+        this.rejection = rejection;
+    }
+
+    public DeductionDTO getRejection() {
+        return rejection;
+    }
+
+    public void setRejection(DeductionDTO rejection) {
+        this.rejection = rejection;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Set<RouteDTO> getLocations() {
+        return locations;
+    }
+
+    public void setLocations(Set<RouteDTO> locations) {
+
+        this.locations = locations;
     }
 
     public Date getStartTime() {

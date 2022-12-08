@@ -2,9 +2,13 @@ package com.reesen.Reesen.dto;
 
 
 public class UserDTO {
+
     private Long id;
     private String email;
 
+    public UserDTO(){
+        
+    }
     public UserDTO(String email) {
         this.email = email;
 
