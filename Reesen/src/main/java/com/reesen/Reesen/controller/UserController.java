@@ -93,13 +93,13 @@ public class UserController {
 
     @PutMapping("/{id}/block")
     public ResponseEntity<Void> blockUser(@PathVariable int id) {
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
     }
 
     @PutMapping("/{id}/unblock")
     public ResponseEntity<Void> unblockUser(@PathVariable int id) {
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
     }
 
