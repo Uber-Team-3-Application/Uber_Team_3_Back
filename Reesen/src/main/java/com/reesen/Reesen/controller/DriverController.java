@@ -3,6 +3,7 @@ package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.mockup.*;
+import com.reesen.Reesen.model.Document;
 import com.reesen.Reesen.model.Driver;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.service.interfaces.IDocumentService;
@@ -13,10 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.swing.text.html.Option;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -115,7 +119,16 @@ public class DriverController {
 
     @PostMapping(value = "/{id}/documents")
     public ResponseEntity<DocumentDTO> addDocument(@RequestBody DocumentDTO documentDTO, @PathVariable("id") Long driverId){
-        return new ResponseEntity<>(DocumentMockup.getDocumentDTO(), HttpStatus.OK);
+
+        if(driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Optional<Driver> driver = this.driverService.findOne(driverId);
+        if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Document document = new Document(documentDTO.getName(), documentDTO.getDocumentImage(), driver.get());
+        document = this.documentService.save(document);
+
+        return new ResponseEntity<>(new DocumentDTO(document), HttpStatus.OK);
 
     }
 
@@ -196,7 +209,15 @@ public class DriverController {
 
     @GetMapping(value = "/{id}/documents")
     public ResponseEntity<Set<DocumentDTO>> getDocument(@PathVariable("id") Long id){
-        return new ResponseEntity<>(DocumentMockup.getDocumentsDTO(id), HttpStatus.OK);
+
+        if(id < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Optional<Driver> driver = this.driverService.findOne(id);
+        if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        List<Document> documents = this.documentService.findAllByDriverId(driver.get().getId());
+
+        return new ResponseEntity<>(this.documentService.getDocumentDTOS(documents), HttpStatus.OK);
 
     }
             /*
@@ -281,6 +302,11 @@ public class DriverController {
      * **/
     @DeleteMapping(value = "/document/{document-id}")
     public ResponseEntity<String> deleteDocuments(@PathVariable("document-id") Long id){
+
+        if(id < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(this.documentService.findOne(id).isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        this.documentService.delete(id);
         return new ResponseEntity<>("Driver document deleted successfully", HttpStatus.NO_CONTENT);
     }
 
