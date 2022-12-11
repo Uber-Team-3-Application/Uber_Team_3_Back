@@ -1,4 +1,4 @@
-package com.reesen.Reesen.dto.Passenger;
+package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.model.Passenger;
 

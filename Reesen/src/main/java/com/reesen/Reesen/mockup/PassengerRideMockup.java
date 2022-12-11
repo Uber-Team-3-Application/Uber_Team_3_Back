@@ -5,7 +5,6 @@ import com.reesen.Reesen.dto.LocationDTO;
 import com.reesen.Reesen.dto.RouteDTO;
 import com.reesen.Reesen.dto.UserDTO;
 import com.reesen.Reesen.model.Location;
-import com.reesen.Reesen.model.Route;
 
 import java.time.Instant;
 import java.util.Date;
@@ -15,7 +14,7 @@ import java.util.Set;
 public class PassengerRideMockup {
     private  Long id;
     private Set<RouteDTO> locations;
-    private  Set<DeductionDTO> rejections;
+    private  Set<DeductionDTO> rejection;
     private Date startTime;
     private  Date endTime;
     private  double totalCost;
@@ -30,13 +29,13 @@ public class PassengerRideMockup {
         id = Long.parseLong("10");
         locations = new HashSet<>();
         passengers = new HashSet<>();
-        rejections = new HashSet<>();
+        rejection = new HashSet<>();
         locations.add(
                 new RouteDTO(
                         new LocationDTO("Kuca Poso", 45.267136, 19.833549),
                         new LocationDTO("Poso Kuca", 45.267136, 19.833549)
                 ));
-        rejections.add(
+        rejection.add(
                 new DeductionDTO(
                         "Ride is canceled due to previous problems with the passenger",
                         Date.from(Instant.now())
@@ -72,12 +71,12 @@ public class PassengerRideMockup {
         this.locations = locations;
     }
 
-    public Set<DeductionDTO> getRejections() {
-        return rejections;
+    public Set<DeductionDTO> getRejection() {
+        return rejection;
     }
 
-    public void setRejections(Set<DeductionDTO> rejections) {
-        this.rejections = rejections;
+    public void setRejection(Set<DeductionDTO> rejection) {
+        this.rejection = rejection;
     }
 
     public Date getStartTime() {

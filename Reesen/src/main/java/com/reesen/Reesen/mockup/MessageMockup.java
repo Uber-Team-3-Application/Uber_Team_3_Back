@@ -21,4 +21,8 @@ public class MessageMockup {
         messageFullDTO.setRideId(Long.parseLong("123"));
         return messageFullDTO;
     }
+
+    public static String getMessageInfo() {
+        return "The passenger has requested and after that aborted the ride";
+    }
 }

@@ -22,6 +22,6 @@ public class VehicleController {
 
     @PutMapping(value = "/{vehicleId}/location")
     public ResponseEntity<String> updateLocation(@RequestBody LocationDTO locationDTO, @PathVariable Long vehicleId){
-        return new ResponseEntity<>("Coordinates successfully updated", HttpStatus.OK);
+        return new ResponseEntity<>("Coordinates successfully updated", HttpStatus.NO_CONTENT);
     }
 }
