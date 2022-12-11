@@ -1,7 +1,8 @@
-package com.reesen.Reesen.dto.Ride;
+package com.reesen.Reesen.dto;
 
 import java.util.Date;
 
+<<<<<<< Updated upstream:Reesen/src/main/java/com/reesen/Reesen/dto/Ride/RideDTO.java
 import com.reesen.Reesen.Enums.RideStatus;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.VehicleType;
@@ -19,6 +20,29 @@ public class RideDTO {
     private boolean isBabyAccessible;
     private boolean isPetAccessible;
     private VehicleType vehicleType;
+=======
+import java.util.Set;
+
+import com.reesen.Reesen.Enums.RideStatus;
+import com.reesen.Reesen.Enums.VehicleName;
+import com.reesen.Reesen.model.*;
+
+public class RideDTO {
+
+	private Long id;
+	private Set<RouteDTO> locations;
+	private DeductionDTO rejection;
+ 	private Date startTime;
+ 	private Date endTime;
+ 	private double totalCost;
+ 	private UserDTO driver;
+ 	private Set<UserDTO> passengers;
+ 	private double estimatedTimeInMinutes;
+ 	private VehicleTypeDTO vehicleType;
+ 	private boolean babyTransport;
+ 	private boolean petTransport;
+	 private RideStatus status;
+>>>>>>> Stashed changes:Reesen/src/main/java/com/reesen/Reesen/dto/RideDTO.java
 
     public RideDTO(){
 
@@ -26,6 +50,7 @@ public class RideDTO {
 
 	public RideDTO(Ride ride) {
 		this.id = ride.getId();
+<<<<<<< Updated upstream:Reesen/src/main/java/com/reesen/Reesen/dto/Ride/RideDTO.java
 		this.timeOfStart = ride.getTimeOfStart();
 		this.timeOfEnd = ride.getTimeOfEnd();
 		this.totalPrice = ride.getTotalPrice();
@@ -36,6 +61,42 @@ public class RideDTO {
 		this.isBabyAccessible = ride.isBabyAccessible();
 		this.isPetAccessible = ride.isPetAccessible();
 		this.vehicleType = ride.getVehicleType();
+=======
+		this.startTime = ride.getTimeOfStart();
+		this.endTime = ride.getTimeOfEnd();
+		this.totalCost = ride.getTotalPrice();
+		this.estimatedTimeInMinutes = ride.getEstimatedTime();
+		this.babyTransport = ride.isBabyAccessible();
+		this.petTransport = ride.isPetAccessible();
+		this.status = ride.getStatus();
+		setPassengers(ride);
+		setVehicleType(ride);
+		this.rejection = new DeductionDTO(ride.getDeduction().getReason(), ride.getDeduction().getDeductionTime());
+	}
+
+
+	private void setPassengers(Ride ride) {
+		for (Passenger passenger : ride.getPassengers()) {
+			passengers.add(new UserDTO(passenger.getId(), passenger.getEmail()));
+		}
+	}
+
+	private void setVehicleType(Ride ride) {
+		if (ride.getVehicleType().getName() == VehicleName.VAN)
+			this.vehicleType = VehicleTypeDTO.KOMBI;
+		else if (ride.getVehicleType().getName() == VehicleName.LUXURY)
+			this.vehicleType = VehicleTypeDTO.LUKSUZNO;
+		else if (ride.getVehicleType().getName() == VehicleName.STANDARD)
+			this.vehicleType = VehicleTypeDTO.STANDARDNO;
+	}
+
+	public DeductionDTO getRejection() {
+		return rejection;
+	}
+
+	public void setRejection(DeductionDTO rejection) {
+		this.rejection = rejection;
+>>>>>>> Stashed changes:Reesen/src/main/java/com/reesen/Reesen/dto/RideDTO.java
 	}
 
 	public Long getId() {
@@ -126,4 +187,11 @@ public class RideDTO {
 		this.vehicleType = vehicleType;
 	}
 
+	public RideStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(RideStatus status) {
+		this.status = status;
+	}
 }
