@@ -1,5 +1,6 @@
 package com.reesen.Reesen.model;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import jakarta.persistence.*;
 
 import java.io.Serializable;

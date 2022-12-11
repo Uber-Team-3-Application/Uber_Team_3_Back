@@ -26,12 +26,12 @@ public class PassengerController {
         passenger.setEmail(passengerDTO.getEmail());
         passenger.setAddress(passengerDTO.getAddress());
         passenger.setPassword(passengerDTO.getPassword());
-        return new ResponseEntity<>(new PassengerDTO(passenger), HttpStatus.OK);
+        return new ResponseEntity<>(new PassengerDTO(passenger), HttpStatus.CREATED);
     }
 
     @GetMapping(value = "/activate/{activationId}")
     public ResponseEntity<String> activatePassenger(@PathVariable Long activationId){
-        return new ResponseEntity<>("Successful account activation", HttpStatus.OK);
+        return new ResponseEntity<>("Successful account activation", HttpStatus.CREATED);
     }
 
     @GetMapping

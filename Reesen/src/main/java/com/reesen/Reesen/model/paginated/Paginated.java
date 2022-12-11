@@ -1,27 +1,22 @@
 package com.reesen.Reesen.model.paginated;
 
-import com.reesen.Reesen.dto.WorkingHoursDTO;
-
 import java.util.HashSet;
 import java.util.Set;
 
-public class WorkingHoursPaginated {
-
+public class Paginated<T> {
     private int totalCount;
-    private Set<WorkingHoursDTO> results;
+    private Set<T> results;
 
-    public WorkingHoursPaginated(){
 
-    }
-    public WorkingHoursPaginated(int totalCount) {
+    public Paginated(int totalCount) {
         this.totalCount = totalCount;
         this.results = new HashSet<>();
     }
-
-    public void addWorkingHours(WorkingHoursDTO workingHoursDTO){
-        this.results.add(workingHoursDTO);
+    public void addResult(T result){
+        this.results.add(result);
     }
-    public WorkingHoursPaginated(int totalCount, Set<WorkingHoursDTO> results) {
+
+    public Paginated(int totalCount, Set<T> results) {
         this.totalCount = totalCount;
         this.results = results;
     }
@@ -34,11 +29,15 @@ public class WorkingHoursPaginated {
         this.totalCount = totalCount;
     }
 
-    public Set<WorkingHoursDTO> getResults() {
+    public Set<T> getResults() {
         return results;
     }
 
-    public void setResults(Set<WorkingHoursDTO> results) {
+    public void setResults(Set<T> results) {
         this.results = results;
+    }
+
+    public void add(T t) {
+        this.results.add(t);
     }
 }

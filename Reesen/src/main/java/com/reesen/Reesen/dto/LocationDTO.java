@@ -3,7 +3,7 @@ package com.reesen.Reesen.dto;
 import com.reesen.Reesen.model.Location;
 
 public class LocationDTO {
-	private Long id;
+
     private String address;
 	private double latitude;
 	private double longitude;
@@ -11,20 +11,19 @@ public class LocationDTO {
     public LocationDTO() {
     }
 
+    public LocationDTO(String address, double latitude, double longitude) {
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
     public LocationDTO(Location location) {
-    	this.id = location.getId();
-        this.address = location.getAddress();
-        this.latitude = location.getLongitude();
+
+        this.latitude = location.getLatitude();
         this.longitude = location.getLongitude();
+        this.address = location.getAddress();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getAddress() {
         return address;
@@ -46,7 +45,5 @@ public class LocationDTO {
         return longitude;
     }
 
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
+
 }
