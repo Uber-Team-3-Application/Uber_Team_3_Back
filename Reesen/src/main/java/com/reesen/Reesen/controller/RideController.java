@@ -26,12 +26,12 @@ public class RideController {
         return new ResponseEntity<>(new RideMockup(), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/active/{driverId}")
+    @GetMapping(value = "/driver/{driverId}/active")
     public ResponseEntity<RideMockup> getDriverActiveRide(@PathVariable("driverId") Long driverId){
         return new ResponseEntity<>(new RideMockup(), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/active/{passengerId}")
+    @GetMapping(value = "/passenger/{passengerId}/active")
     public ResponseEntity<RideMockup> getPassengerActiveRide(@PathVariable("passengerId") Long passengerId){
         return new ResponseEntity<>(new RideMockup(), HttpStatus.OK);
     }
