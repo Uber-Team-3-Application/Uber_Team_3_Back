@@ -9,6 +9,8 @@ import com.reesen.Reesen.service.interfaces.IDriverService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class DriverService implements IDriverService {
     private final DriverRepository driverRepository;
@@ -24,8 +26,18 @@ public class DriverService implements IDriverService {
     }
 
     @Override
-    public Driver findOne(Long id) {
-        return this.driverRepository.findById(id).orElseGet(null);
+    public Optional<Driver> findOne(Long id) {
+        return this.driverRepository.findById(id);
+    }
+
+    @Override
+    public Driver findByEmail(String email){
+        return this.driverRepository.findByEmail(email);
+    }
+
+    @Override
+    public Driver findByEmailAndId(String email, Long id) {
+        return this.driverRepository.findByEmailAndId(email, id);
     }
 
     @Override
@@ -39,8 +51,7 @@ public class DriverService implements IDriverService {
         driver.setAddress(driverDTO.getAddress());
         driver.setPassword(driverDTO.getPassword());
         driver.setId(Long.parseLong("123"));
-        //this.driverRepository.save(driver);
-        return new CreatedDriverDTO(driver);
+        return new CreatedDriverDTO(this.driverRepository.save(driver));
     }
 
     @Override
@@ -56,5 +67,18 @@ public class DriverService implements IDriverService {
         createdDriverDTO.setAddress("Bulevar Oslobodjenja 74");
         driverPaginated.addResult(createdDriverDTO);
         return driverPaginated;
+    }
+
+    public Driver getDriverFromDriverDTO(Long id, DriverDTO driverDTO){
+        Driver driver = new Driver();
+        driver.setEmail(driverDTO.getEmail());
+        driver.setName(driverDTO.getName());
+        driver.setSurname(driverDTO.getSurname());
+        driver.setProfilePicture(driverDTO.getProfilePicture());
+        driver.setTelephoneNumber(driverDTO.getTelephoneNumber());
+        driver.setAddress(driverDTO.getAddress());
+        driver.setId(id);
+        driver.setPassword(driverDTO.getPassword());
+        return driver;
     }
 }

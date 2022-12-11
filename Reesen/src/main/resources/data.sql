@@ -8,3 +8,6 @@ values('Nemanja', 'Stefanovic', 'profilna', '+38121521', 'nemus@gmail.com', 'Nem
 
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address)
 values('Marko', 'Preradovic', 'profilna', '+38121521', 'markopreradovic@gmail.com', 'Marko123', false, true, 'Kurtijeva 12, Novi Sad');
+
+insert into Drivers(id) values(1);
+insert into Drivers(id) values(2);

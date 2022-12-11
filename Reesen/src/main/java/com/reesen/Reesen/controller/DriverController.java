@@ -3,6 +3,7 @@ package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.mockup.*;
+import com.reesen.Reesen.model.Driver;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.service.interfaces.IDocumentService;
 import com.reesen.Reesen.service.interfaces.IDriverService;
@@ -16,6 +17,7 @@ import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.Set;
 
 @CrossOrigin
@@ -47,16 +49,19 @@ public class DriverController {
     @PutMapping(value = "/{id}")
     public ResponseEntity<CreatedDriverDTO> updateDriver(@RequestBody DriverDTO driverDTO, @PathVariable Long id){
 
-        CreatedDriverDTO driver = new CreatedDriverDTO();
-        driver.setEmail(driverDTO.getEmail());
-        driver.setName(driverDTO.getName());
-        driver.setSurname(driverDTO.getSurname());
-        driver.setProfilePicture(driverDTO.getProfilePicture());
-        driver.setTelephoneNumber(driverDTO.getTelephoneNumber());
-        driver.setAddress(driverDTO.getAddress());
-        driver.setId(id);
+        if(this.driverService.findOne(id).isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        return new ResponseEntity<>(driver, HttpStatus.OK);
+        Driver driver = this.driverService.findByEmail(driverDTO.getEmail());
+        if(driver!= null && !driver.getId().toString().equals(id.toString())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        driver = this.driverService.getDriverFromDriverDTO(id, driverDTO);
+        this.driverService.save(driver);
+        CreatedDriverDTO updatedDriver = new CreatedDriverDTO(driver);
+        return new ResponseEntity<>(updatedDriver, HttpStatus.OK);
+
+
+
     }
 
             /**
@@ -93,6 +98,10 @@ public class DriverController {
      * **/
     @PostMapping
     public ResponseEntity<CreatedDriverDTO> createDriver(@RequestBody DriverDTO driverDTO){
+
+        if(this.driverService.findByEmail(driverDTO.getEmail()) != null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
 
         CreatedDriverDTO createdDriverDTO = this.driverService.createDriverDTO(driverDTO);
         return new ResponseEntity<>(createdDriverDTO, HttpStatus.OK);
@@ -167,7 +176,16 @@ public class DriverController {
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<CreatedDriverDTO> getDriver(@PathVariable Long id){
-        return new ResponseEntity<>(DriverMockup.getDriver(id), HttpStatus.OK);
+
+        if(id < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Optional<Driver> driver = this.driverService.findOne(id);
+        if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        CreatedDriverDTO driverDTO = new CreatedDriverDTO(driver.get());
+
+        return new ResponseEntity<>(driverDTO, HttpStatus.OK);
+
     }
 
             /**

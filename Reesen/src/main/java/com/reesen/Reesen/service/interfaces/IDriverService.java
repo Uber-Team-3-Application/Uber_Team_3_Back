@@ -6,12 +6,18 @@ import com.reesen.Reesen.model.Driver;
 import com.reesen.Reesen.model.paginated.Paginated;
 
 import java.awt.print.Pageable;
+import java.util.Optional;
 
 public interface IDriverService {
     Driver save(Driver driver);
-    Driver findOne(Long id);
+    Optional<Driver> findOne(Long id);
 
 
     CreatedDriverDTO createDriverDTO(DriverDTO driverDTO);
     Paginated<CreatedDriverDTO> getDriverPaginated();
+
+    Driver findByEmail(String email);
+
+    Driver findByEmailAndId(String email, Long id);
+    Driver getDriverFromDriverDTO(Long id, DriverDTO driverDTO);
 }
