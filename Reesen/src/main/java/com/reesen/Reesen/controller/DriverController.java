@@ -3,13 +3,9 @@ package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.mockup.*;
-import com.reesen.Reesen.model.Document;
-import com.reesen.Reesen.model.Driver;
+import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.paginated.Paginated;
-import com.reesen.Reesen.service.interfaces.IDocumentService;
-import com.reesen.Reesen.service.interfaces.IDriverService;
-import com.reesen.Reesen.service.interfaces.IVehicleService;
-import com.reesen.Reesen.service.interfaces.IWorkingHoursService;
+import com.reesen.Reesen.service.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,16 +28,19 @@ public class DriverController {
     private final IDocumentService documentService;
     private final IVehicleService vehicleService;
     private final IWorkingHoursService workingHoursService;
+    private final ILocationService locationService;
 
     @Autowired
     public DriverController(IDriverService driverService,
                             IDocumentService documentService,
                             IVehicleService vehicleService,
-                            IWorkingHoursService workingHoursService){
+                            IWorkingHoursService workingHoursService,
+                            ILocationService locationService){
         this.driverService = driverService;
         this.documentService = documentService;
         this.vehicleService = vehicleService;
         this.workingHoursService = workingHoursService;
+        this.locationService = locationService;
     }
 
 
@@ -75,6 +74,20 @@ public class DriverController {
              * **/
     @PutMapping(value = "/{id}/vehicle")
     public ResponseEntity<VehicleDTO> updateVehicle(@RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId){
+
+        if(driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Optional<Driver> driver = this.driverService.findOne(driverId);
+        if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Vehicle vehicle = this.driverService.getVehicle(driverId);
+        if(vehicle == null){
+            //TODO create vehicle!!
+        }
+        //TODO EDIT VEHICLE
+
+
+
         return new ResponseEntity<>(VehicleMockup.getVehicleDTO(), HttpStatus.OK);
     }
 
@@ -141,7 +154,22 @@ public class DriverController {
 
     @PostMapping(value = "/{id}/vehicle")
     public ResponseEntity<VehicleDTO> addVehicle(@RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId){
-        return new ResponseEntity<>(VehicleMockup.getVehicleDTO(), HttpStatus.OK);
+
+        if(driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Optional<Driver> driver = this.driverService.findOne(driverId);
+        if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+
+        Location location = this.locationService.getLocation(vehicleDTO.getCurrentLocation());
+        Vehicle vehicle = this.vehicleService.createVehicle(vehicleDTO,location);
+        vehicle.setDriver(driver.get());
+
+        driver.get().setVehicle(vehicle);
+        this.driverService.save(driver.get());
+
+
+        return new ResponseEntity<>(new VehicleDTO(vehicle), HttpStatus.OK);
     }
 
     
@@ -227,7 +255,19 @@ public class DriverController {
             * **/
     @GetMapping(value = "/{id}/vehicle")
     public ResponseEntity<VehicleDTO> getVehicle(@PathVariable("id") Long id){
-        return new ResponseEntity<>(VehicleMockup.getVehicleDTO(), HttpStatus.OK);
+        if(id < 1 ) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        if(this.driverService.findOne(id).isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Vehicle vehicle = this.driverService.getVehicle(id);
+        if(vehicle == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Optional<VehicleType> type = this.vehicleService.findType(vehicle.getId());
+        Location location = this.vehicleService.findLocation(vehicle.getId());
+        type.ifPresent(vehicle::setType);
+        vehicle.setCurrentLocation(location);
+
+        return new ResponseEntity<>(new VehicleDTO(vehicle), HttpStatus.OK);
     }
             /*
              *

@@ -3,6 +3,7 @@ package com.reesen.Reesen.service;
 import com.reesen.Reesen.dto.CreatedDriverDTO;
 import com.reesen.Reesen.dto.DriverDTO;
 import com.reesen.Reesen.model.Driver;
+import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.repository.DriverRepository;
 import com.reesen.Reesen.service.interfaces.IDriverService;
@@ -80,5 +81,10 @@ public class DriverService implements IDriverService {
         driver.setId(id);
         driver.setPassword(driverDTO.getPassword());
         return driver;
+    }
+
+    @Override
+    public Vehicle getVehicle(Long driverId){
+        return this.driverRepository.getVehicle(driverId);
     }
 }
