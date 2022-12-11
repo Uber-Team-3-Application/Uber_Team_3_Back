@@ -1,26 +1,6 @@
 package com.reesen.Reesen.dto;
 
 import java.util.Date;
-
-<<<<<<< Updated upstream:Reesen/src/main/java/com/reesen/Reesen/dto/Ride/RideDTO.java
-import com.reesen.Reesen.Enums.RideStatus;
-import com.reesen.Reesen.model.Ride;
-import com.reesen.Reesen.model.VehicleType;
-
-public class RideDTO {
-
-    private Long id;
-    private Date timeOfStart;
-    private Date timeOfEnd;
-    private double totalPrice;
-    private Long driverId;
-    private double estimatedTime;
-    private RideStatus status;
-    private boolean isPanicPressed;
-    private boolean isBabyAccessible;
-    private boolean isPetAccessible;
-    private VehicleType vehicleType;
-=======
 import java.util.Set;
 
 import com.reesen.Reesen.Enums.RideStatus;
@@ -42,7 +22,6 @@ public class RideDTO {
  	private boolean babyTransport;
  	private boolean petTransport;
 	 private RideStatus status;
->>>>>>> Stashed changes:Reesen/src/main/java/com/reesen/Reesen/dto/RideDTO.java
 
     public RideDTO(){
 
@@ -50,18 +29,6 @@ public class RideDTO {
 
 	public RideDTO(Ride ride) {
 		this.id = ride.getId();
-<<<<<<< Updated upstream:Reesen/src/main/java/com/reesen/Reesen/dto/Ride/RideDTO.java
-		this.timeOfStart = ride.getTimeOfStart();
-		this.timeOfEnd = ride.getTimeOfEnd();
-		this.totalPrice = ride.getTotalPrice();
-		this.driverId = ride.getDriver().getId();
-		this.estimatedTime = ride.getEstimatedTime();
-		this.status = ride.getStatus();
-		this.isPanicPressed = ride.isPanicPressed();
-		this.isBabyAccessible = ride.isBabyAccessible();
-		this.isPetAccessible = ride.isPetAccessible();
-		this.vehicleType = ride.getVehicleType();
-=======
 		this.startTime = ride.getTimeOfStart();
 		this.endTime = ride.getTimeOfEnd();
 		this.totalCost = ride.getTotalPrice();
@@ -96,7 +63,6 @@ public class RideDTO {
 
 	public void setRejection(DeductionDTO rejection) {
 		this.rejection = rejection;
->>>>>>> Stashed changes:Reesen/src/main/java/com/reesen/Reesen/dto/RideDTO.java
 	}
 
 	public Long getId() {
@@ -107,84 +73,84 @@ public class RideDTO {
 		this.id = id;
 	}
 
-	public Date getTimeOfStart() {
-		return timeOfStart;
+	public Set<RouteDTO> getLocations() {
+		return locations;
 	}
 
-	public void setTimeOfStart(Date timeOfStart) {
-		this.timeOfStart = timeOfStart;
+	public void setLocations(Set<RouteDTO> locations) {
+		this.locations = locations;
 	}
 
-	public Date getTimeOfEnd() {
-		return timeOfEnd;
+	public Date getStartTime() {
+		return startTime;
 	}
 
-	public void setTimeOfEnd(Date timeOfEnd) {
-		this.timeOfEnd = timeOfEnd;
+	public void setStartTime(Date startTime) {
+		this.startTime = startTime;
 	}
 
-	public double getTotalPrice() {
-		return totalPrice;
+	public Date getEndTime() {
+		return endTime;
 	}
 
-	public void setTotalPrice(double totalPrice) {
-		this.totalPrice = totalPrice;
+	public void setEndTime(Date endTime) {
+		this.endTime = endTime;
 	}
 
-	public Long getDriverId() {
-		return driverId;
+	public double getTotalCost() {
+		return totalCost;
 	}
 
-	public void setDriverId(Long driverId) {
-		this.driverId = driverId;
+	public void setTotalCost(double totalCost) {
+		this.totalCost = totalCost;
 	}
 
-	public double getEstimatedTime() {
-		return estimatedTime;
+	public UserDTO getDriver() {
+		return driver;
 	}
 
-	public void setEstimatedTime(double estimatedTime) {
-		this.estimatedTime = estimatedTime;
+	public void setDriver(UserDTO driver) {
+		this.driver = driver;
 	}
 
-	public RideStatus getStatus() {
-		return status;
+	public Set<UserDTO> getPassengers() {
+		return passengers;
 	}
 
-	public void setStatus(RideStatus status) {
-		this.status = status;
+	public void setPassengers(Set<UserDTO> passengers) {
+		this.passengers = passengers;
 	}
 
-	public boolean isPanicPressed() {
-		return isPanicPressed;
+	public double getEstimatedTimeInMinutes() {
+		return estimatedTimeInMinutes;
 	}
 
-	public void setPanicPressed(boolean isPanicPressed) {
-		this.isPanicPressed = isPanicPressed;
+	public void setEstimatedTimeInMinutes(double estimatedTimeInMinutes) {
+		this.estimatedTimeInMinutes = estimatedTimeInMinutes;
 	}
 
-	public boolean isBabyAccessible() {
-		return isBabyAccessible;
-	}
-
-	public void setBabyAccessible(boolean isBabyAccessible) {
-		this.isBabyAccessible = isBabyAccessible;
-	}
-
-	public boolean isPetAccessible() {
-		return isPetAccessible;
-	}
-
-	public void setPetAccessible(boolean isPetAccessible) {
-		this.isPetAccessible = isPetAccessible;
-	}
-
-	public VehicleType getVehicleType() {
+	public VehicleTypeDTO getVehicleType() {
 		return vehicleType;
 	}
 
-	public void setVehicleType(VehicleType vehicleType) {
+	public void setVehicleType(VehicleTypeDTO vehicleType) {
 		this.vehicleType = vehicleType;
+	}
+
+	public boolean isBabyTransport() {
+		return babyTransport;
+	}
+
+	public void setBabyTransport(boolean babyTransport) {
+		this.babyTransport = babyTransport;
+	}
+
+	public boolean isPetTransport() {
+		return petTransport;
+	}
+
+	public void setPetTransport(boolean petTransport) {
+		this.petTransport = petTransport;
 	}
 
 	public RideStatus getStatus() {
