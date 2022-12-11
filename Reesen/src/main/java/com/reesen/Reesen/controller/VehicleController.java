@@ -21,7 +21,17 @@ public class VehicleController {
     }
 
     @PutMapping(value = "/{vehicleId}/location")
+<<<<<<< Updated upstream
+    public ResponseEntity<LocationDTO> updateLocation(@RequestBody VehicleDTO vehicleDTO, @PathVariable Long vehicleId){
+        LocationDTO locationDTO = new LocationDTO();
+        locationDTO.setId(Long.parseLong("1"));
+        locationDTO.setAddress("Poso Kuca");
+        locationDTO.setLongitude(46.123);
+        locationDTO.setLatitude(65.028);
+        return new ResponseEntity<>(locationDTO, HttpStatus.OK);
+=======
     public ResponseEntity<String> updateLocation(@RequestBody LocationDTO locationDTO, @PathVariable Long vehicleId){
-        return new ResponseEntity<>("Coordinates successfully updated", HttpStatus.OK);
+        return new ResponseEntity<>("Coordinates successfully updated", HttpStatus.NO_CONTENT);
+>>>>>>> Stashed changes
     }
 }

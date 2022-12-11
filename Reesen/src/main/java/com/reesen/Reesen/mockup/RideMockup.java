@@ -1,10 +1,7 @@
 package com.reesen.Reesen.mockup;
 
 import com.reesen.Reesen.Enums.RideStatus;
-import com.reesen.Reesen.dto.DeductionDTO;
-import com.reesen.Reesen.dto.LocationDTO;
-import com.reesen.Reesen.dto.RouteDTO;
-import com.reesen.Reesen.dto.UserDTO;
+import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.Location;
 
 import java.time.Instant;
@@ -15,7 +12,7 @@ import java.util.Set;
 public class RideMockup {
     private  Long id;
     private Set<RouteDTO> locations;
-    private  Set<DeductionDTO> rejection;
+    private  DeductionDTO rejection;
     private Date startTime;
     private  Date endTime;
     private  double totalCost;
@@ -31,17 +28,16 @@ public class RideMockup {
         id = Long.parseLong("10");
         locations = new HashSet<>();
         passengers = new HashSet<>();
-        rejection = new HashSet<>();
-        locations.add(
-                new RouteDTO(
-                        new LocationDTO( "Kuca Poso", 45.267136, 19.833549),
-                        new LocationDTO( "Poso Kuca", 45.267136, 19.833549)
-                ));
-        rejection.add(
+        rejection = (
                 new DeductionDTO(
                         "Ride is canceled due to previous problems with the passenger",
                         Date.from(Instant.now())
 
+                ));
+        locations.add(
+                new RouteDTO(
+                        new LocationDTO( "Kuca Poso", 45.267136, 19.833549),
+                        new LocationDTO( "Poso Kuca", 45.267136, 19.833549)
                 ));
         startTime = Date.from(Instant.now());
         endTime = Date.from(Instant.now());
@@ -56,6 +52,24 @@ public class RideMockup {
         babyTransport = true;
         petTransport = true;
         status = RideStatus.ACTIVE;
+    }
+
+    public RideDTO getRide(){
+        RideDTO ride = new RideDTO();
+        ride.setId(id);
+        ride.setDriver(driver);
+        ride.setLocations(locations);
+        ride.setPassengers(passengers);
+        ride.setEndTime(endTime);
+        ride.setRejection(rejection);
+        ride.setBabyTransport(babyTransport);
+        ride.setStartTime(startTime);
+        ride.setEstimatedTimeInMinutes(estimatedTimeInMinutes);
+        ride.setVehicleType(VehicleTypeDTO.valueOf(vehicleType));
+        ride.setStatus(status);
+        ride.setPetTransport(petTransport);
+        ride.setTotalCost(totalCost);
+        return ride;
     }
 
     public Long getId() {
@@ -74,11 +88,11 @@ public class RideMockup {
         this.locations = locations;
     }
 
-    public Set<DeductionDTO> getRejection() {
+    public DeductionDTO getRejection() {
         return rejection;
     }
 
-    public void setRejection(Set<DeductionDTO> rejection) {
+    public void setRejection(DeductionDTO rejection) {
         this.rejection = rejection;
     }
 
