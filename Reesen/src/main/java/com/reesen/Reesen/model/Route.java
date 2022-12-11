@@ -12,31 +12,17 @@ public class Route implements Serializable {
     private Long id;
 
     @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
-    @JoinColumn(name = "startLocationId")
-    private Location startLocation;
+    private Location departure;
 
     @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
-    @JoinColumn(name = "endLocationId")
-    private Location endLocation;
-
-    @Column
-    private double distanceKm;
+    private Location destination;
 
     public Route() {
     }
 
-    public Route(Location startLocation, Location endLocation, double distanceKm) {
-        this.startLocation = startLocation;
-        this.endLocation = endLocation;
-        this.distanceKm = distanceKm;
-    }
-
-    public double getDistanceKm() {
-        return distanceKm;
-    }
-
-    public void setDistanceKm(double distanceKm) {
-        this.distanceKm = distanceKm;
+    public Route(Location departure, Location destination) {
+        this.departure = departure;
+        this.destination = destination;
     }
 
     public Long getId() {
@@ -47,19 +33,19 @@ public class Route implements Serializable {
         this.id = id;
     }
 
-    public Location getStartLocation() {
-        return startLocation;
+    public Location getDeparture() {
+        return departure;
     }
 
-    public void setStartLocation(Location startLocation) {
-        this.startLocation = startLocation;
+    public void setDeparture(Location departure) {
+        this.departure = departure;
     }
 
-    public Location getEndLocation() {
-        return endLocation;
+    public Location getDestination() {
+        return destination;
     }
 
-    public void setEndLocation(Location endLocation) {
-        this.endLocation = endLocation;
+    public void setDestination(Location destination) {
+        this.destination = destination;
     }
 }

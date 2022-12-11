@@ -2,32 +2,42 @@ package com.reesen.Reesen.dto;
 
 import java.util.Date;
 
+import com.reesen.Reesen.model.Deduction;
+
 public class DeductionDTO {
 
-    private String reason;
-    private Date timeOfRejection;
+	private String reason;
+	private Date timeOfRejection;
 
-    public DeductionDTO(String reason, Date timeOfRejection) {
-        this.reason = reason;
-        this.timeOfRejection = timeOfRejection;
-    }
+	public DeductionDTO() {
 
-    public DeductionDTO() {
-    }
+	}
+	public DeductionDTO(String reason, Date timeOfRejection){
+		this.reason = reason;
+		this.timeOfRejection = timeOfRejection;
+	}
+	public DeductionDTO(Deduction deduction) {
+		this.reason = deduction.getReason();
+		this.timeOfRejection = deduction.getDeductionTime();
+	}
 
-    public String getReason() {
-        return reason;
-    }
 
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
+	public String getReason() {
+		return reason;
+	}
 
-    public Date getTimeOfRejection() {
-        return timeOfRejection;
-    }
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
 
-    public void setTimeOfRejection(Date timeOfRejection) {
-        this.timeOfRejection = timeOfRejection;
-    }
+	public Date getTimeOfRejection() {
+		return this.timeOfRejection;
+	}
+
+	public void setTimeOfRejection(Date deductionTime) {
+		this.timeOfRejection = deductionTime;
+	}
+
+
 }
+

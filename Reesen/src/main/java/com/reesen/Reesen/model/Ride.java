@@ -39,8 +39,9 @@ public class Ride implements Serializable {
     @Column
     private RideStatus status;
 
-    @OneToMany(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
-    private Set<Deduction> deductions;
+
+    @OneToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    private Deduction deduction;
 
     @Column
     private boolean isPanicPressed;
@@ -51,38 +52,36 @@ public class Ride implements Serializable {
     @Column
     private boolean isPetAccessible;
 
-    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.EAGER)
     private VehicleType vehicleType;
 
     @OneToMany(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
-    private Set<Path> paths;
+    private Set<Route> locations;
 
     public Ride() {
     }
 
-    public Ride(Date timeOfStart, Date timeOfEnd, double totalPrice, Driver driver, Set<Passenger> passengers, double estimatedTime, Set<Review> review, RideStatus status, Set<Deduction> deductions, boolean isPanicPressed, boolean isBabyAccessible, boolean isPetAccessible, VehicleType vehicleType, Set<Path> paths) {
-        this.timeOfStart = timeOfStart;
-        this.timeOfEnd = timeOfEnd;
-        this.totalPrice = totalPrice;
-        this.driver = driver;
-        this.passengers = passengers;
-        this.estimatedTime = estimatedTime;
-        this.review = review;
-        this.status = status;
-        this.deductions = deductions;
-        this.isPanicPressed = isPanicPressed;
-        this.isBabyAccessible = isBabyAccessible;
-        this.isPetAccessible = isPetAccessible;
-        this.vehicleType = vehicleType;
-        this.paths = paths;
-    }
+    public Ride(Date timeOfStart, Date timeOfEnd, double totalPrice, Driver driver, Set<Passenger> passengers,
+                double estimatedTime, Set<Review> review, RideStatus status, Deduction deduction,
+                boolean isPanicPressed, boolean isBabyAccessible, boolean isPetAccessible, VehicleType vehicleType, Set<Route> locations) {
+        {
+            this.timeOfStart = timeOfStart;
+            this.timeOfEnd = timeOfEnd;
+            this.totalPrice = totalPrice;
+            this.driver = driver;
+            this.passengers = passengers;
+            this.estimatedTime = estimatedTime;
+            this.review = review;
+            this.status = status;
+            this.deduction = deduction;
+            this.isPanicPressed = isPanicPressed;
+            this.isBabyAccessible = isBabyAccessible;
+            this.isPetAccessible = isPetAccessible;
+            this.vehicleType = vehicleType;
+            this.locations = locations;
+        }
 
-    public Set<Path> getPaths() {
-        return paths;
-    }
 
-    public void setPaths(Set<Path> paths) {
-        this.paths = paths;
     }
 
     public Long getId() {
@@ -157,12 +156,12 @@ public class Ride implements Serializable {
         this.status = status;
     }
 
-    public Set<Deduction> getDeductions() {
-        return deductions;
+    public Deduction getDeduction() {
+        return deduction;
     }
 
-    public void setDeductions(Set<Deduction> deductions) {
-        this.deductions = deductions;
+    public void setDeduction(Deduction deduction) {
+        this.deduction = deduction;
     }
 
     public boolean isPanicPressed() {
@@ -195,5 +194,13 @@ public class Ride implements Serializable {
 
     public void setVehicleType(VehicleType vehicleType) {
         this.vehicleType = vehicleType;
+    }
+
+    public Set<Route> getLocations() {
+        return locations;
+    }
+
+    public void setLocations(Set<Route> locations) {
+        this.locations = locations;
     }
 }

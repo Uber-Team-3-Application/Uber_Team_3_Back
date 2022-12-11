@@ -12,18 +12,23 @@ public class Location implements Serializable {
     private Long id;
 
     @Column
-    private double geographicWidth;
+    private String address;
 
     @Column
-    private double geographicLength;
+    private double latitude;
+
+    @Column
+    private double longitude;
 
     public Location() {
     }
 
-    public Location(double geographicWidth, double geographicLength) {
-        this.geographicWidth = geographicWidth;
-        this.geographicLength = geographicLength;
+    public Location(double latitude, double longitude, String address) {
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
+
 
     public Long getId() {
         return id;
@@ -33,19 +38,27 @@ public class Location implements Serializable {
         this.id = id;
     }
 
-    public double getGeographicWidth() {
-        return geographicWidth;
+    public String getAddress() {
+        return address;
     }
 
-    public void setGeographicWidth(double geographicWidth) {
-        this.geographicWidth = geographicWidth;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public double getGeographicLength() {
-        return geographicLength;
+    public double getLatitude() {
+        return latitude;
     }
 
-    public void setGeographicLength(double geographicLength) {
-        this.geographicLength = geographicLength;
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 }

@@ -1,11 +1,7 @@
 package com.reesen.Reesen.mockup;
 
-import com.reesen.Reesen.dto.DeductionDTO;
-import com.reesen.Reesen.dto.DriverDTO;
-import com.reesen.Reesen.dto.PassengerDTO;
-import com.reesen.Reesen.dto.UserDTO;
+import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.Location;
-import com.reesen.Reesen.model.VehicleType;
 
 import java.time.Instant;
 import java.util.Date;
@@ -15,8 +11,6 @@ import java.util.Set;
 public class DriverRideMockup {
 
     private  Long id;
-    private  Set<Location> locations;
-    private  Set<DeductionDTO> rejections;
     private  Date startTime;
     private  Date endTime;
     private  double totalCost;
@@ -26,26 +20,29 @@ public class DriverRideMockup {
     private  String vehicleType;
     private  boolean babyTransport;
     private  boolean petTransport;
+    private  DeductionDTO rejection;
+    private  Set<RouteDTO> locations;
 
-    public DriverRideMockup(){
-        id = Long.parseLong("10");
+    public DriverRideMockup(Long id){
+        this.id = id;
         locations = new HashSet<>();
         passengers = new HashSet<>();
-        rejections = new HashSet<>();
-        locations.add(new Location(45.267136, 19.833549));
-        rejections.add(
-                new DeductionDTO(
-                        "Ride is canceled due to previous problems with the passenger",
-                        Date.from(Instant.now())
 
-        ));
         startTime = Date.from(Instant.now());
         endTime = Date.from(Instant.now());
-        totalCost = 1235;
-        driver = new UserDTO("user@example.com", "VOZAC");
-        driver.setId(Long.parseLong("123"));
+        LocationDTO departure = new LocationDTO( "Bulevar Oslobodjenja 74", 45.267136, 19.833549);
+        LocationDTO destination = new LocationDTO( "Bulevar Oslobodjenja 74", 45.267136, 19.83354 );
+        locations.add(new RouteDTO(departure, destination));
 
-        UserDTO passenger = new UserDTO(Long.parseLong("123"), "user@example.com", "PUTNIK");
+
+        rejection = new DeductionDTO(
+                        "Ride is canceled due to previous problems with the passenger",
+                        Date.from(Instant.now()));
+
+        totalCost = 1235;
+        driver = new UserDTO(Long.parseLong("123"), "user@example.com");
+
+        UserDTO passenger = new UserDTO(Long.parseLong("123"), "user@example.com");
         passengers.add(passenger);
         estimatedTimeInMinutes = 5;
         vehicleType = "STANDARDNO";
@@ -62,20 +59,20 @@ public class DriverRideMockup {
         this.id = id;
     }
 
-    public Set<Location> getLocations() {
+    public Set<RouteDTO> getLocations() {
         return locations;
     }
 
-    public void setLocations(Set<Location> locations) {
+    public void setLocations(Set<RouteDTO> locations) {
         this.locations = locations;
     }
 
-    public Set<DeductionDTO> getRejections() {
-        return rejections;
+    public DeductionDTO getRejection() {
+        return rejection;
     }
 
-    public void setRejections(Set<DeductionDTO> rejections) {
-        this.rejections = rejections;
+    public void setRejection(DeductionDTO rejections) {
+        this.rejection = rejections;
     }
 
     public Date getStartTime() {
