@@ -6,6 +6,7 @@ import com.reesen.Reesen.mockup.*;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.service.interfaces.*;
+import org.hibernate.jdbc.Work;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -103,14 +104,18 @@ public class DriverController {
 
     @PutMapping(value = "/working-hour/{working-hour-id}")
     public ResponseEntity<WorkingHoursDTO> changeWorkingHours(
+            @RequestBody WorkingHoursDTO workingHoursDTO,
             @PathVariable("working-hour-id") Long workingHourId
     ){
-        WorkingHoursDTO workingHoursDTO = new WorkingHoursDTO();
-        workingHoursDTO.setId(workingHourId);
-        workingHoursDTO.setStart(Date.from(Instant.now()));
-        workingHoursDTO.setEnd(Date.from(Instant.now()));
+        if(workingHourId < 1 ) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        return new ResponseEntity<>(workingHoursDTO, HttpStatus.OK);
+        Optional<WorkingHours> workingHours = this.workingHoursService.findOne(workingHourId);
+        if(workingHours.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        WorkingHours updatedWH = this.workingHoursService.editWorkingHours(workingHours.get(), workingHoursDTO);
+        this.workingHoursService.save(updatedWH);
+
+        return new ResponseEntity<>(new WorkingHoursDTO(updatedWH), HttpStatus.OK);
     }
     /**
      *
@@ -184,21 +189,17 @@ public class DriverController {
              *
              * **/
     @PostMapping(value = "/{id}/working-hour")
-    public ResponseEntity<WorkingHoursDTO> createWorkingHours(@PathVariable("id") Long driverId){
+    public ResponseEntity<WorkingHoursDTO> createWorkingHours(@RequestBody WorkingHoursDTO workingHoursDTO, @PathVariable("id") Long driverId){
 
-        WorkingHoursDTO workingHours = new WorkingHoursDTO();
-        workingHours.setId(Long.parseLong("123"));
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        java.util.Date date = null;
-        try {
-            date = sdf.parse("10-10-2022");
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        workingHours.setStart(date);
-        workingHours.setEnd(date);
+        if(driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        return new ResponseEntity<>(workingHours, HttpStatus.OK);
+        Optional<Driver> driver = this.driverService.findOne(driverId);
+        if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        WorkingHours workingHours = this.workingHoursService.createWorkingHours(workingHoursDTO, driver.get());
+        workingHours = this.workingHoursService.save(workingHours);
+
+        return new ResponseEntity<>(new WorkingHoursDTO(workingHours), HttpStatus.OK);
     }
 
     /**
