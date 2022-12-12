@@ -49,7 +49,18 @@ public class WorkingHoursService implements IWorkingHoursService {
     }
     @Override
     public Page<WorkingHours> findAll(Long driverId, Pageable page, LocalDateTime from, LocalDateTime to){
-        return null;
+        if(from == null && to == null)
+            return this.workingHoursRepository.findAllByDriverId(driverId, page);
+        if(to != null && from == null)
+            return this.workingHoursRepository.findAllByDriverIdAndEndTimeBefore(driverId, to, page);
+        if(to == null)
+            return this.workingHoursRepository.findAllByDriverIdAndStartTimeAfter(driverId, from, page);
+
+        return this.workingHoursRepository.findAllByDriverIdAndStartTimeAfterAndEndTimeBefore(driverId,
+                                                                                                            from,
+                                                                                                            to,
+                                                                                                            page);
+
     }
 
 }

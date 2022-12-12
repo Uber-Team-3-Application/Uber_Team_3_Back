@@ -19,7 +19,9 @@ import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -290,21 +292,26 @@ public class DriverController {
     public ResponseEntity<Paginated<WorkingHoursDTO>> getWorkingHours(
             Pageable page,
             @PathVariable("id") Long driverId,
-            @RequestParam("from") LocalDateTime from,
-            @RequestParam("to") LocalDateTime to
+            @RequestParam("from") String from,
+            @RequestParam("to") String to
     )
     {
         Optional<Driver> driver = this.driverService.findOne(driverId);
         if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime dateFrom = LocalDateTime.parse(from, formatter);
+        LocalDateTime dateTo = LocalDateTime.parse(to, formatter);
+
+
+
         Page<WorkingHours> workingHours;
-        workingHours = this.workingHoursService.findAll(driverId, page, from, to);
+        workingHours = this.workingHoursService.findAll(driverId, page, dateFrom, dateTo);
 
         Set<WorkingHoursDTO> workingHoursDTOS = new HashSet<>();
         for(WorkingHours workingHour: workingHours){
             workingHoursDTOS.add(new WorkingHoursDTO(workingHour));
         }
-        // TODO check what getNumberOfElements returns
         return new ResponseEntity<>(new Paginated<WorkingHoursDTO>
                 (workingHours.getNumberOfElements(), workingHoursDTOS),
                 HttpStatus.OK);
