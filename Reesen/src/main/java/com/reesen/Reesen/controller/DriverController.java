@@ -310,11 +310,13 @@ public class DriverController {
     public ResponseEntity<WorkingHoursDTO> getDetailsAboutWorkingHours(
             @PathVariable("working-hour-id") Long workingHourId)
     {
-        WorkingHoursDTO workingHoursDTO = new WorkingHoursDTO();
-        workingHoursDTO.setId(workingHourId);
-        workingHoursDTO.setStart(Date.from(Instant.now()));
-        workingHoursDTO.setEnd(Date.from(Instant.now()));
-        return new ResponseEntity<>(workingHoursDTO, HttpStatus.OK);
+
+        if(workingHourId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Optional<WorkingHours> workingHours = this.workingHoursService.findOne(workingHourId);
+        if(workingHours.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(new WorkingHoursDTO(workingHours.get()), HttpStatus.OK);
     }
 
     /*
