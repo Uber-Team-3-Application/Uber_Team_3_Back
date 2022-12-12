@@ -43,7 +43,7 @@ public class WorkingHoursService implements IWorkingHoursService {
     @Override
     public WorkingHours editWorkingHours(WorkingHours workingHours, WorkingHoursDTO workingHoursDTO){
         workingHours.setId(workingHours.getId());
-        workingHours.setStartTime(workingHours.getStartTime());
+        workingHours.setStartTime(workingHoursDTO.getStart());
         workingHours.setEndTime(workingHoursDTO.getEnd());
         return workingHours;
     }

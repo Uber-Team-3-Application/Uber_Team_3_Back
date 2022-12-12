@@ -299,11 +299,9 @@ public class DriverController {
         Optional<Driver> driver = this.driverService.findOne(driverId);
         if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         LocalDateTime dateFrom = LocalDateTime.parse(from, formatter);
         LocalDateTime dateTo = LocalDateTime.parse(to, formatter);
-
-
 
         Page<WorkingHours> workingHours;
         workingHours = this.workingHoursService.findAll(driverId, page, dateFrom, dateTo);
