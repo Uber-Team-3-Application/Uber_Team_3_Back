@@ -81,14 +81,18 @@ public class DriverController {
         if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Vehicle vehicle = this.driverService.getVehicle(driverId);
+        // if ! exists -> create
         if(vehicle == null){
-            //TODO create vehicle!!
+            vehicle = this.vehicleService.createVehicle(vehicleDTO, driver.get());
+        }else{
+            // if exists -> edit
+            vehicle = this.vehicleService.editVehicle(vehicle, vehicleDTO);
         }
-        //TODO EDIT VEHICLE
+        vehicle = this.vehicleService.save(vehicle);
+        driver.get().setVehicle(vehicle);
+        this.driverService.save(driver.get());
 
-
-
-        return new ResponseEntity<>(VehicleMockup.getVehicleDTO(), HttpStatus.OK);
+        return new ResponseEntity<>(new VehicleDTO(vehicle), HttpStatus.OK);
     }
 
             /**
