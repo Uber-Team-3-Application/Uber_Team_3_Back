@@ -8,6 +8,8 @@ import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.service.interfaces.*;
 import org.hibernate.jdbc.Work;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,8 @@ import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -210,13 +214,15 @@ public class DriverController {
 
     @GetMapping
     public ResponseEntity<Paginated<CreatedDriverDTO>> getDrivers(
-            @RequestParam("page") int page,
-            @RequestParam("size") int size
+            Pageable page
     ){
-
-        Paginated<CreatedDriverDTO> driverPaginated = new Paginated<>(243);
-        driverPaginated.add(DriverMockup.getDriver(Long.parseLong("123")));
-        return new ResponseEntity<>(driverPaginated, HttpStatus.OK);
+        Page<Driver> drivers = this.driverService.findAll(page);
+        Set<CreatedDriverDTO> driverDTOS = new HashSet<>();
+        for(Driver driver: drivers){
+            driverDTOS.add(new CreatedDriverDTO(driver));
+        }
+        return new ResponseEntity<>(
+                new Paginated<CreatedDriverDTO>(drivers.getNumberOfElements(), driverDTOS), HttpStatus.OK);
     }
 
 
@@ -282,28 +288,26 @@ public class DriverController {
 
     @GetMapping(value = "/{id}/working-hour")
     public ResponseEntity<Paginated<WorkingHoursDTO>> getWorkingHours(
+            Pageable page,
             @PathVariable("id") Long driverId,
-            @RequestParam("page") int page,
-            @RequestParam("size") int size,
-            @RequestParam("from") String from,
-            @RequestParam("to") String to
+            @RequestParam("from") LocalDateTime from,
+            @RequestParam("to") LocalDateTime to
     )
     {
-        Paginated<WorkingHoursDTO> workingHoursPaginated = new Paginated<WorkingHoursDTO>(243);
-        WorkingHoursDTO workingHoursDTO = new WorkingHoursDTO();
-        workingHoursDTO.setId(Long.parseLong("10"));
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        java.util.Date date = null;
-        try {
-            date = sdf.parse("10-10-2022");
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        workingHoursDTO.setStart(date);
-        workingHoursDTO.setEnd(date);
-        workingHoursPaginated.add(workingHoursDTO);
+        Optional<Driver> driver = this.driverService.findOne(driverId);
+        if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        return new ResponseEntity<>(workingHoursPaginated, HttpStatus.OK);
+        Page<WorkingHours> workingHours;
+        workingHours = this.workingHoursService.findAll(driverId, page, from, to);
+
+        Set<WorkingHoursDTO> workingHoursDTOS = new HashSet<>();
+        for(WorkingHours workingHour: workingHours){
+            workingHoursDTOS.add(new WorkingHoursDTO(workingHour));
+        }
+        // TODO check what getNumberOfElements returns
+        return new ResponseEntity<>(new Paginated<WorkingHoursDTO>
+                (workingHours.getNumberOfElements(), workingHoursDTOS),
+                HttpStatus.OK);
     }
 
     @GetMapping(value = "/working-hour/{working-hour-id}")

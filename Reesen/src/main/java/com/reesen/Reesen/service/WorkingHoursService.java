@@ -5,8 +5,12 @@ import com.reesen.Reesen.model.Driver;
 import com.reesen.Reesen.model.WorkingHours;
 import com.reesen.Reesen.repository.WorkingHoursRepository;
 import com.reesen.Reesen.service.interfaces.IWorkingHoursService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -42,6 +46,10 @@ public class WorkingHoursService implements IWorkingHoursService {
         workingHours.setStartTime(workingHours.getStartTime());
         workingHours.setEndTime(workingHoursDTO.getEnd());
         return workingHours;
+    }
+    @Override
+    public Page<WorkingHours> findAll(Long driverId, Pageable page, LocalDateTime from, LocalDateTime to){
+        return null;
     }
 
 }

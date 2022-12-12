@@ -8,6 +8,8 @@ import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.repository.DriverRepository;
 import com.reesen.Reesen.service.interfaces.IDriverService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -86,5 +88,10 @@ public class DriverService implements IDriverService {
     @Override
     public Vehicle getVehicle(Long driverId){
         return this.driverRepository.getVehicle(driverId);
+    }
+
+    @Override
+    public Page<Driver> findAll(Pageable page){
+        return this.driverRepository.findAll(page);
     }
 }
