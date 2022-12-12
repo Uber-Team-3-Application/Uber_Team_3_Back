@@ -6,7 +6,6 @@ import com.reesen.Reesen.mockup.*;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.service.interfaces.*;
-import org.hibernate.jdbc.Work;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,12 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
-import java.sql.Date;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
@@ -36,18 +29,21 @@ public class DriverController {
     private final IVehicleService vehicleService;
     private final IWorkingHoursService workingHoursService;
     private final ILocationService locationService;
+    private final IRideService rideService;
 
     @Autowired
     public DriverController(IDriverService driverService,
                             IDocumentService documentService,
                             IVehicleService vehicleService,
                             IWorkingHoursService workingHoursService,
-                            ILocationService locationService){
+                            ILocationService locationService,
+                            IRideService rideService){
         this.driverService = driverService;
         this.documentService = documentService;
         this.vehicleService = vehicleService;
         this.workingHoursService = workingHoursService;
         this.locationService = locationService;
+        this.rideService = rideService;
     }
 
 
@@ -335,20 +331,30 @@ public class DriverController {
      * **/
 
     @GetMapping(value = "/{id}/ride")
-    public ResponseEntity<Paginated<DriverRideMockup>> getRides(
+    public ResponseEntity<Paginated<DriverRideDTO>> getRides(
             @PathVariable("id") Long driverId,
-            @RequestParam("page") int page,
-            @RequestParam("size") int size,
-            @RequestParam("sort") String sort,
+            Pageable page,
             @RequestParam("from") String from,
             @RequestParam("to") String to)
     {
 
-        Paginated<DriverRideMockup> driverRidePaginated = new Paginated<DriverRideMockup>(243);
-        DriverRideMockup ride = new DriverRideMockup(Long.parseLong("123"));
-        driverRidePaginated.add(ride);
+        Optional<Driver> driver = this.driverService.findOne(driverId);
+        if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        return new ResponseEntity<>(driverRidePaginated, HttpStatus.OK);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime dateFrom = LocalDateTime.parse(from, formatter);
+        LocalDateTime dateTo = LocalDateTime.parse(to, formatter);
+
+        Page<Ride> driversRides = this.rideService.findAll(driverId, page, dateFrom, dateTo);
+
+        Set<DriverRideDTO> rideDTOs = new HashSet<>();
+
+        for(Ride ride:driversRides){
+            rideDTOs.add(new DriverRideDTO(ride));
+        }
+
+        return new ResponseEntity<>(new Paginated<>(driversRides.getNumberOfElements(), rideDTOs), HttpStatus.OK);
     }
 
     /**

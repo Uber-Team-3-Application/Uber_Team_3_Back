@@ -15,7 +15,7 @@ public interface WorkingHoursRepository extends JpaRepository<WorkingHours, Long
     public Page<WorkingHours> findAllByDriverId(Long driverId, Pageable page);
     public Page<WorkingHours> findAllByDriverIdAndStartTimeAfterAndEndTimeBefore(
                                                                                  Long driverId,
-                                                                                 LocalDateTime starTime,
+                                                                                 LocalDateTime startTime,
                                                                                  LocalDateTime endTime,
                                                                                  Pageable page);
 
