@@ -36,11 +36,11 @@ public class RideService implements IRideService {
 		if(from == null && to == null)
 			return this.rideRepository.findAllByDriverId(driverId, page);
 		if(to != null && from == null)
-			return this.rideRepository.findAllByDriverIdAndEndTimeBefore(driverId, to, page);
+			return this.rideRepository.findAllByDriverIdAndTimeOfEndBefore(driverId, to, page);
 		if(to == null)
-			return this.rideRepository.findAllByDriverIdAndStartTimeAfter(driverId, from, page);
+			return this.rideRepository.findAllByDriverIdAndTimeOfStartAfter(driverId, from, page);
 
-		return this.rideRepository.findAllByDriverIdAndStartTimeAfterAndEndTimeBefore(driverId,
+		return this.rideRepository.findAllByDriverIdAndTimeOfStartAfterAndTimeOfEndBefore(driverId,
 				from,
 				to,
 				page);

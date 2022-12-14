@@ -14,19 +14,19 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
 
     public Page<Ride> findAllByDriverId(Long driverId, Pageable page);
 
-    public Page<Ride> findAllByDriverIdAndStartTimeAfterAndEndTimeBefore(
+    public Page<Ride> findAllByDriverIdAndTimeOfStartAfterAndTimeOfEndBefore(
             Long driverId,
-            LocalDateTime startTime,
-            LocalDateTime endTime,
+            LocalDateTime timeOfStart,
+            LocalDateTime timeOfEnd,
             Pageable page);
 
-    public Page<Ride> findAllByDriverIdAndStartTimeAfter(
+    public Page<Ride> findAllByDriverIdAndTimeOfStartAfter(
             Long driverId,
-            LocalDateTime startTime,
+            LocalDateTime timeOfStart,
             Pageable page);
 
-    public Page<Ride> findAllByDriverIdAndEndTimeBefore(
+    public Page<Ride> findAllByDriverIdAndTimeOfEndBefore(
             Long driverId,
-            LocalDateTime endTime,
+            LocalDateTime timeOfEnd,
             Pageable page);
 }
