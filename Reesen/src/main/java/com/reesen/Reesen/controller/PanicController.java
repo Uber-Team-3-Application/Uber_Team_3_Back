@@ -1,8 +1,8 @@
 package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.*;
-import com.reesen.Reesen.model.Ride;
-import com.reesen.Reesen.model.User;
+import com.reesen.Reesen.model.Panic;
+import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.service.interfaces.IPanicService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Instant;
-import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @CrossOrigin
 @RestController
@@ -29,45 +30,13 @@ public class PanicController {
     }
 
     @GetMapping
-    public ResponseEntity<PanicTotalDTO> getPanicNotifications(){
+    public ResponseEntity<Paginated<PanicDTO>> getPanicNotifications(){
+        List<Panic> panics = this.panicService.findAll();
 
-        PanicTotalDTO panicTotalDTO = new PanicTotalDTO();
-        panicTotalDTO.setTotalCount(243);
+        Set<PanicDTO> panicDTOs = new HashSet<>();
+        for(Panic panic:panics) panicDTOs.add(new PanicDTO(panic));
 
-        PanicDTO panicDTO = new PanicDTO();
-        panicDTO.setId(Long.parseLong("10"));
-        panicDTO.setTime(Date.from(Instant.now()));
-        panicDTO.setReason("Driver is drinking while driving");
-
-        panicDTO.setUser(new User(
-                "Pera",
-                "Peric",
-                "U3dhZ2dlciByb2Nrcw==",
-                "+381123123",
-                "pera.peric@email.com",
-                "Bulevar Oslobodjenja 74"));
-
-        PanicRideDTO panicRideDTO = new PanicRideDTO();
-        panicRideDTO.setDriver(new UserDTO(
-                Long.parseLong("123"),
-                "user@example.com"));
-
-        panicRideDTO.addPassenger(new UserDTO(
-                Long.parseLong("123"),
-                "user@example.com"));
-
-        panicRideDTO.setBabyTransport(true);
-        panicRideDTO.setPetTransport(true);
-        panicRideDTO.setEstimatedTimeInMinutes(5);
-        panicRideDTO.setStartTime(Date.from(Instant.now()));
-        panicRideDTO.setEndTime(Date.from(Instant.now()));
-        panicRideDTO.setTotalCost(1235);
-
-        panicDTO.setRide(panicRideDTO);
-
-        panicTotalDTO.addPanicDTO(panicDTO);
-
-        return new ResponseEntity<>(panicTotalDTO, HttpStatus.OK);
+        return new ResponseEntity<>(new Paginated<PanicDTO>(panicDTOs.size(), panicDTOs), HttpStatus.OK);
 
     }
 

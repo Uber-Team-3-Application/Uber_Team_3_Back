@@ -1,15 +1,10 @@
-package com.reesen.Reesen.dto.Ride;
-
+package com.reesen.Reesen.dto;
 
 import java.util.Date;
-
 import java.util.Set;
 
+import com.reesen.Reesen.Enums.RideStatus;
 import com.reesen.Reesen.Enums.VehicleName;
-import com.reesen.Reesen.dto.DeductionDTO;
-import com.reesen.Reesen.dto.RouteDTO;
-import com.reesen.Reesen.dto.UserDTO;
-import com.reesen.Reesen.dto.VehicleTypeDTO;
 import com.reesen.Reesen.model.*;
 
 public class RideDTO {
@@ -26,10 +21,11 @@ public class RideDTO {
  	private VehicleTypeDTO vehicleType;
  	private boolean babyTransport;
  	private boolean petTransport;
+	 private RideStatus status;
 
-	 public RideDTO() {
+    public RideDTO(){
 
-	 }
+    }
 
 	public RideDTO(Ride ride) {
 		this.id = ride.getId();
@@ -39,6 +35,7 @@ public class RideDTO {
 		this.estimatedTimeInMinutes = ride.getEstimatedTime();
 		this.babyTransport = ride.isBabyAccessible();
 		this.petTransport = ride.isPetAccessible();
+		this.status = ride.getStatus();
 		setPassengers(ride);
 		setVehicleType(ride);
 		this.rejection = new DeductionDTO(ride.getDeduction().getReason(), ride.getDeduction().getDeductionTime());
@@ -156,6 +153,11 @@ public class RideDTO {
 		this.petTransport = petTransport;
 	}
 
+	public RideStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(RideStatus status) {
+		this.status = status;
+	}
 }
-
-

@@ -1,5 +1,6 @@
 package com.reesen.Reesen.dto;
 
+import com.reesen.Reesen.model.Panic;
 import com.reesen.Reesen.model.User;
 
 import java.util.Date;
@@ -8,7 +9,7 @@ import java.util.Date;
 public class PanicDTO {
 
     private Long id;
-    private User user;
+    private PanicUserDTO user;
     private PanicRideDTO ride;
     private Date time;
     private String reason;
@@ -16,15 +17,22 @@ public class PanicDTO {
     public PanicDTO(){
 
     }
+    public PanicDTO(Panic panic){
+        this.id = panic.getId();
+        this.user = new PanicUserDTO(panic.getUser());
+        this.ride = new PanicRideDTO(panic.getRide());
+        this.time = panic.getTimeOfPress();
+        this.reason = panic.getReason();
+    }
 
-    public PanicDTO(User user, PanicRideDTO ride, Date time, String reason) {
+    public PanicDTO(PanicUserDTO user, PanicRideDTO ride, Date time, String reason) {
         this.user = user;
         this.ride = ride;
         this.time = time;
         this.reason = reason;
     }
 
-    public PanicDTO(Long id, User user, PanicRideDTO ride, Date time, String reason) {
+    public PanicDTO(Long id, PanicUserDTO user, PanicRideDTO ride, Date time, String reason) {
         this.id = id;
         this.user = user;
         this.ride = ride;
@@ -41,11 +49,11 @@ public class PanicDTO {
         this.id = id;
     }
 
-    public User getUser() {
+    public PanicUserDTO getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(PanicUserDTO user) {
         this.user = user;
     }
 

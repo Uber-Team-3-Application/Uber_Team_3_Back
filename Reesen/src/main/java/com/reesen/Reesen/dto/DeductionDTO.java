@@ -12,11 +12,15 @@ public class DeductionDTO {
 	public DeductionDTO() {
 
 	}
-
-	public DeductionDTO(String reason, Date timeOfRejection) {
+	public DeductionDTO(String reason, Date timeOfRejection){
 		this.reason = reason;
 		this.timeOfRejection = timeOfRejection;
 	}
+	public DeductionDTO(Deduction deduction) {
+		this.reason = deduction.getReason();
+		this.timeOfRejection = deduction.getDeductionTime();
+	}
+
 
 	public String getReason() {
 		return reason;
@@ -27,11 +31,11 @@ public class DeductionDTO {
 	}
 
 	public Date getTimeOfRejection() {
-		return timeOfRejection;
+		return this.timeOfRejection;
 	}
 
-	public void setTimeOfRejection(Date timeOfRejection) {
-		this.timeOfRejection = timeOfRejection;
+	public void setTimeOfRejection(Date deductionTime) {
+		this.timeOfRejection = deductionTime;
 	}
 
 

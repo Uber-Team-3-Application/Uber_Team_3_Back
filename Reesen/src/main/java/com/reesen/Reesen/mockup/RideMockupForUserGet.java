@@ -1,12 +1,8 @@
 package com.reesen.Reesen.mockup;
 
 import com.reesen.Reesen.dto.*;
-import com.reesen.Reesen.dto.Ride.RideDTO;
-import com.reesen.Reesen.model.Location;
+import com.reesen.Reesen.dto.RideDTO;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashSet;

@@ -1,86 +1,64 @@
 package com.reesen.Reesen.dto;
 
+import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.model.Passenger;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.Route;
-import com.reesen.Reesen.model.User;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-public class PanicRideDTO {
-
-    private Long id;
+public class DriverRideDTO {
+    private  Long id;
     private Date startTime;
-    private Date endTime;
-    private double totalCost;
+    private  Date endTime;
+    private  double totalCost;
     private UserDTO driver;
     private Set<UserDTO> passengers;
-    private double estimatedTimeInMinutes;
-    private String vehicleType;
-    private boolean babyTransport;
-    private boolean petTransport;
-    private DeductionDTO rejection;
-    private Set<RouteDTO> locations;
+    private  double estimatedTimeInMinutes;
+    private  String vehicleType;
+    private  boolean babyTransport;
+    private  boolean petTransport;
+    private  DeductionDTO rejection;
+    private  Set<RouteDTO> locations;
 
-    public PanicRideDTO(){
-        this.passengers = new HashSet<>();
-        this.locations = new HashSet<>();
+    public DriverRideDTO() {
     }
-    public PanicRideDTO(Ride ride){
+
+    public DriverRideDTO(Ride ride) {
         this.id = ride.getId();
         this.startTime = ride.getTimeOfStart();
         this.endTime = ride.getTimeOfEnd();
         this.totalCost = ride.getTotalPrice();
-        this.driver = new UserDTO(ride.getDriver());
-        this.passengers = new HashSet<>();
-        for(Passenger pass:ride.getPassengers()){
-            this.passengers.add(new UserDTO(pass));
-        }
         this.estimatedTimeInMinutes = ride.getEstimatedTime();
-        this.vehicleType = ride.getVehicleType().toString();
         this.babyTransport = ride.isBabyAccessible();
         this.petTransport = ride.isPetAccessible();
-        this.locations = new HashSet<>();
-        for(Route route:ride.getLocations()){
-            this.locations.add(
-                    new RouteDTO(new LocationDTO(route.getDeparture()), new LocationDTO(route.getDestination())));
+        this.vehicleType = ride.getVehicleType().toString();
+        this.driver = new UserDTO(ride.getDriver().getId(), ride.getDriver().getEmail());
+        setPassengers(ride);
+        this.rejection = new DeductionDTO(ride.getDeduction().getReason(), ride.getDeduction().getDeductionTime());
+        this.locations = setLocations(ride);
+
+    }
+
+    private void setPassengers(Ride ride) {
+        for (Passenger passenger : ride.getPassengers()) {
+            passengers.add(new UserDTO(passenger.getId(), passenger.getEmail()));
         }
-        this.rejection = new DeductionDTO(ride.getDeduction());
+    }
+    private Set<RouteDTO> setLocations(Ride ride){
+
+        Set<RouteDTO> routes = new HashSet<>();
+        for(Route route: ride.getLocations()){
+            LocationDTO departure = new LocationDTO(route.getDeparture());
+            LocationDTO destination = new LocationDTO(route.getDestination());
+            routes.add(new RouteDTO(departure, destination));
+        }
+        return routes;
+
     }
 
-    public void addPassenger(UserDTO passenger){
-        this.passengers.add(passenger);
-    }
-
-
-    public void addLocation(RouteDTO location){
-        this.locations.add(location);
-    }
-    public PanicRideDTO(Long id, Date startTime, Date endTime, double totalCost, UserDTO driver, Set<UserDTO> passengers, int estimatedTimeInMinutes, String vehicleType, boolean babyTransport, boolean petTransport
-    , Set<RouteDTO> locations, DeductionDTO rejection) {
-        this.id = id;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.totalCost = totalCost;
-        this.driver = driver;
-        this.passengers = passengers;
-        this.estimatedTimeInMinutes = estimatedTimeInMinutes;
-        this.vehicleType = vehicleType;
-        this.babyTransport = babyTransport;
-        this.petTransport = petTransport;
-        this.locations = locations;
-        this.rejection = rejection;
-    }
-
-    public DeductionDTO getRejection() {
-        return rejection;
-    }
-
-    public void setRejection(DeductionDTO rejection) {
-        this.rejection = rejection;
-    }
 
     public Long getId() {
         return id;
@@ -88,15 +66,6 @@ public class PanicRideDTO {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Set<RouteDTO> getLocations() {
-        return locations;
-    }
-
-    public void setLocations(Set<RouteDTO> locations) {
-
-        this.locations = locations;
     }
 
     public Date getStartTime() {
@@ -169,5 +138,21 @@ public class PanicRideDTO {
 
     public void setPetTransport(boolean petTransport) {
         this.petTransport = petTransport;
+    }
+
+    public DeductionDTO getRejection() {
+        return rejection;
+    }
+
+    public void setRejection(DeductionDTO rejection) {
+        this.rejection = rejection;
+    }
+
+    public Set<RouteDTO> getLocations() {
+        return locations;
+    }
+
+    public void setLocations(Set<RouteDTO> locations) {
+        this.locations = locations;
     }
 }
