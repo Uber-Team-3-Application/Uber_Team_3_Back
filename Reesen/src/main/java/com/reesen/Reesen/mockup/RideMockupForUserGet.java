@@ -4,6 +4,7 @@ import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.dto.RideDTO;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 
@@ -32,7 +33,7 @@ public class RideMockupForUserGet {
         rideDTO.setVehicleType(VehicleTypeDTO.STANDARDNO);
         rideDTO.setBabyTransport(true);
         rideDTO.setPetTransport(true);
-        rideDTO.setRejection(new DeductionDTO("Ride is canceled due to previous problems with the passenger", Date.from(Instant.now())));
+        rideDTO.setRejection(new DeductionDTO("Ride is canceled due to previous problems with the passenger", LocalDateTime.now()));
 
         return rideDTO;
     }

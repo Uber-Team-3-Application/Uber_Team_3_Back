@@ -15,6 +15,10 @@ public class RouteDTO {
 		this.departure = departure;
 		this.destination = destination;
 	}
+	public RouteDTO(LocationDTO departure, LocationDTO destination) {
+		this.departure = departure;
+		this.destination = destination;
+	}
 
 	public Long getId() {
 		return id;

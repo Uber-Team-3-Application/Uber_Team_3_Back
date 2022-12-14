@@ -44,10 +44,10 @@ public class RideController {
     public ResponseEntity<RideDTO> getPassengerActiveRide(@PathVariable("passengerId") Long passengerId){
         if(passengerId < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        Optional<Ride> ride = this.rideService.findDriverActiveRide(passengerId);
-        if(ride.isEmpty())
+        Ride ride = this.rideService.findPassengerActiveRide(passengerId);
+        if(ride == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        RideDTO rideDTO = new RideDTO(ride.get());
+        RideDTO rideDTO = new RideDTO(ride);
         return new ResponseEntity<>(rideDTO, HttpStatus.OK);
     }
 
@@ -68,7 +68,8 @@ public class RideController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(this.rideService.findOne(id).isEmpty())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        Ride ride = this.rideService.withdrawRide(id);
+        Ride ride = this.rideService.findOne(id).get();
+        ride = this.rideService.withdrawRide(ride);
         this.rideService.save(ride);
         RideDTO withdrawRide = new RideDTO(ride);
         return new ResponseEntity<>(withdrawRide, HttpStatus.OK);
@@ -80,7 +81,8 @@ public class RideController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(this.rideService.findOne(id).isEmpty())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        Ride ride = this.rideService.panicRide(id, reason);
+        Ride ride = this.rideService.findOne(id).get();
+        ride = this.rideService.panicRide(ride, reason);
         this.rideService.save(ride);
         RideDTO panicRide = new RideDTO(ride);
         return new ResponseEntity<>(panicRide, HttpStatus.OK);
@@ -92,7 +94,8 @@ public class RideController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(this.rideService.findOne(id).isEmpty())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        Ride ride = this.rideService.acceptRide(id);
+        Ride ride = this.rideService.findOne(id).get();
+        ride = this.rideService.acceptRide(ride);
         this.rideService.save(ride);
         RideDTO acceptedRide = new RideDTO(ride);
         return new ResponseEntity<>(acceptedRide, HttpStatus.OK);
@@ -104,7 +107,8 @@ public class RideController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(this.rideService.findOne(id).isEmpty())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        Ride ride = this.rideService.endRide(id);
+        Ride ride = this.rideService.findOne(id).get();
+        ride = this.rideService.endRide(ride);
         this.rideService.save(ride);
         RideDTO endedRide = new RideDTO(ride);
         return new ResponseEntity<>(endedRide, HttpStatus.OK);
@@ -116,7 +120,8 @@ public class RideController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(this.rideService.findOne(id).isEmpty())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        Ride ride = this.rideService.cancelRide(id, reason);
+        Ride ride = this.rideService.findOne(id).get();
+        ride = this.rideService.cancelRide(ride, reason);
         this.rideService.save(ride);
         RideDTO canceledRide = new RideDTO(ride);
         return new ResponseEntity<>(canceledRide, HttpStatus.OK);

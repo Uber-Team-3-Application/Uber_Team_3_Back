@@ -10,8 +10,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PassengerRepository extends JpaRepository<Passenger, Long> {
-
-    Route findByEmail(String email);
+    
     Passenger findByEmail(String email);
 
 }

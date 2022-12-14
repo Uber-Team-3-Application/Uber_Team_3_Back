@@ -1,5 +1,6 @@
 package com.reesen.Reesen.repository;
 
+import com.reesen.Reesen.Enums.RideStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,18 +15,7 @@ import java.util.Optional;
 @Repository
 public interface RideRepository extends JpaRepository<Ride, Long> {
 
-    Optional<Ride> findDriverActiveRide(Long driverId);
-
-    Ride withdrawRide(Long id);
-
-    Ride panicPressed(Long id, String reason);
-
-    Ride cancelRide(Long id, String reason);
-
-    Ride endRide(Long id);
-
-    Ride acceptRide(Long id);
-
+    Optional<Ride> findRideByDriverIdAndStatus(Long driverId, RideStatus status);
 
     public Page<Ride> findAllByDriverId(Long driverId, Pageable page);
 

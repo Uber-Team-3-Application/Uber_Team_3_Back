@@ -6,6 +6,7 @@ import com.reesen.Reesen.dto.RouteDTO;
 import com.reesen.Reesen.dto.UserDTO;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,7 +38,7 @@ public class PassengerRideMockup {
         rejection.add(
                 new DeductionDTO(
                         "Ride is canceled due to previous problems with the passenger",
-                        Date.from(Instant.now())
+                        LocalDateTime.now()
 
                 ));
         startTime = Date.from(Instant.now());

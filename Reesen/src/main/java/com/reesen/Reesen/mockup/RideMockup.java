@@ -4,6 +4,7 @@ import com.reesen.Reesen.Enums.RideStatus;
 import com.reesen.Reesen.dto.*;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,7 +31,7 @@ public class RideMockup {
         rejection = (
                 new DeductionDTO(
                         "Ride is canceled due to previous problems with the passenger",
-                        Date.from(Instant.now())
+                        LocalDateTime.now()
 
                 ));
         locations.add(

@@ -21,14 +21,17 @@ public interface IRideService {
 
 	Optional<Ride> findDriverActiveRide(Long driverId);
 
-	Ride withdrawRide(Long id);
+	Ride withdrawRide(Ride ride);
 
-	Ride panicRide(Long id, String reason);
+	Ride panicRide(Ride ride, String reason);
 
-	Ride cancelRide(Long id, String reason);
+	Ride cancelRide(Ride ride, String reason);
 
-	Ride endRide(Long id);
+	Ride endRide(Ride ride);
 
-	Ride acceptRide(Long id);
+	Ride acceptRide(Ride ride);
+
 	Page<Ride> findAll(Long driverId, Pageable page, LocalDateTime from, LocalDateTime to);
+
+	Ride findPassengerActiveRide(Long passengerId);
 }

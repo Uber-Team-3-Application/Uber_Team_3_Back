@@ -1,14 +1,11 @@
 package com.reesen.Reesen.service;
 
+import com.reesen.Reesen.Enums.RideStatus;
+import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.dto.*;
-import com.reesen.Reesen.model.Passenger;
-import com.reesen.Reesen.model.Route;
-import com.reesen.Reesen.model.VehicleType;
-import com.reesen.Reesen.repository.PassengerRepository;
-import com.reesen.Reesen.repository.RouteRepository;
+import com.reesen.Reesen.model.*;
+import com.reesen.Reesen.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.reesen.Reesen.model.Ride;
-import com.reesen.Reesen.repository.RideRepository;
 import com.reesen.Reesen.service.interfaces.IRideService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,10 +15,6 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import java.util.Date;
-import org.springframework.stereotype.Service;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
 
 @Service
@@ -30,12 +23,16 @@ public class RideService implements IRideService {
     private final RideRepository rideRepository;
 	private final RouteRepository routeRepository;
 	private final PassengerRepository passengerRepository;
+	private final VehicleTypeRepository vehicleTypeRepository;
+	private final PanicRepository panicRepository;
 
     @Autowired
-    public RideService(RideRepository rideRepository, RouteRepository routeRepository, PassengerRepository passengerRepository){
+    public RideService(RideRepository rideRepository, RouteRepository routeRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository){
         this.rideRepository = rideRepository;
 		this.routeRepository = routeRepository;
 		this.passengerRepository = passengerRepository;
+		this.vehicleTypeRepository = vehicleTypeRepository;
+		this.panicRepository = panicRepository;
 	}
 
 	@Override
@@ -58,46 +55,54 @@ public class RideService implements IRideService {
 			locations.add(this.routeRepository.findById(routeDTO.getId()).get());
 		}
 		ride.setLocations(locations);
-		//ride.setVehicleType(rideDTO.getVehicleType());
+		ride.setVehicleType(this.vehicleTypeRepository.findByName(VehicleName.valueOf(rideDTO.getVehicleType())));
 		ride.setBabyAccessible(rideDTO.isBabyTransport());
 		ride.setPetAccessible(rideDTO.isPetTransport());
 		Set<UserDTO> passengersDTOs = rideDTO.getPassengers();
-		for(UserDTO userDTO: passengersDTOs){
-			locations.add(this.passengerRepository.findByEmail(userDTO.getEmail()));
-		}
 		Set<Passenger> passengers = new HashSet<>();
+		for(UserDTO userDTO: passengersDTOs){
+			passengers.add(this.passengerRepository.findByEmail(userDTO.getEmail()));
+		}
 		ride.setPassengers(passengers);
 		return new RideDTO(this.rideRepository.save(ride));
 	}
 
 	@Override
 	public Optional<Ride> findDriverActiveRide(Long driverId) {
-		return this.rideRepository.findDriverActiveRide(driverId);
+		return this.rideRepository.findRideByDriverIdAndStatus(driverId, RideStatus.ACTIVE);
 	}
 
 	@Override
-	public Ride withdrawRide(Long id) {
-		return this.rideRepository.withdrawRide(id);
+	public Ride withdrawRide(Ride ride) {
+		ride.setStatus(RideStatus.WITHDRAWN);
+		return ride;
 	}
 
 	@Override
-	public Ride panicRide(Long id, String reason) {
-		return this.rideRepository.panicPressed(id, reason);
+	public Ride panicRide(Ride ride, String reason) {
+		this.panicRepository.save(new Panic(LocalDateTime.now(), reason, ride, ride.getDriver()));
+		ride.setStatus(RideStatus.FINISHED);
+		return ride;
 	}
 
 	@Override
-	public Ride cancelRide(Long id, String reason) {
-		return this.rideRepository.cancelRide(id, reason);
+	public Ride cancelRide(Ride ride, String reason) {
+		ride.setStatus(RideStatus.REJECTED);
+		Deduction deduction = new Deduction(ride, ride.getDriver(), reason, LocalDateTime.now());
+		ride.setDeduction(deduction);
+		return ride;
 	}
 
 	@Override
-	public Ride endRide(Long id) {
-		return this.rideRepository.endRide(id);
+	public Ride endRide(Ride ride) {
+		ride.setStatus(RideStatus.FINISHED);
+		return ride;
 	}
 
 	@Override
-	public Ride acceptRide(Long id) {
-		return this.rideRepository.acceptRide(id);
+	public Ride acceptRide(Ride ride) {
+		ride.setStatus(RideStatus.ACCEPTED);
+		return ride;
 	}
 
 	public Page<Ride> findAll(Long driverId, Pageable page, LocalDateTime from, LocalDateTime to){
@@ -114,4 +119,14 @@ public class RideService implements IRideService {
 				page);
 
 	}
+	@Override
+	public Ride findPassengerActiveRide(Long passengerId) {
+		Passenger passenger = this.passengerRepository.findById(passengerId).get();
+		for(Ride ride: passenger.getRides()){
+			if(ride.getStatus() == RideStatus.ACTIVE)
+				return ride;
+		}
+		return null;
+	}
+
 }
