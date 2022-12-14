@@ -40,12 +40,6 @@ public class VehicleService implements IVehicleService {
         return this.vehicleRepository.save(vehicle);
     }
 
-    @Override
-    public Vehicle updateLocation(Long vehicleId, LocationDTO locationDTO) {
-       // return this.vehicleRepository.updateLocation(vehicleId, locationDTO);
-        return null;
-    }
-
     public Vehicle createVehicle(VehicleDTO vehicleDTO, Location location){
         Vehicle vehicle = new Vehicle();
         VehicleName vehicleName = VehicleName.getVehicleName(vehicleDTO.getVehicleType());
@@ -90,6 +84,13 @@ public class VehicleService implements IVehicleService {
     @Override
     public Location findLocation(Long id){
         return this.vehicleRepository.getLocation(id);
+    }
+
+    @Override
+    public Vehicle setCurrentLocation(Vehicle vehicle, LocationDTO locationDTO) {
+        Location location = new Location(locationDTO.getLatitude(), locationDTO.getLongitude(), locationDTO.getAddress());
+        vehicle.setCurrentLocation(location);
+        return vehicle;
     }
 
     @Override

@@ -16,8 +16,6 @@ public interface IVehicleService {
 
     Optional<Vehicle> findOne(Long id);
     Vehicle save(Vehicle vehicle);
-
-    Vehicle updateLocation(Long vehicleId, LocationDTO locationDTO);
     Vehicle createVehicle(VehicleDTO vehicleDTO, Driver driver);
     Vehicle createVehicle(VehicleDTO vehicleDTO, Location location);
     Vehicle editVehicle(Vehicle vehicle, VehicleDTO vehicleDTO);
@@ -26,4 +24,6 @@ public interface IVehicleService {
 
     Optional<VehicleType> findType(Long id);
     Location findLocation(Long id);
+
+    Vehicle setCurrentLocation(Vehicle vehicle, LocationDTO locationDTO);
 }

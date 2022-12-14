@@ -8,9 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
-
-   // Vehicle updateLocation(Long vehicleId, LocationDTO locationDTO);
-    
     @Query("select v.currentLocation from Vehicle v where v.id=:vehicleId")
     Location getLocation(Long vehicleId);
 }
