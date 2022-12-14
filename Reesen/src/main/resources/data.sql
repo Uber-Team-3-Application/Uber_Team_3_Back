@@ -11,12 +11,10 @@ values('Marko', 'Preradovic', 'profilna', '+38121521', 'markopreradovic@gmail.co
 
 insert into Drivers(id) values(1);
 insert into Drivers(id) values(2);
+
 insert into Passenger(id, is_confirmed_mail, amount_of_money) values(3, true, 1000);
 insert into Passenger(id, is_confirmed_mail, amount_of_money) values(4, true, 3000);
 
-
-insert into Document(document_image, name, driver_id)
-values ('U3dhZ2dlciByb2Nrcw==', 'Vozacka Dozvola', 1);
 insert into Document(document_image, name, driver_id)
 values ('U3dhZ2dlciByb2Nrcw==', 'Saobracajna Dozvola', 1);
 insert into Document(document_image, name, driver_id)
@@ -28,5 +26,4 @@ values ('U3dhZ2dlciByb2Nrcw==', 'Saobracajna Dozvola', 2);
 insert into Vehicle_Type(price_per_km, name) values(120, 'STANDARD');
 insert into Vehicle_Type(price_per_km, name) values(140, 'LUXURY');
 insert into Vehicle_Type(price_per_km, name) values(130, 'VAN');
-
 
