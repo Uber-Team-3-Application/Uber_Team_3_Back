@@ -4,17 +4,37 @@ import com.reesen.Reesen.dto.ReviewDTO;
 import com.reesen.Reesen.dto.ReviewWithPassengerDTO;
 import com.reesen.Reesen.dto.RideReviewDTO;
 import com.reesen.Reesen.mockup.ReviewMockup;
+import com.reesen.Reesen.model.Review;
+import com.reesen.Reesen.model.Ride;
+import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.model.paginated.Paginated;
+import com.reesen.Reesen.service.interfaces.IReviewService;
+import com.reesen.Reesen.service.interfaces.IRideService;
+import com.reesen.Reesen.service.interfaces.IVehicleService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @CrossOrigin
 @RestController
 @RequestMapping("api/review")
 public class ReviewController {
+
+    private final IReviewService reviewService;
+    private final IRideService rideService;
+    private final IVehicleService vehicleService;
+
+    @Autowired
+    public ReviewController(IReviewService reviewService, IRideService rideService, IVehicleService vehicleService) {
+        this.reviewService = reviewService;
+        this.rideService = rideService;
+        this.vehicleService = vehicleService;
+    }
 
     @PostMapping("/{rideId}/vehicle/{id}")
     public ResponseEntity<ReviewWithPassengerDTO> createReviewAboutVehicle(
@@ -22,15 +42,22 @@ public class ReviewController {
             @PathVariable int rideId,
             @RequestBody ReviewDTO review) {
 
+        // TODO: PASSENGER ???  --> NIJE IMPLEMENTIRANA LOGIKA TOKENA
         return new ResponseEntity<>(ReviewMockup.getReview(), HttpStatus.OK);
     }
 
 
     @GetMapping("/vehicle/{id}")
     public ResponseEntity<Paginated<ReviewWithPassengerDTO>> getReviewsForVehicle(@PathVariable int id) {
-        HashSet<ReviewWithPassengerDTO> set = new HashSet<>();
-        set.add(ReviewMockup.getReview());
-        return new ResponseEntity<>(new Paginated<>(243, set), HttpStatus.OK);
+
+        Vehicle vehicle = vehicleService.findOne((long) id).get();
+        Set<ReviewWithPassengerDTO> retVal = new HashSet<>();
+        for (Review review : reviewService.getReviews()) {
+            if (Objects.equals(review.getRide().getDriver().getVehicle().getId(), vehicle.getId())) {
+                retVal.add(new ReviewWithPassengerDTO(review, false));
+            }
+        }
+        return new ResponseEntity<>(new Paginated<>(retVal.size(),retVal), HttpStatus.OK);
     }
 
     @PostMapping("/{rideId}/driver/{id}")
@@ -40,21 +67,35 @@ public class ReviewController {
             @RequestBody ReviewDTO reviewDTO
     )
     {
+
+        // TODO: PASSENGER ?? --> NIJE IMPLEMENTIRANA LOGIKA TOKENA
         return new ResponseEntity<>(ReviewMockup.getReview(), HttpStatus.OK);
     }
 
     @GetMapping("/driver/{id}")
     public ResponseEntity<Paginated<ReviewWithPassengerDTO>> getReviewsForTheSpecificDriver(@PathVariable Long id) {
-        HashSet<ReviewWithPassengerDTO> set = new HashSet<>();
-        set.add(ReviewMockup.getReview());
-        return new ResponseEntity<>(new Paginated<>(243, set), HttpStatus.OK);
+
+        Ride ride = rideService.findOne(id);
+        Set<ReviewWithPassengerDTO> retVal = new HashSet<>();
+        for (Review review : reviewService.getReviews()) {
+            if (Objects.equals(review.getRide().getId(), ride.getId())) {
+                retVal.add(new ReviewWithPassengerDTO(review, true));
+            }
+        }
+        return new ResponseEntity<>(new Paginated<>(retVal.size(),retVal), HttpStatus.OK);
+
     }
 
     @GetMapping("/{rideId}")
     public  ResponseEntity<HashSet<RideReviewDTO>> getAllReviewsForTheSpecificRide(@PathVariable Long rideId) {
+
+        Ride ride = rideService.findOne(rideId);
         HashSet<RideReviewDTO> reviews = new HashSet<>();
-        RideReviewDTO review = new RideReviewDTO(ReviewMockup.getReview(), ReviewMockup.getReview());
-        reviews.add(review);
+        for (Review review : ride.getReview()) {
+            ReviewWithPassengerDTO vehicleReview = new ReviewWithPassengerDTO(review, false);
+            ReviewWithPassengerDTO driverReview = new ReviewWithPassengerDTO(review, true);
+            reviews.add(new RideReviewDTO(vehicleReview, driverReview));
+        }
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 

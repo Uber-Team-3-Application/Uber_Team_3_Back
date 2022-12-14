@@ -6,6 +6,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.Date;
 import java.util.Optional;
+import com.reesen.Reesen.model.WorkingHours;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDateTime;
+import java.util.Date;
 
 public interface IRideService {
 	Optional<Ride> findOne(Long id);
@@ -24,4 +30,5 @@ public interface IRideService {
 	Ride endRide(Long id);
 
 	Ride acceptRide(Long id);
+	Page<Ride> findAll(Long driverId, Pageable page, LocalDateTime from, LocalDateTime to);
 }

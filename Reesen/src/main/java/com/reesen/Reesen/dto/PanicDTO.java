@@ -1,5 +1,6 @@
 package com.reesen.Reesen.dto;
 
+import com.reesen.Reesen.model.Panic;
 import com.reesen.Reesen.model.User;
 
 import java.util.Date;
@@ -15,6 +16,13 @@ public class PanicDTO {
 
     public PanicDTO(){
 
+    }
+    public PanicDTO(Panic panic){
+        this.id = panic.getId();
+        this.user = new PanicUserDTO(panic.getUser());
+        this.ride = new PanicRideDTO(panic.getRide());
+        this.time = panic.getTimeOfPress();
+        this.reason = panic.getReason();
     }
 
     public PanicDTO(PanicUserDTO user, PanicRideDTO ride, Date time, String reason) {
