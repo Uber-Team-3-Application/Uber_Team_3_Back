@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 @Repository
 public interface RideRepository extends JpaRepository<Ride, Long> {
-}
+
     public Page<Ride> findAllByDriverId(Long driverId, Pageable page);
 
     public Page<Ride> findAllByDriverIdAndTimeOfStartAfterAndTimeOfEndBefore(
