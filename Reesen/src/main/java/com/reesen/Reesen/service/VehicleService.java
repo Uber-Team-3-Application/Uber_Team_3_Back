@@ -1,5 +1,6 @@
 package com.reesen.Reesen.service;
 
+import com.reesen.Reesen.dto.LocationDTO;
 import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.dto.VehicleDTO;
 import com.reesen.Reesen.model.Driver;
@@ -30,8 +31,8 @@ public class VehicleService implements IVehicleService {
     }
 
     @Override
-    public Vehicle findOne(Long id) {
-        return this.vehicleRepository.findById(id).orElseGet(null);
+    public Optional<Vehicle> findOne(Long id) {
+        return this.vehicleRepository.findById(id);
     }
 
     @Override
@@ -40,6 +41,10 @@ public class VehicleService implements IVehicleService {
     }
 
     @Override
+    public Vehicle updateLocation(Long vehicleId, LocationDTO locationDTO) {
+        return this.vehicleRepository.updateLocation(vehicleId, locationDTO);
+    }
+
     public Vehicle createVehicle(VehicleDTO vehicleDTO, Location location){
         Vehicle vehicle = new Vehicle();
         VehicleName vehicleName = VehicleName.getVehicleName(vehicleDTO.getVehicleType());
