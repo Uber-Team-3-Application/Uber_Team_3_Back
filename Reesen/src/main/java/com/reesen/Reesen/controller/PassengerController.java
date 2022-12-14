@@ -72,15 +72,15 @@ public class PassengerController {
         Date toDate = new SimpleDateFormat("dd/MM/yyyy").parse(to);
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        Optional<Passenger> passenger = this.passengerService.findOne(id);
-        if(passenger.isEmpty())
+        if(this.passengerService.findOne(id).isEmpty())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        Page<Ride> rides = this.rideService.findAllPassengerRides(id, page, fromDate, toDate);
+        Passenger passenger = this.passengerService.findOne(id).get();
+        Set<Ride> rides = passenger.getRides();
         Set<RideDTO> rideDTOs = new HashSet<>();
         for(Ride ride: rides){
             rideDTOs.add(new RideDTO(ride));
         }
-        return new ResponseEntity<>(new Paginated<RideDTO>(rides.getNumberOfElements(), rideDTOs), HttpStatus.OK);
+        return new ResponseEntity<>(new Paginated<RideDTO>(page.getPageNumber(), rideDTOs), HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}")

@@ -11,6 +11,4 @@ import java.util.Date;
 public interface IRideService {
 	Ride findOne(Long id);
 	Ride save(Ride ride);
-
-	Page<Ride> findAllPassengerRides(Long id, Pageable page, Date fromDate, Date toDate);
 }
