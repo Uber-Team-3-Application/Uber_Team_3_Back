@@ -1,7 +1,10 @@
 package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.LocationDTO;
+import com.reesen.Reesen.dto.PassengerDTO;
 import com.reesen.Reesen.dto.VehicleDTO;
+import com.reesen.Reesen.model.Passenger;
+import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.service.interfaces.IVehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +25,12 @@ public class VehicleController {
 
     @PutMapping(value = "/{vehicleId}/location")
     public ResponseEntity<String> updateLocation(@RequestBody LocationDTO locationDTO, @PathVariable Long vehicleId){
+        if(vehicleId < 1)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(this.vehicleService.findOne(vehicleId).isEmpty())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Vehicle vehicle = this.vehicleService.updateLocation(vehicleId, locationDTO);
+        this.vehicleService.save(vehicle);
         return new ResponseEntity<>("Coordinates successfully updated", HttpStatus.NO_CONTENT);
     }
 }
