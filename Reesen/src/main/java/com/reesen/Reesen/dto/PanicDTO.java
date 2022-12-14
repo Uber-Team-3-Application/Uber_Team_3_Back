@@ -3,6 +3,7 @@ package com.reesen.Reesen.dto;
 import com.reesen.Reesen.model.Panic;
 import com.reesen.Reesen.model.User;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 
@@ -11,7 +12,7 @@ public class PanicDTO {
     private Long id;
     private PanicUserDTO user;
     private PanicRideDTO ride;
-    private Date time;
+    private LocalDateTime time;
     private String reason;
 
     public PanicDTO(){
@@ -25,14 +26,14 @@ public class PanicDTO {
         this.reason = panic.getReason();
     }
 
-    public PanicDTO(PanicUserDTO user, PanicRideDTO ride, Date time, String reason) {
+    public PanicDTO(PanicUserDTO user, PanicRideDTO ride, LocalDateTime time, String reason) {
         this.user = user;
         this.ride = ride;
         this.time = time;
         this.reason = reason;
     }
 
-    public PanicDTO(Long id, PanicUserDTO user, PanicRideDTO ride, Date time, String reason) {
+    public PanicDTO(Long id, PanicUserDTO user, PanicRideDTO ride, LocalDateTime time, String reason) {
         this.id = id;
         this.user = user;
         this.ride = ride;
@@ -65,11 +66,11 @@ public class PanicDTO {
         this.ride = ride;
     }
 
-    public Date getTime() {
+    public LocalDateTime getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(LocalDateTime time) {
         this.time = time;
     }
 

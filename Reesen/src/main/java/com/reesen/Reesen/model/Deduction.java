@@ -3,6 +3,7 @@ package com.reesen.Reesen.model;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Table
@@ -25,12 +26,12 @@ public class Deduction implements Serializable {
     private String reason;
 
     @Column
-    private Date deductionTime;
+    private LocalDateTime deductionTime;
 
     public Deduction() {
     }
 
-    public Deduction(Ride ride, User user, String reason, Date deductionTime) {
+    public Deduction(Ride ride, User user, String reason, LocalDateTime deductionTime) {
         this.ride = ride;
         this.user = user;
         this.reason = reason;
@@ -69,11 +70,11 @@ public class Deduction implements Serializable {
         this.reason = reason;
     }
 
-    public Date getDeductionTime() {
+    public LocalDateTime getDeductionTime() {
         return deductionTime;
     }
 
-    public void setDeductionTime(Date deductionTime) {
+    public void setDeductionTime(LocalDateTime deductionTime) {
         this.deductionTime = deductionTime;
     }
 }
