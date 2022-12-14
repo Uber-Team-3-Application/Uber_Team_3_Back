@@ -50,7 +50,7 @@ public class ReviewController {
     @GetMapping("/vehicle/{id}")
     public ResponseEntity<Paginated<ReviewWithPassengerDTO>> getReviewsForVehicle(@PathVariable int id) {
 
-        Vehicle vehicle = vehicleService.findOne((long) id);
+        Vehicle vehicle = vehicleService.findOne((long) id).get();
         Set<ReviewWithPassengerDTO> retVal = new HashSet<>();
         for (Review review : reviewService.getReviews()) {
             if (Objects.equals(review.getRide().getDriver().getVehicle().getId(), vehicle.getId())) {
