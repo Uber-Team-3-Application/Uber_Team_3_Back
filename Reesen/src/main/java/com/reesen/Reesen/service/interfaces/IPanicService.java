@@ -7,7 +7,6 @@ import java.util.List;
 
 public interface IPanicService {
 
-    PanicTotalDTO getPanicTotalDTO();
 
     List<Panic> findAll();
 }
