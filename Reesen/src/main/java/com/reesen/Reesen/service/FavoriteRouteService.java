@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.reesen.Reesen.model.FavoriteRoute;
 import com.reesen.Reesen.repository.FavoriteRouteRepository;
 import com.reesen.Reesen.service.interfaces.IFavoriteRouteService;
+import org.springframework.stereotype.Service;
 
+@Service
 public class FavoriteRouteService implements IFavoriteRouteService{
 	
 	private final FavoriteRouteRepository favoriteRouteRepository;

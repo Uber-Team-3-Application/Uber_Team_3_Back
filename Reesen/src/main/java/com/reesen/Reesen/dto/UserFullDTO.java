@@ -1,5 +1,7 @@
 package com.reesen.Reesen.dto;
 
+import com.reesen.Reesen.model.User;
+
 public class UserFullDTO {
     private Long id;
     private String name;
@@ -11,6 +13,16 @@ public class UserFullDTO {
 
     public UserFullDTO() {
 
+    }
+
+    public UserFullDTO(User user) {
+        this.id = user.getId();
+        this.name = user.getName();
+        this.surname = user.getSurname();
+        this.profilePicture = user.getProfilePicture();
+        this.telephoneNumber = user.getTelephoneNumber();
+        this.email = user.getEmail();
+        this.address = user.getAddress();
     }
 
     public UserFullDTO(Long id, String name, String surname, String profilePicture, String telephoneNumber, String email, String address) {

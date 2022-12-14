@@ -23,8 +23,6 @@ public class Panic implements Serializable {
     @JoinColumn(name = "rideId")
     private Ride ride;
 
-
-
     @OneToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     private User user;
