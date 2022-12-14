@@ -5,7 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.reesen.Reesen.model.Route;
 import com.reesen.Reesen.repository.RouteRepository;
 import com.reesen.Reesen.service.interfaces.IRouteService;
+import org.springframework.stereotype.Service;
 
+
+@Service
 public class RouteService implements IRouteService{
 	
     private final RouteRepository routeRepository;
