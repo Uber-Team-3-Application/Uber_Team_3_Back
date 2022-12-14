@@ -1,7 +1,6 @@
 package com.reesen.Reesen.mockup;
 
 import com.reesen.Reesen.dto.*;
-import com.reesen.Reesen.model.Location;
 
 import java.time.Instant;
 import java.util.Date;
@@ -32,7 +31,7 @@ public class DriverRideMockup {
         endTime = Date.from(Instant.now());
         LocationDTO departure = new LocationDTO( "Bulevar Oslobodjenja 74", 45.267136, 19.833549);
         LocationDTO destination = new LocationDTO( "Bulevar Oslobodjenja 74", 45.267136, 19.83354 );
-        locations.add(new RouteDTO(departure, destination));
+        locations.add(new RouteDTO(id, departure, destination));
 
 
         rejection = new DeductionDTO(

@@ -1,10 +1,8 @@
 package com.reesen.Reesen.dto;
 
-import com.reesen.Reesen.model.Route;
-import com.reesen.Reesen.model.Location;
-
 public class RouteDTO {
-	
+
+	private Long id;
     private LocationDTO departure;
     private LocationDTO destination;
     
@@ -12,11 +10,19 @@ public class RouteDTO {
 
 	}
 
-	public RouteDTO(LocationDTO departure, LocationDTO destination) {
+	public RouteDTO(Long id, LocationDTO departure, LocationDTO destination) {
+		this.id = id;
 		this.departure = departure;
 		this.destination = destination;
 	}
 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	public LocationDTO getDeparture() {
 		return departure;

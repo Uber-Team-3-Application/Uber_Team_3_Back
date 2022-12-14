@@ -2,7 +2,6 @@ package com.reesen.Reesen.mockup;
 
 import com.reesen.Reesen.Enums.RideStatus;
 import com.reesen.Reesen.dto.*;
-import com.reesen.Reesen.model.Location;
 
 import java.time.Instant;
 import java.util.Date;
@@ -36,7 +35,7 @@ public class RideMockup {
                 ));
         locations.add(
                 new RouteDTO(
-                        new LocationDTO( "Kuca Poso", 45.267136, 19.833549),
+                        id, new LocationDTO( "Kuca Poso", 45.267136, 19.833549),
                         new LocationDTO( "Poso Kuca", 45.267136, 19.833549)
                 ));
         startTime = Date.from(Instant.now());

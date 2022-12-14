@@ -73,7 +73,7 @@ public class PanicService implements IPanicService {
         LocationDTO departure = new LocationDTO("Bulevar oslobodjenja 46", 45.267136, 19.833549);
         LocationDTO destination = new LocationDTO("Bulevar oslobodjenja 46", 45.267136, 19.833549);
 
-        panicRideDTO.addLocation(new RouteDTO(departure, destination));
+        panicRideDTO.addLocation(new RouteDTO(10L, departure, destination));
         panicRideDTO.setRejection(
                 new DeductionDTO("Ride is canceled due to previous problems with the passenger",
                         Date.from(Instant.now())));

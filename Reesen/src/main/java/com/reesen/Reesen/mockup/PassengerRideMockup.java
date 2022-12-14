@@ -4,7 +4,6 @@ import com.reesen.Reesen.dto.DeductionDTO;
 import com.reesen.Reesen.dto.LocationDTO;
 import com.reesen.Reesen.dto.RouteDTO;
 import com.reesen.Reesen.dto.UserDTO;
-import com.reesen.Reesen.model.Location;
 
 import java.time.Instant;
 import java.util.Date;
@@ -32,7 +31,7 @@ public class PassengerRideMockup {
         rejection = new HashSet<>();
         locations.add(
                 new RouteDTO(
-                        new LocationDTO("Kuca Poso", 45.267136, 19.833549),
+                        id, new LocationDTO("Kuca Poso", 45.267136, 19.833549),
                         new LocationDTO("Poso Kuca", 45.267136, 19.833549)
                 ));
         rejection.add(
