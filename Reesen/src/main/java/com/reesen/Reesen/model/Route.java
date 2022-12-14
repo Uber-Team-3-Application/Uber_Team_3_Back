@@ -17,6 +17,9 @@ public class Route implements Serializable {
     @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     private Location destination;
 
+    @Column
+    private double mileage;
+
     public Route() {
     }
 
@@ -48,4 +51,13 @@ public class Route implements Serializable {
     public void setDestination(Location destination) {
         this.destination = destination;
     }
+
+    public double getMileage() {
+        return mileage;
+    }
+
+    public void setMileage(double mileage) {
+        this.mileage = mileage;
+    }
+
 }

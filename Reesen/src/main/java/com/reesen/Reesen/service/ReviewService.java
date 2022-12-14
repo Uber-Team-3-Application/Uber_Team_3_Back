@@ -5,7 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.reesen.Reesen.model.Review;
 import com.reesen.Reesen.repository.ReviewRepository;
 import com.reesen.Reesen.service.interfaces.IReviewService;
+import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.Set;
+
+@Service
 public class ReviewService implements IReviewService {
 	
 	private final ReviewRepository reviewRepository;
@@ -24,5 +29,8 @@ public class ReviewService implements IReviewService {
 	public Review save(Review review) {
 		return  this.reviewRepository.save(review);
 	}
+
+	@Override
+	public Set<Review> getReviews() {return new HashSet<>(this.reviewRepository.findAll());}
 
 }
