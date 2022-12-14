@@ -1,6 +1,6 @@
 package com.reesen.Reesen.dto;
 
-import com.fasterxml.jackson.annotation.JsonFilter;
+import com.reesen.Reesen.model.Review;
 
 public class ReviewWithPassengerDTO {
     private Long id;
@@ -15,6 +15,13 @@ public class ReviewWithPassengerDTO {
         this.rating = rating;
         this.comment = comment;
         this.passenger = passenger;
+    }
+
+    public ReviewWithPassengerDTO(Review review, boolean isDriverComment) {
+        this.id = review.getId();
+        this.rating = review.getVehicleRating();
+        this.comment = isDriverComment ? review.getDriverComment() : review.getVehicleComment();
+        this.passenger = new UserDTO(review.getPassenger().getId(), review.getPassenger().getEmail());
     }
 
     public Long getId() {
