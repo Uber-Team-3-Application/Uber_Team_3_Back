@@ -42,7 +42,8 @@ public class VehicleService implements IVehicleService {
 
     @Override
     public Vehicle updateLocation(Long vehicleId, LocationDTO locationDTO) {
-        return this.vehicleRepository.updateLocation(vehicleId, locationDTO);
+       // return this.vehicleRepository.updateLocation(vehicleId, locationDTO);
+        return null;
     }
 
     public Vehicle createVehicle(VehicleDTO vehicleDTO, Location location){
