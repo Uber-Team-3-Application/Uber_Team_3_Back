@@ -1,6 +1,8 @@
 package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.*;
+import com.reesen.Reesen.model.Panic;
+import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.service.interfaces.IPanicService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,10 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @CrossOrigin
 @RestController
@@ -24,10 +30,13 @@ public class PanicController {
     }
 
     @GetMapping
-    public ResponseEntity<PanicTotalDTO> getPanicNotifications(){
+    public ResponseEntity<Paginated<PanicDTO>> getPanicNotifications(){
+        List<Panic> panics = this.panicService.findAll();
 
-        PanicTotalDTO panicTotalDTO = this.panicService.getPanicTotalDTO();
-        return new ResponseEntity<>(panicTotalDTO, HttpStatus.OK);
+        Set<PanicDTO> panicDTOs = new HashSet<>();
+        for(Panic panic:panics) panicDTOs.add(new PanicDTO(panic));
+
+        return new ResponseEntity<>(new Paginated<PanicDTO>(panicDTOs.size(), panicDTOs), HttpStatus.OK);
 
     }
 
