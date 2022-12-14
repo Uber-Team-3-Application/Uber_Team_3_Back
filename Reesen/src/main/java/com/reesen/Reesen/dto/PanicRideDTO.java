@@ -1,6 +1,8 @@
 package com.reesen.Reesen.dto;
 
+import com.reesen.Reesen.model.Passenger;
 import com.reesen.Reesen.model.Ride;
+import com.reesen.Reesen.model.Route;
 import com.reesen.Reesen.model.User;
 
 import java.util.Date;
@@ -31,13 +33,20 @@ public class PanicRideDTO {
         this.startTime = ride.getTimeOfStart();
         this.endTime = ride.getTimeOfEnd();
         this.totalCost = ride.getTotalPrice();
-        //this.driver = ride.getDriver();
-        //this.passengers = passengers;
+        this.driver = new UserDTO(ride.getDriver());
+        this.passengers = new HashSet<>();
+        for(Passenger pass:ride.getPassengers()){
+            this.passengers.add(new UserDTO(pass));
+        }
         this.estimatedTimeInMinutes = ride.getEstimatedTime();
         this.vehicleType = ride.getVehicleType().toString();
         this.babyTransport = ride.isBabyAccessible();
         this.petTransport = ride.isPetAccessible();
-        //this.locations = ride.getLocations();
+        this.locations = new HashSet<>();
+        for(Route route:ride.getLocations()){
+            this.locations.add(
+                    new RouteDTO(new LocationDTO(route.getDeparture()), new LocationDTO(route.getDestination())));
+        }
         this.rejection = new DeductionDTO(ride.getDeduction());
     }
 
