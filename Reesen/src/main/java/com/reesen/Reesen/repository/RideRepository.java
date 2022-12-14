@@ -16,7 +16,6 @@ import java.util.Optional;
 public interface RideRepository extends JpaRepository<Ride, Long> {
 
     Optional<Ride> findRideByDriverIdAndStatus(Long driverId, RideStatus status);
-
     public Page<Ride> findAllByDriverId(Long driverId, Pageable page);
 
     public Page<Ride> findAllByDriverIdAndTimeOfStartAfterAndTimeOfEndBefore(
