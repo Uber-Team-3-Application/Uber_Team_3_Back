@@ -29,7 +29,8 @@ public class VehicleController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(this.vehicleService.findOne(vehicleId).isEmpty())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        Vehicle vehicle = this.vehicleService.updateLocation(vehicleId, locationDTO);
+        Vehicle vehicle = this.vehicleService.findOne(vehicleId).get();
+        vehicle = this.vehicleService.setCurrentLocation(vehicle, locationDTO);
         this.vehicleService.save(vehicle);
         return new ResponseEntity<>("Coordinates successfully updated", HttpStatus.NO_CONTENT);
     }
