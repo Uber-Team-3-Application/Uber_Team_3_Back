@@ -9,12 +9,27 @@ values('Nemanja', 'Stefanovic', 'profilna', '+38121521', 'nemus@gmail.com', 'Nem
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address)
 values('Marko', 'Preradovic', 'profilna', '+38121521', 'markopreradovic@gmail.com', 'Marko123', false, true, 'Kurtijeva 12, Novi Sad');
 
-insert into Drivers(id) values(1);
-insert into Drivers(id) values(2);
+
 
 insert into Passenger(id, is_confirmed_mail, amount_of_money) values(3, true, 1000);
 insert into Passenger(id, is_confirmed_mail, amount_of_money) values(4, true, 3000);
 
+
+
+
+insert into Vehicle_Type(price_per_km, name) values(120, 'STANDARD');
+insert into Vehicle_Type(price_per_km, name) values(140, 'LUXURY');
+insert into Vehicle_Type(price_per_km, name) values(130, 'VAN');
+
+insert into location(id, address, latitude, longitude) values(1, 'Radnicka 19, Novi Sad', 19.55, 17.55);
+
+insert into Vehicle
+    (id, is_baby_accessible, is_pet_accessible, model, number_of_seats, registration_plate, current_location_id, vehicle_type_id)
+    values
+    (1, true, true, 'Audi A3', 4, 'KK077KK', 1, 1);
+
+insert into Drivers(id) values(1);
+insert into Drivers(id, vehicle_id) values(2, 1);
 insert into Document(document_image, name, driver_id)
 values ('U3dhZ2dlciByb2Nrcw==', 'Saobracajna Dozvola', 1);
 insert into Document(document_image, name, driver_id)
@@ -23,7 +38,4 @@ insert into Document(document_image, name, driver_id)
 values ('U3dhZ2dlciByb2Nrcw==', 'Saobracajna Dozvola', 2);
 
 
-insert into Vehicle_Type(price_per_km, name) values(120, 'STANDARD');
-insert into Vehicle_Type(price_per_km, name) values(140, 'LUXURY');
-insert into Vehicle_Type(price_per_km, name) values(130, 'VAN');
 
