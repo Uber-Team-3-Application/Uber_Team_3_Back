@@ -8,6 +8,7 @@ import com.reesen.Reesen.model.Location;
 import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.model.VehicleType;
 
+import java.util.List;
 import java.util.Optional;
 
 import java.util.Optional;
@@ -26,4 +27,6 @@ public interface IVehicleService {
     Location findLocation(Long id);
 
     Vehicle setCurrentLocation(Vehicle vehicle, LocationDTO locationDTO);
+
+    List<VehicleType> getVehicleTypes();
 }
