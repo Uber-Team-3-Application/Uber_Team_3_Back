@@ -14,7 +14,8 @@ values('Marko', 'Preradovic', 'profilna', '+38121521', 'markopreradovic@gmail.co
 insert into Passenger(id, is_confirmed_mail, amount_of_money) values(3, true, 1000);
 insert into Passenger(id, is_confirmed_mail, amount_of_money) values(4, true, 3000);
 
-
+insert into Admin(name, password, profile_picture, surname, username)
+            values('Nikolaj', 'Nikolaj123', 'U3dhZ2dlciByb2Nrcw', 'Velimirovic', 'nikolaj');
 
 
 insert into Vehicle_Type(price_per_km, name) values(120, 'STANDARD');
