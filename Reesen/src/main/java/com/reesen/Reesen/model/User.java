@@ -1,6 +1,7 @@
 package com.reesen.Reesen.model;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
+import com.reesen.Reesen.Enums.Role;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -41,6 +42,9 @@ public class User implements Serializable {
     @Column
     private String address;
 
+    @Column
+    private Role role;
+
 
     public User() {
     }
@@ -52,9 +56,36 @@ public class User implements Serializable {
         this.telephoneNumber = telephoneNumber;
         this.email = email;
         this.password = password;
-        this.isBlocked = isBlocked;
+        this.isBlocked = false;
         isActive = false;
         isBlocked = false;
+    }
+
+    public User(Long id, String name, String surname, String profilePicture, String telephoneNumber, String email, String password, boolean isBlocked, boolean isActive, String address, Role role) {
+        this.id = id;
+        this.name = name;
+        this.surname = surname;
+        this.profilePicture = profilePicture;
+        this.telephoneNumber = telephoneNumber;
+        this.email = email;
+        this.password = password;
+        this.isBlocked = isBlocked;
+        this.isActive = isActive;
+        this.address = address;
+        this.role = role;
+    }
+
+    public User(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, boolean isBlocked, boolean isActive, String address, Role role) {
+        this.name = name;
+        this.surname = surname;
+        this.profilePicture = profilePicture;
+        this.telephoneNumber = telephoneNumber;
+        this.email = email;
+        this.password = password;
+        this.isBlocked = isBlocked;
+        this.isActive = isActive;
+        this.address = address;
+        this.role = role;
     }
 
     public User(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, boolean isBlocked, boolean isActive, String address) {
@@ -147,5 +178,13 @@ public class User implements Serializable {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }
