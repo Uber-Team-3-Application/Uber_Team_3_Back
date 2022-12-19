@@ -45,6 +45,8 @@ public class User implements Serializable {
     @Column
     private Role role;
 
+    @Transient
+    private String jwt;
 
     public User() {
     }

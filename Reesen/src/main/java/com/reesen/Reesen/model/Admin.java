@@ -30,6 +30,8 @@ public class Admin implements Serializable {
     @Column
     private Role role;
 
+    @Transient
+    private String jwt;
     public Admin() {
     }
 
