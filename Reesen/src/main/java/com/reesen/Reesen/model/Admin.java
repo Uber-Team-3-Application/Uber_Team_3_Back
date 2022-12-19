@@ -1,5 +1,6 @@
 package com.reesen.Reesen.model;
 
+import com.reesen.Reesen.Enums.Role;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -26,7 +27,19 @@ public class Admin implements Serializable {
     @Column(nullable = false)
     private String surname;
 
+    @Column
+    private Role role;
+
     public Admin() {
+    }
+
+    public Admin(String username, String password, String profilePicture, String name, String surname, Role role) {
+        this.username = username;
+        this.password = password;
+        this.profilePicture = profilePicture;
+        this.name = name;
+        this.surname = surname;
+        this.role = role;
     }
 
     public Admin(String username, String password, String profilePicture, String name, String surname) {
@@ -35,6 +48,23 @@ public class Admin implements Serializable {
         this.profilePicture = profilePicture;
         this.name = name;
         this.surname = surname;
+        this.role = Role.ADMIN;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public Long getId() {
@@ -77,11 +107,5 @@ public class Admin implements Serializable {
         this.name = name;
     }
 
-    public String getsurname() {
-        return surname;
-    }
 
-    public void setsurname(String surname) {
-        this.surname = surname;
-    }
 }
