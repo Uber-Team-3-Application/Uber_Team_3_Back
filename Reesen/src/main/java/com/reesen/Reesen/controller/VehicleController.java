@@ -7,13 +7,16 @@ import com.reesen.Reesen.dto.VehicleTypeDTO;
 import com.reesen.Reesen.model.Passenger;
 import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.model.VehicleType;
+import com.reesen.Reesen.service.interfaces.IDriverService;
 import com.reesen.Reesen.service.interfaces.IVehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @CrossOrigin
 @RestController
@@ -23,7 +26,8 @@ public class VehicleController {
     private final IVehicleService vehicleService;
 
     @Autowired
-    public VehicleController(IVehicleService vehicleService){
+    public VehicleController(IVehicleService vehicleService
+                             ){
         this.vehicleService = vehicleService;
     }
 
@@ -44,5 +48,13 @@ public class VehicleController {
     public ResponseEntity<List<VehicleType>> getAllVehicleTypes(){
         List<VehicleType> vehicleTypes = this.vehicleService.getVehicleTypes();
         return new ResponseEntity<>(vehicleTypes, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/vehicle-locations")
+    public ResponseEntity<List<LocationDTO>> getAllVehicleLocations(){
+
+        List<LocationDTO> locations = this.vehicleService.getAllLocations();
+
+        return new ResponseEntity<>(locations, HttpStatus.OK);
     }
 }

@@ -9,6 +9,10 @@ values('Nemanja', 'Stefanovic', 'profilna', '+38121521', 'nemus@gmail.com', 'Nem
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address)
 values('Marko', 'Preradovic', 'profilna', '+38121521', 'markopreradovic@gmail.com', 'Marko123', false, true, 'Kurtijeva 12, Novi Sad');
 
+insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address)
+values('Nebojsa', 'Vuga', 'profilna', '+38fsa1521', 'nebojsavuga@gmail.com', 'Nebojsa123', false, true, 'Radnicka 19, Novi Sad');
+
+
 
 
 insert into Passenger(id, is_confirmed_mail, amount_of_money) values(3, true, 1000);
@@ -22,15 +26,28 @@ insert into Vehicle_Type(price_per_km, name) values(120, 'STANDARD');
 insert into Vehicle_Type(price_per_km, name) values(140, 'LUXURY');
 insert into Vehicle_Type(price_per_km, name) values(130, 'VAN');
 
-insert into location(id, address, latitude, longitude) values(1, 'Radnicka 19, Novi Sad', 19.55, 17.55);
+insert into location(id, address, latitude, longitude) values(1, 'Radnicka 19, Novi Sad', 45.249101856630546, 19.848034);
+insert into location(id, address, latitude, longitude) values(2, 'Zeleznicka 2, Novi Sad', 45.2493924092008, 19.840783700998372 );
+insert into location(id, address, latitude, longitude) values(3, 'Cerska 34, Lacarak', 44.997668, 19.557723 );
 
 insert into Vehicle
     (id, is_baby_accessible, is_pet_accessible, model, number_of_seats, registration_plate, current_location_id, vehicle_type_id)
     values
     (1, true, true, 'Audi A3', 4, 'KK077KK', 1, 1);
 
-insert into Drivers(id) values(1);
+insert into Vehicle
+(id, is_baby_accessible, is_pet_accessible, model, number_of_seats, registration_plate, current_location_id, vehicle_type_id)
+values
+(2, true, true, 'Opel Astra G', 4, 'SM333RK', 2, 1);
+
+insert into Vehicle
+(id, is_baby_accessible, is_pet_accessible, model, number_of_seats, registration_plate, current_location_id, vehicle_type_id)
+values
+(3, true, true, 'Mecedes Benz C class', 4, 'SM077CF', 3, 2);
+
+insert into Drivers(id, vehicle_id) values(1, 2);
 insert into Drivers(id, vehicle_id) values(2, 1);
+insert into Drivers(id, vehicle_id) values(5, 3);
 insert into Document(document_image, name, driver_id)
 values ('U3dhZ2dlciByb2Nrcw==', 'Saobracajna Dozvola', 1);
 insert into Document(document_image, name, driver_id)

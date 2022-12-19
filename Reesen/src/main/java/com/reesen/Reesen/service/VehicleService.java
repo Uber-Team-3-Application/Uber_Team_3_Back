@@ -14,6 +14,7 @@ import com.reesen.Reesen.service.interfaces.IVehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -95,7 +96,17 @@ public class VehicleService implements IVehicleService {
     }
 
     @Override
+    public List<LocationDTO> getAllLocations() {
+        List<Long> vehicle_ids = this.vehicleRepository.getAllLocationIds();
 
+        List<LocationDTO> locations = new ArrayList<>();
+        for(Long id: vehicle_ids){
+            locations.add(new LocationDTO(this.vehicleRepository.getLocation(id)));
+        }
+        return locations;
+    }
+
+    @Override
     public Vehicle createVehicle(VehicleDTO vehicleDTO, Driver driver){
         Location location = new Location();
         location.setLongitude(vehicleDTO.getCurrentLocation().getLongitude());

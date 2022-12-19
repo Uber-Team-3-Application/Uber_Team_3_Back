@@ -29,4 +29,6 @@ public interface IVehicleService {
     Vehicle setCurrentLocation(Vehicle vehicle, LocationDTO locationDTO);
 
     List<VehicleType> getVehicleTypes();
+
+    List<LocationDTO> getAllLocations();
 }
