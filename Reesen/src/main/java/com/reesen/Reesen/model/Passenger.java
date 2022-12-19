@@ -30,7 +30,6 @@ public class Passenger extends User implements Serializable{
         this.favouriteRoutes = favouriteRoutes;
         this.isConfirmedMail = isConfirmedMail;
         this.amountOfMoney = amountOfMoney;
-        this.setRole(Role.PASSENGER);
     }
 
     public Passenger(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, boolean isBlocked, boolean isActive, String address, Set<Ride> rides, Set<FavoriteRoute> favouriteRoutes, boolean isConfirmedMail, double amountOfMoney) {
@@ -39,7 +38,6 @@ public class Passenger extends User implements Serializable{
         this.favouriteRoutes = favouriteRoutes;
         this.isConfirmedMail = isConfirmedMail;
         this.amountOfMoney = amountOfMoney;
-        this.setRole(Role.PASSENGER);
     }
 
     public Set<Ride> getRides() {

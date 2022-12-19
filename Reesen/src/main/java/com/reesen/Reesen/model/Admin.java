@@ -27,21 +27,8 @@ public class Admin implements Serializable {
     @Column(nullable = false)
     private String surname;
 
-    @Column
-    private Role role;
 
-    @Transient
-    private String jwt;
     public Admin() {
-    }
-
-    public Admin(String username, String password, String profilePicture, String name, String surname, Role role) {
-        this.username = username;
-        this.password = password;
-        this.profilePicture = profilePicture;
-        this.name = name;
-        this.surname = surname;
-        this.role = role;
     }
 
     public Admin(String username, String password, String profilePicture, String name, String surname) {
@@ -50,8 +37,9 @@ public class Admin implements Serializable {
         this.profilePicture = profilePicture;
         this.name = name;
         this.surname = surname;
-        this.role = Role.ADMIN;
     }
+
+
 
     public String getSurname() {
         return surname;
@@ -59,14 +47,6 @@ public class Admin implements Serializable {
 
     public void setSurname(String surname) {
         this.surname = surname;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
     }
 
     public Long getId() {
