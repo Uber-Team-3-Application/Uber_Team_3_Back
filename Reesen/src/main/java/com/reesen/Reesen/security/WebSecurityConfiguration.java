@@ -9,9 +9,11 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
 @Configuration
@@ -23,9 +25,17 @@ public class WebSecurityConfiguration {
     private JwtRequestFilter jwtRequestFilter;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-        // TODO : VEX
-        return null;
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.headers().frameOptions().disable();
+                 http.csrf().disable()
+                .authorizeRequests() // csrf->disabled, pošto nam JWT odrađuje zaštitu od CSRF napada
+                .antMatchers("/*").permitAll().antMatchers("/api/v2/login/*").permitAll() // statički html i login mogu svi da pozovu
+                .antMatchers("/api/**").authenticated() // sav pristup API-ju mora da bude autentikovan
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // ne koristimo HttpSession i kukije
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // JWT procesiramo pre autentikacije
+
+        return http.build();
     }
 
     @Bean

@@ -1,7 +1,7 @@
 package com.reesen.Reesen.model;
 
 import com.reesen.Reesen.Enums.Role;
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 import java.io.Serializable;
 import java.util.Set;
