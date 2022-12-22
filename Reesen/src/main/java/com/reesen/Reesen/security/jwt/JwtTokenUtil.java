@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.io.UnsupportedEncodingException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,17 +45,28 @@ public class JwtTokenUtil {
         return expiration.before(new Date());
     }
 
-    public String generateToken(String username){
+    public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        return doGenerateToken(claims, username);
+        claims.put("sub", userDetails.getUsername());
+        claims.put("role", userDetails.getAuthorities());
+        claims.put("created", new Date());
+        return this.generateToken(claims);
     }
 
-    private String doGenerateToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder().setClaims(claims)
-                .setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
-                .signWith(SignatureAlgorithm.HS512, secret).compact();
+    private String generateToken(Map<String, Object> claims) {
+        try {
+            return Jwts.builder()
+                    .setClaims(claims)
+                    .setExpiration(Date.from(Instant.now().plus(3, ChronoUnit.HOURS)))
+                    .signWith(SignatureAlgorithm.HS512, this.secret.getBytes("UTF-8"))
+                    .compact();
+        } catch (UnsupportedEncodingException ex) {
+            return Jwts.builder()
+                    .setClaims(claims)
+                    .setExpiration(Date.from(Instant.now().plus(3, ChronoUnit.HOURS)))
+                    .signWith(SignatureAlgorithm.HS512, this.secret)
+                    .compact();
+        }
     }
 
     public Boolean validateToken(String token, UserDetails userDetails){

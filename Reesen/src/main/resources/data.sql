@@ -1,5 +1,5 @@
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
-values('Mirko', 'Preradovic', 'profilna', '+38121521', 'mirko@gmail.com', 'Mirko123', false, true, 'Rajfajzenova 12, Novi Sad', 'DRIVER');
+values('Mirko', 'Preradovic', 'profilna', '+38121521', 'mirko@gmail.com', '$2a$12$C6YIMN3gkgH5WPCAps9PNuiHHntv9Mv4DZSvkPU1Z9sCPGimd6VpO', false, true, 'Rajfajzenova 12, Novi Sad', 'DRIVER');
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
 values('Marko', 'Kraljevic', 'profilna', '+38121521', 'marko@gmail.com', 'Marko123', false, true, 'Mirkova 14, Novi Sad', 'DRIVER');
 

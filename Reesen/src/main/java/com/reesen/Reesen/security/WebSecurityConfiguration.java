@@ -29,7 +29,7 @@ public class WebSecurityConfiguration {
         http.headers().frameOptions().disable();
                  http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/*").permitAll().antMatchers("/api/unregisteredUser/login").permitAll() // statički html i login mogu svi da pozovu
+                .antMatchers("/*").permitAll().antMatchers("*/login").permitAll() // statički html i login mogu svi da pozovu
                      // sav pristup API-ju mora da bude autentikovan
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // ne koristimo HttpSession i kukije
@@ -41,6 +41,7 @@ public class WebSecurityConfiguration {
     @Bean
     public PasswordEncoder passwordEncoder() {
         PasswordEncoder encoder = new BCryptPasswordEncoder();
+
         return encoder;
     }
 

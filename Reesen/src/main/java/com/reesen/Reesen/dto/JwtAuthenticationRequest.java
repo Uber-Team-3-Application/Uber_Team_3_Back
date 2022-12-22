@@ -1,10 +1,10 @@
 package com.reesen.Reesen.dto;
 
-public class LoginDTO {
+public class JwtAuthenticationRequest {
     private String email;
     private String password;
 
-    public LoginDTO(String email, String password) {
+    public JwtAuthenticationRequest(String email, String password) {
         this.email = email;
         this.password = password;
     }

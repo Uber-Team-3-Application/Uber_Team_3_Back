@@ -2,16 +2,24 @@ package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.dto.RideDTO;
-import com.reesen.Reesen.mockup.*;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.paginated.Paginated;
+import com.reesen.Reesen.security.jwt.JwtTokenUtil;
 import com.reesen.Reesen.service.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.util.*;
 
@@ -24,6 +32,12 @@ public class UserController {
     private final IRemarkService remarkService;
     private final IDriverService driverService;
     private final IPassengerService passengerService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
     public UserController(IUserService userService, IMessageService messageService, IRemarkService remarkService,
@@ -87,10 +101,29 @@ public class UserController {
 
 
     @PostMapping("/login")
-    //TODO: NIJE IMPLEMENTIRALA LOGIKA TOKENA
-    public ResponseEntity<TokenDTO> logIn(@RequestBody LoginDTO login) {
-        return new ResponseEntity<>(TokenMockup.getToken(), HttpStatus.OK);
+
+    public ResponseEntity<TokenDTO> logIn(@RequestBody JwtAuthenticationRequest authenticationRequest, HttpServletResponse response) {
+
+        // Ukoliko kredencijali nisu ispravni, logovanje nece biti uspesno, desice se
+        // AuthenticationException
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                authenticationRequest.getEmail(), authenticationRequest.getPassword()));
+
+        // Ukoliko je autentifikacija uspesna, ubaci korisnika u trenutni security
+        // kontekst
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // Kreiraj token za tog korisnika
+        System.out.println();
+        UserDetails user = (UserDetails) authentication.getPrincipal();
+        String jwt = jwtTokenUtil.generateToken(user);
+        Date expiresIn = jwtTokenUtil.getExpirationDate(jwt);
+
+        // Vrati token kao odgovor na uspesnu autentifikaciju
+        return ResponseEntity.ok(new TokenDTO(jwt, jwt));
+
     }
+
 
 
     @GetMapping("/{id}/message")

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -17,6 +18,11 @@ public class UserService implements IUserService {
     @Autowired
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return this.userRepository.findByEmail(email);
     }
 
     @Override
