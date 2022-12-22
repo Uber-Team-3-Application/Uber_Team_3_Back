@@ -47,7 +47,6 @@ public class VehicleController {
 
 
     @GetMapping(value = "/types")
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<List<VehicleType>> getAllVehicleTypes(){
         List<VehicleType> vehicleTypes = this.vehicleService.getVehicleTypes();
         return new ResponseEntity<>(vehicleTypes, HttpStatus.OK);

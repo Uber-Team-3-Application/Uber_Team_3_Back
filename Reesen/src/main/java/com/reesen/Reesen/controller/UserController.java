@@ -87,7 +87,6 @@ public class UserController {
 
 
     @PostMapping("/login")
-    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER', 'PASSENGER')")
     //TODO: NIJE IMPLEMENTIRALA LOGIKA TOKENA
     public ResponseEntity<TokenDTO> logIn(@RequestBody LoginDTO login) {
         return new ResponseEntity<>(TokenMockup.getToken(), HttpStatus.OK);
