@@ -30,7 +30,7 @@ public class WebSecurityConfiguration {
                  http.csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/*").permitAll().antMatchers("/api/unregisteredUser/login").permitAll() // statički html i login mogu svi da pozovu
-                .antMatchers("/api/**").authenticated() // sav pristup API-ju mora da bude autentikovan
+                     // sav pristup API-ju mora da bude autentikovan
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // ne koristimo HttpSession i kukije
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // JWT procesiramo pre autentikacije

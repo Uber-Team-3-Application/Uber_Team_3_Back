@@ -234,6 +234,7 @@ public class DriverController {
 
 
     @GetMapping(value = "/{id}")
+    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER', 'ADMIN')")
     public ResponseEntity<CreatedDriverDTO> getDriver(@PathVariable Long id){
 
         if(id < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
