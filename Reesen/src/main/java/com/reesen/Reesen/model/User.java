@@ -1,7 +1,8 @@
 package com.reesen.Reesen.model;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
-import jakarta.persistence.*;
+import com.reesen.Reesen.Enums.Role;
+import javax.persistence.*;
 
 import java.io.Serializable;
 
@@ -41,8 +42,28 @@ public class User implements Serializable {
     @Column
     private String address;
 
+    @Enumerated(EnumType.STRING)
+    @Column
+    private Role role;
+
+    @Transient
+    private String jwt;
 
     public User() {
+    }
+
+    public User(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, boolean isBlocked, boolean isActive, String address, Role role, String jwt) {
+        this.name = name;
+        this.surname = surname;
+        this.profilePicture = profilePicture;
+        this.telephoneNumber = telephoneNumber;
+        this.email = email;
+        this.password = password;
+        this.isBlocked = isBlocked;
+        this.isActive = isActive;
+        this.address = address;
+        this.role = role;
+        this.jwt = jwt;
     }
 
     public User(String name, String surname, String profilePicture, String telephoneNumber, String email, String password) {
@@ -52,9 +73,44 @@ public class User implements Serializable {
         this.telephoneNumber = telephoneNumber;
         this.email = email;
         this.password = password;
-        this.isBlocked = isBlocked;
+        this.isBlocked = false;
         isActive = false;
         isBlocked = false;
+    }
+
+    public String getJwt() {
+        return jwt;
+    }
+
+    public void setJwt(String jwt) {
+        this.jwt = jwt;
+    }
+
+    public User(Long id, String name, String surname, String profilePicture, String telephoneNumber, String email, String password, boolean isBlocked, boolean isActive, String address, Role role) {
+        this.id = id;
+        this.name = name;
+        this.surname = surname;
+        this.profilePicture = profilePicture;
+        this.telephoneNumber = telephoneNumber;
+        this.email = email;
+        this.password = password;
+        this.isBlocked = isBlocked;
+        this.isActive = isActive;
+        this.address = address;
+        this.role = role;
+    }
+
+    public User(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, boolean isBlocked, boolean isActive, String address, Role role) {
+        this.name = name;
+        this.surname = surname;
+        this.profilePicture = profilePicture;
+        this.telephoneNumber = telephoneNumber;
+        this.email = email;
+        this.password = password;
+        this.isBlocked = isBlocked;
+        this.isActive = isActive;
+        this.address = address;
+        this.role = role;
     }
 
     public User(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, boolean isBlocked, boolean isActive, String address) {
@@ -147,5 +203,13 @@ public class User implements Serializable {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }

@@ -33,4 +33,6 @@ public class UserService implements IUserService {
     public Set<User> getUsers() {
         return new HashSet<>(this.userRepository.findAll());
     }
+
+
 }

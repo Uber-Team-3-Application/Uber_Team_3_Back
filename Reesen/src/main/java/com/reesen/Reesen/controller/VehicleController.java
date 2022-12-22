@@ -12,6 +12,7 @@ import com.reesen.Reesen.service.interfaces.IVehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ public class VehicleController {
     }
 
     @PutMapping(value = "/{vehicleId}/location")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<String> updateLocation(@RequestBody LocationDTO locationDTO, @PathVariable Long vehicleId){
         if(vehicleId < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -45,6 +47,7 @@ public class VehicleController {
 
 
     @GetMapping(value = "/types")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<List<VehicleType>> getAllVehicleTypes(){
         List<VehicleType> vehicleTypes = this.vehicleService.getVehicleTypes();
         return new ResponseEntity<>(vehicleTypes, HttpStatus.OK);

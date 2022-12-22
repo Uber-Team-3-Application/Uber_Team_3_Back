@@ -1,6 +1,6 @@
 package com.reesen.Reesen.model;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

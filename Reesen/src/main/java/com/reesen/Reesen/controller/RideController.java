@@ -8,6 +8,7 @@ import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.service.interfaces.IRideService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -24,12 +25,14 @@ public class RideController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<RideDTO> createRide(@RequestBody CreateRideDTO rideDTO){
         RideDTO ride = this.rideService.createRideDTO(rideDTO);
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
 
     @GetMapping(value = "/driver/{driverId}/active")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<RideDTO> getDriverActiveRide(@PathVariable("driverId") Long driverId){
         if(driverId < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -41,6 +44,7 @@ public class RideController {
     }
 
     @GetMapping(value = "/passenger/{passengerId}/active")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<RideDTO> getPassengerActiveRide(@PathVariable("passengerId") Long passengerId){
         if(passengerId < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -52,6 +56,7 @@ public class RideController {
     }
 
     @GetMapping(value = "/{id}")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<RideDTO> getRideDetail(@PathVariable Long id){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -63,6 +68,7 @@ public class RideController {
     }
 
     @PutMapping(value = "/{id}/withdraw")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<RideDTO> cancelExistingRide(@PathVariable Long id){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -76,6 +82,7 @@ public class RideController {
     }
 
     @PutMapping(value = "/{id}/panic")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<RideDTO> pressedPanic(@PathVariable Long id, @RequestBody String reason){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -89,6 +96,7 @@ public class RideController {
     }
 
     @PutMapping(value = "/{id}/accept")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<RideDTO> acceptRide(@PathVariable Long id){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -102,6 +110,7 @@ public class RideController {
     }
 
     @PutMapping(value = "/{id}/end")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<RideDTO> endRide(@PathVariable Long id){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -115,6 +124,7 @@ public class RideController {
     }
 
     @PutMapping(value = "/{id}/cancel")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<RideDTO> cancelRide(@PathVariable Long id, @RequestBody String reason){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

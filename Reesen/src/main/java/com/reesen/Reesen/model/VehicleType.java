@@ -2,7 +2,7 @@ package com.reesen.Reesen.model;
 
 
 import com.reesen.Reesen.Enums.VehicleName;
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 import java.io.Serializable;
 
