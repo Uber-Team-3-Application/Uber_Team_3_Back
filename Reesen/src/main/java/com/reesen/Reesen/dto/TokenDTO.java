@@ -2,22 +2,13 @@ package com.reesen.Reesen.dto;
 
 public class TokenDTO {
     private String accessToken;
-    private String refreshToken;
 
     public TokenDTO() {}
 
-    public TokenDTO(String accessToken, String refreshToken) {
+    public TokenDTO(String accessToken) {
         this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
     }
 
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
 
     public String getAccessToken() {
         return accessToken;

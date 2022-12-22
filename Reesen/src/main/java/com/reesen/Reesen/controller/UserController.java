@@ -101,7 +101,6 @@ public class UserController {
 
 
     @PostMapping("/login")
-
     public ResponseEntity<TokenDTO> logIn(@RequestBody JwtAuthenticationRequest authenticationRequest, HttpServletResponse response) {
 
         // Ukoliko kredencijali nisu ispravni, logovanje nece biti uspesno, desice se
@@ -117,10 +116,9 @@ public class UserController {
         System.out.println();
         UserDetails user = (UserDetails) authentication.getPrincipal();
         String jwt = jwtTokenUtil.generateToken(user);
-        Date expiresIn = jwtTokenUtil.getExpirationDate(jwt);
 
         // Vrati token kao odgovor na uspesnu autentifikaciju
-        return ResponseEntity.ok(new TokenDTO(jwt, jwt));
+        return ResponseEntity.ok(new TokenDTO(jwt));
 
     }
 
