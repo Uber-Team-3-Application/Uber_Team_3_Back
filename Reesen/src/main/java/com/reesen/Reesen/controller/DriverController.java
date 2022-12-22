@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -53,6 +54,7 @@ public class DriverController {
      *
      * **/
     @PutMapping(value = "/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
     public ResponseEntity<CreatedDriverDTO> updateDriver(@RequestBody DriverDTO driverDTO, @PathVariable Long id){
 
         if(this.driverService.findOne(id).isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -76,6 +78,7 @@ public class DriverController {
              *
              * **/
     @PutMapping(value = "/{id}/vehicle")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<VehicleDTO> updateVehicle(@RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId){
 
         if(driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -105,6 +108,7 @@ public class DriverController {
              * **/
 
     @PutMapping(value = "/working-hour/{working-hour-id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
     public ResponseEntity<WorkingHoursDTO> changeWorkingHours(
             @RequestBody WorkingHoursDTO workingHoursDTO,
             @PathVariable("working-hour-id") Long workingHourId
@@ -125,6 +129,7 @@ public class DriverController {
      *
      * **/
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CreatedDriverDTO> createDriver(@RequestBody DriverDTO driverDTO){
 
         if(this.driverService.findByEmail(driverDTO.getEmail()) != null)
@@ -142,6 +147,7 @@ public class DriverController {
              * **/
 
     @PostMapping(value = "/{id}/documents")
+    @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<DocumentDTO> addDocument(@RequestBody DocumentDTO documentDTO, @PathVariable("id") Long driverId){
 
         if(driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -164,6 +170,7 @@ public class DriverController {
 
 
     @PostMapping(value = "/{id}/vehicle")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<VehicleDTO> addVehicle(@RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId){
 
         if(driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -191,6 +198,7 @@ public class DriverController {
              *
              * **/
     @PostMapping(value = "/{id}/working-hour")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN')")
     public ResponseEntity<WorkingHoursDTO> createWorkingHours(@RequestBody WorkingHoursDTO workingHoursDTO, @PathVariable("id") Long driverId){
 
         if(driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -211,6 +219,7 @@ public class DriverController {
      * **/
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Paginated<CreatedDriverDTO>> getDrivers(
             Pageable page
     ){

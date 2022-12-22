@@ -9,6 +9,7 @@ import com.reesen.Reesen.service.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -36,6 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/ride")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER', 'PASSENGER')")
     public ResponseEntity<Paginated<RideDTO>> getRide(
             @PathVariable("id") int id,
             @RequestParam("page") int page,
@@ -68,6 +70,7 @@ public class UserController {
 
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER', 'PASSENGER')")
     public ResponseEntity<Paginated<UserFullDTO>> getUsers(
             @RequestParam("page") int page,
             @RequestParam("size") int size
@@ -84,6 +87,7 @@ public class UserController {
 
 
     @PostMapping("/login")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER', 'PASSENGER')")
     //TODO: NIJE IMPLEMENTIRALA LOGIKA TOKENA
     public ResponseEntity<TokenDTO> logIn(@RequestBody LoginDTO login) {
         return new ResponseEntity<>(TokenMockup.getToken(), HttpStatus.OK);
@@ -91,6 +95,7 @@ public class UserController {
 
 
     @GetMapping("/{id}/message")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER', 'PASSENGER')")
     public ResponseEntity<Paginated<MessageFullDTO>> getUserMessages(
             @PathVariable int id) {
 
@@ -106,6 +111,7 @@ public class UserController {
 
 
     @PostMapping("/{id}/message")
+    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
     public ResponseEntity<MessageFullDTO> sendMessageToTheUser(
             @PathVariable int id,
             @RequestBody MessageDTO messageDto
@@ -120,6 +126,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}/block")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> blockUser(@PathVariable int id) {
         User user = this.userService.findOne((long) id);
         user.setBlocked(true);
@@ -129,6 +136,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}/unblock")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> unblockUser(@PathVariable int id) {
         User user = this.userService.findOne((long) id);
         user.setBlocked(false);
@@ -138,6 +146,7 @@ public class UserController {
     }
 
     @PostMapping("/{id}/note")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RemarkDTO> createNote(
             @PathVariable int id,
             @RequestBody String message
@@ -150,6 +159,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/note")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Paginated<RemarkDTO>> getNotes(
             @PathVariable int id,
             @RequestParam int page,

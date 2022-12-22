@@ -28,8 +28,8 @@ public class WebSecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.headers().frameOptions().disable();
                  http.csrf().disable()
-                .authorizeRequests() // csrf->disabled, pošto nam JWT odrađuje zaštitu od CSRF napada
-                .antMatchers("/*").permitAll().antMatchers("/api/v2/login/*").permitAll() // statički html i login mogu svi da pozovu
+                .authorizeRequests()
+                .antMatchers("/*").permitAll().antMatchers("/api/unregisteredUser/login").permitAll() // statički html i login mogu svi da pozovu
                 .antMatchers("/api/**").authenticated() // sav pristup API-ju mora da bude autentikovan
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // ne koristimo HttpSession i kukije

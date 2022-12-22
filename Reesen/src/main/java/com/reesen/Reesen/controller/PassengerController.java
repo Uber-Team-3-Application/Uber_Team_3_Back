@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -33,6 +34,7 @@ public class PassengerController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<PassengerDTO> createPassenger(@RequestBody PassengerDTO passengerDTO){
         if(this.passengerService.findByEmail(passengerDTO.getEmail()) != null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -41,11 +43,13 @@ public class PassengerController {
     }
 
     @GetMapping(value = "/activate/{activationId}")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<String> activatePassenger(@PathVariable Long activationId){
         return new ResponseEntity<>("Successful account activation", HttpStatus.OK);
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<Paginated<PassengerDTO>> getPassengers(Pageable page){
         Page<Passenger> passengers = this.passengerService.findAll(page);
         Set<PassengerDTO> passengerDTOs = new HashSet<>();
@@ -56,6 +60,7 @@ public class PassengerController {
     }
 
     @GetMapping(value = "/{id}")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<PassengerDTO> getPassengerDetails(@PathVariable Long id){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -67,6 +72,7 @@ public class PassengerController {
     }
 
     @GetMapping(value = "/{id}/ride")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<Paginated<RideDTO>> getPassengerRides(@PathVariable Long id, Pageable page, @RequestParam(value = "sort", required = false) String sort, @RequestParam(value = "from", required = false) String from, @RequestParam(value = "to", required = false) String to) throws ParseException {
         Date fromDate =new SimpleDateFormat("dd/MM/yyyy").parse(from);
         Date toDate = new SimpleDateFormat("dd/MM/yyyy").parse(to);
@@ -84,6 +90,7 @@ public class PassengerController {
     }
 
     @PutMapping(value = "/{id}")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<PassengerDTO> updatePassenger(@RequestBody PassengerDTO passengerDTO, @PathVariable Long id){
         if(this.passengerService.findOne(id).isEmpty())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

@@ -14,6 +14,7 @@ import com.reesen.Reesen.service.interfaces.IVehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
@@ -42,7 +43,7 @@ public class ReviewController {
             @PathVariable int rideId,
             @RequestBody ReviewDTO review) {
 
-        // TODO: PASSENGER ???  --> NIJE IMPLEMENTIRANA LOGIKA TOKENA
+
         return new ResponseEntity<>(ReviewMockup.getReview(), HttpStatus.OK);
     }
 
@@ -61,10 +62,13 @@ public class ReviewController {
     }
 
     @PostMapping("/{rideId}/driver/{id}")
+    @PreAuthorize("hasRole('PASSENGER')")
     public ResponseEntity<ReviewWithPassengerDTO> leaveReviewForTheDriver(
             @PathVariable Long id,
             @PathVariable Long rideId,
             @RequestBody ReviewDTO reviewDTO
+
+            // POZVATI JWT_TOKEN_UTIL
     )
     {
 
