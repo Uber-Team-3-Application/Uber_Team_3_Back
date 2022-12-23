@@ -2,16 +2,28 @@ package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.dto.RideDTO;
-import com.reesen.Reesen.mockup.*;
+import com.reesen.Reesen.exceptions.BadRequestException;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.paginated.Paginated;
+import com.reesen.Reesen.security.SecurityUser;
+import com.reesen.Reesen.security.jwt.JwtTokenUtil;
 import com.reesen.Reesen.service.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.util.*;
 
@@ -26,6 +38,12 @@ public class UserController {
     private final IPassengerService passengerService;
 
     @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
     public UserController(IUserService userService, IMessageService messageService, IRemarkService remarkService,
                           IDriverService driverService, IPassengerService passengerService) {
         this.userService = userService;
@@ -37,7 +55,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/ride")
-    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER', 'PASSENGER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Paginated<RideDTO>> getRide(
             @PathVariable("id") int id,
             @RequestParam("page") int page,
@@ -70,7 +88,7 @@ public class UserController {
 
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER', 'PASSENGER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Paginated<UserFullDTO>> getUsers(
             @RequestParam("page") int page,
             @RequestParam("size") int size
@@ -87,9 +105,35 @@ public class UserController {
 
 
     @PostMapping("/login")
-    //TODO: NIJE IMPLEMENTIRALA LOGIKA TOKENA
-    public ResponseEntity<TokenDTO> logIn(@RequestBody LoginDTO login) {
-        return new ResponseEntity<>(TokenMockup.getToken(), HttpStatus.OK);
+    public ResponseEntity<TokenDTO> logIn(@RequestBody LoginDTO login, HttpServletResponse response) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (!(auth instanceof AnonymousAuthenticationToken)) {
+            throw new BadRequestException("Unauthorized!");
+        }
+
+        try {
+            TokenDTO token = new TokenDTO();
+            SecurityUser userDetails = (SecurityUser) this.userService.findByUsername(login.getEmail());
+
+            String tokenValue = this.jwtTokenUtil.generateToken(userDetails);
+            token.setToken(tokenValue);
+            token.setRefreshToken(tokenValue);
+            Authentication authentication =
+                    this.authenticationManager.authenticate(
+                            new UsernamePasswordAuthenticationToken(login.getEmail(),
+                                    login.getPassword()));
+
+
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            return new ResponseEntity<>(token, HttpStatus.OK);
+        } catch (BadCredentialsException e) {
+            throw new BadRequestException("Wrong password!");
+        }
+
     }
 
 
@@ -110,7 +154,7 @@ public class UserController {
 
 
     @PostMapping("/{id}/message")
-    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
+    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER', 'ADMIN')")
     public ResponseEntity<MessageFullDTO> sendMessageToTheUser(
             @PathVariable int id,
             @RequestBody MessageDTO messageDto

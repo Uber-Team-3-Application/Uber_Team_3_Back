@@ -31,12 +31,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     {
 
         if(request.getRequestURL().toString().contains("/api")){
-            String requestTokenHeader = request.getHeader("Authorization");
+            String requestTokenHeader = request.getHeader("X-Auth-Token");
             String username = null;
             String jwtToken = null;
-            if(requestTokenHeader != null && requestTokenHeader.contains("Bearer")){
+            if(requestTokenHeader != null){
                 try {
-                    jwtToken = requestTokenHeader.substring(requestTokenHeader.indexOf("Bearer ") + 7);
+                    jwtToken = requestTokenHeader;
+                    System.out.println(jwtToken);
+                    username = jwtTokenUtil.getUsername(jwtToken);
                     UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
                     if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
                         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
