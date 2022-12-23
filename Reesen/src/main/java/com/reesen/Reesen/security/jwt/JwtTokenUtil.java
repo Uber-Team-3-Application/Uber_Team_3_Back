@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -25,6 +26,9 @@ public class JwtTokenUtil {
     @Value("${jwt.secret}")
     private String secret;
 
+    @Value("${token.expiration}")
+    private Long expiration;
+
     public String getUsername(String token){
         return getClaim(token, Claims::getSubject);
     }
@@ -38,7 +42,8 @@ public class JwtTokenUtil {
     }
 
     public Claims getAllClaims(String token){
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        return (Claims) Jwts.parser().setSigningKey(secret.getBytes(Charset.forName("UTF-8"))).parse(token).getBody();
+        //return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
     }
 
     private Boolean isExpired(String token){
@@ -54,21 +59,27 @@ public class JwtTokenUtil {
         claims.put("id", userDetails.getId());
         return this.generateToken(claims);
     }
+    private Date generateExpirationDate() {
+        return new Date(System.currentTimeMillis() + (this.expiration * 1000));
+    }
 
     private String generateToken(Map<String, Object> claims) {
+
         try {
-            return Jwts.builder()
+            return Jwts
+                    .builder()
                     .setClaims(claims)
-                    .setExpiration(Date.from(Instant.now().plus(3, ChronoUnit.HOURS)))
+                    .setExpiration(this.generateExpirationDate())
                     .signWith(SignatureAlgorithm.HS512, this.secret.getBytes("UTF-8"))
                     .compact();
         } catch (UnsupportedEncodingException ex) {
             return Jwts.builder()
                     .setClaims(claims)
-                    .setExpiration(Date.from(Instant.now().plus(3, ChronoUnit.HOURS)))
+                    .setExpiration(this.generateExpirationDate())
                     .signWith(SignatureAlgorithm.HS512, this.secret)
                     .compact();
         }
+
     }
 
     public Boolean validateToken(String token, UserDetails userDetails){
