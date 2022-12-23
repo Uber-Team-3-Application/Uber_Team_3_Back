@@ -1,12 +1,11 @@
 package com.reesen.Reesen.service;
 
-import com.reesen.Reesen.model.Admin;
 import com.reesen.Reesen.model.User;
 import com.reesen.Reesen.repository.UserRepository;
+import com.reesen.Reesen.security.SecurityUser;
 import com.reesen.Reesen.security.UserFactory;
 import com.reesen.Reesen.service.interfaces.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -28,13 +27,11 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public UserDetails findByUsername(String username) throws UsernameNotFoundException {
+    public SecurityUser findByUsername(String username) throws UsernameNotFoundException {
         User user = this.userRepository.findByEmail(username).orElseThrow(
                 () -> new UsernameNotFoundException(String.format("User with username '%s' is not found!", username)));
 
         return UserFactory.create(user);
-
-
     }
 
     @Override

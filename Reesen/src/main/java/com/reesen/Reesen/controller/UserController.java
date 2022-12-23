@@ -5,6 +5,7 @@ import com.reesen.Reesen.dto.RideDTO;
 import com.reesen.Reesen.exceptions.BadRequestException;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.paginated.Paginated;
+import com.reesen.Reesen.security.SecurityUser;
 import com.reesen.Reesen.security.jwt.JwtTokenUtil;
 import com.reesen.Reesen.service.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,7 +115,7 @@ public class UserController {
 
         try {
             TokenDTO token = new TokenDTO();
-            UserDetails userDetails = this.userService.findByUsername(login.getEmail());
+            SecurityUser userDetails = (SecurityUser) this.userService.findByUsername(login.getEmail());
 
             String tokenValue = this.jwtTokenUtil.generateToken(userDetails);
             token.setToken(tokenValue);

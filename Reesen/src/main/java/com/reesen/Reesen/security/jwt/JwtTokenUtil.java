@@ -1,6 +1,7 @@
 package com.reesen.Reesen.security.jwt;
 
 
+import com.reesen.Reesen.security.SecurityUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -45,11 +46,12 @@ public class JwtTokenUtil {
         return expiration.before(new Date());
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(SecurityUser userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("sub", userDetails.getUsername());
         claims.put("role", userDetails.getAuthorities());
         claims.put("created", new Date());
+        claims.put("id", userDetails.getId());
         return this.generateToken(claims);
     }
 
