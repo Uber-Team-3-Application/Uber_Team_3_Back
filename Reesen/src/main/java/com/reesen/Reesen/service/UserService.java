@@ -1,9 +1,13 @@
 package com.reesen.Reesen.service;
 
+import com.reesen.Reesen.model.Admin;
 import com.reesen.Reesen.model.User;
 import com.reesen.Reesen.repository.UserRepository;
+import com.reesen.Reesen.security.UserFactory;
 import com.reesen.Reesen.service.interfaces.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -13,11 +17,24 @@ import java.util.Set;
 @Service
 public class UserService implements IUserService {
 
+
     private final UserRepository userRepository;
+
+
 
     @Autowired
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    @Override
+    public UserDetails findByUsername(String username) throws UsernameNotFoundException {
+        User user = this.userRepository.findByEmail(username).orElseThrow(
+                () -> new UsernameNotFoundException(String.format("User with username '%s' is not found!", username)));
+
+        return UserFactory.create(user);
+
+
     }
 
     @Override
@@ -39,6 +56,8 @@ public class UserService implements IUserService {
     public Set<User> getUsers() {
         return new HashSet<>(this.userRepository.findAll());
     }
+
+
 
 
 }

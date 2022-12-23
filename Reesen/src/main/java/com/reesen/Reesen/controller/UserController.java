@@ -2,14 +2,17 @@ package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.dto.RideDTO;
+import com.reesen.Reesen.exceptions.BadRequestException;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.security.jwt.JwtTokenUtil;
 import com.reesen.Reesen.service.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -101,26 +104,37 @@ public class UserController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDTO> logIn(@RequestBody JwtAuthenticationRequest authenticationRequest, HttpServletResponse response) {
+    public ResponseEntity<TokenDTO> logIn(@RequestBody LoginDTO login, HttpServletResponse response) {
 
-        // Ukoliko kredencijali nisu ispravni, logovanje nece biti uspesno, desice se
-        // AuthenticationException
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                authenticationRequest.getEmail(), authenticationRequest.getPassword()));
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        // Ukoliko je autentifikacija uspesna, ubaci korisnika u trenutni security
-        // kontekst
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (!(auth instanceof AnonymousAuthenticationToken)) {
+            throw new BadRequestException("Unauthorized!");
+        }
 
-        // Kreiraj token za tog korisnika
-        System.out.println();
-        UserDetails user = (UserDetails) authentication.getPrincipal();
-        String jwt = jwtTokenUtil.generateToken(user);
+        try {
+            TokenDTO token = new TokenDTO();
+            UserDetails userDetails = this.userService.findByUsername(login.getEmail());
 
-        // Vrati token kao odgovor na uspesnu autentifikaciju
-        return ResponseEntity.ok(new TokenDTO(jwt));
+            String tokenValue = this.jwtTokenUtil.generateToken(userDetails);
+            token.setToken(tokenValue);
+            token.setRefreshToken(tokenValue);
+            Authentication authentication =
+                    this.authenticationManager.authenticate(
+                            new UsernamePasswordAuthenticationToken(login.getEmail(),
+                                    login.getPassword()));
+
+
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            return new ResponseEntity<>(token, HttpStatus.OK);
+        } catch (BadCredentialsException e) {
+            throw new BadRequestException("Wrong password!");
+        }
 
     }
+
 
 
 

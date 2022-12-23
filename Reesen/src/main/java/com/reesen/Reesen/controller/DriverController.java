@@ -170,7 +170,7 @@ public class DriverController {
 
 
     @PostMapping(value = "/{id}/vehicle")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN', 'DRIVER')")
     public ResponseEntity<VehicleDTO> addVehicle(@RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId){
 
         if(driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
