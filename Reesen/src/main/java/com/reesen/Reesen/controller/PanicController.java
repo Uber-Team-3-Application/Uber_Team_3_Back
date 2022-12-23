@@ -31,7 +31,7 @@ public class PanicController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Paginated<PanicDTO>> getPanicNotifications(){
         List<Panic> panics = this.panicService.findAll();
 

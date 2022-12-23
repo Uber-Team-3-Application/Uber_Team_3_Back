@@ -20,7 +20,7 @@ public class UnregisteredUserController {
 
     @PostMapping
     public ResponseEntity<EstimatedTimeDTO> getAssumption(@RequestBody DriveAssessmentDTO driveAssessment) {
-        // TODO:
+        // TODO: ONLY FORMULA
         EstimatedTimeDTO timeDTO = new EstimatedTimeDTO(10, 450);
         return new ResponseEntity<>(timeDTO, HttpStatus.OK);
     }

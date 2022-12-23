@@ -55,7 +55,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/ride")
-    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER', 'PASSENGER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Paginated<RideDTO>> getRide(
             @PathVariable("id") int id,
             @RequestParam("page") int page,
@@ -88,7 +88,7 @@ public class UserController {
 
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER', 'PASSENGER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Paginated<UserFullDTO>> getUsers(
             @RequestParam("page") int page,
             @RequestParam("size") int size
@@ -137,8 +137,6 @@ public class UserController {
     }
 
 
-
-
     @GetMapping("/{id}/message")
     @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER', 'PASSENGER')")
     public ResponseEntity<Paginated<MessageFullDTO>> getUserMessages(
@@ -156,7 +154,7 @@ public class UserController {
 
 
     @PostMapping("/{id}/message")
-    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
+    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER', 'ADMIN')")
     public ResponseEntity<MessageFullDTO> sendMessageToTheUser(
             @PathVariable int id,
             @RequestBody MessageDTO messageDto

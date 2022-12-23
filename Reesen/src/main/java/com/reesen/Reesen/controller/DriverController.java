@@ -147,7 +147,7 @@ public class DriverController {
              * **/
 
     @PostMapping(value = "/{id}/documents")
-    @PreAuthorize("hasRole('DRIVER')")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN')")
     public ResponseEntity<DocumentDTO> addDocument(@RequestBody DocumentDTO documentDTO, @PathVariable("id") Long driverId){
 
         if(driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -255,6 +255,7 @@ public class DriverController {
              * **/
 
     @GetMapping(value = "/{id}/documents")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
     public ResponseEntity<Set<DocumentDTO>> getDocument(@PathVariable("id") Long id){
 
         if(id < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -273,6 +274,7 @@ public class DriverController {
             *
             * **/
     @GetMapping(value = "/{id}/vehicle")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
     public ResponseEntity<VehicleDTO> getVehicle(@PathVariable("id") Long id){
         if(id < 1 ) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
@@ -295,6 +297,7 @@ public class DriverController {
              * **/
 
     @GetMapping(value = "/{id}/working-hour")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
     public ResponseEntity<Paginated<WorkingHoursDTO>> getWorkingHours(
             Pageable page,
             @PathVariable("id") Long driverId,
@@ -322,6 +325,7 @@ public class DriverController {
     }
 
     @GetMapping(value = "/working-hour/{working-hour-id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
     public ResponseEntity<WorkingHoursDTO> getDetailsAboutWorkingHours(
             @PathVariable("working-hour-id") Long workingHourId)
     {
@@ -341,6 +345,7 @@ public class DriverController {
      * **/
 
     @GetMapping(value = "/{id}/ride")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
     public ResponseEntity<Paginated<DriverRideDTO>> getRides(
             @PathVariable("id") Long driverId,
             Pageable page,
@@ -373,6 +378,7 @@ public class DriverController {
      *
      * **/
     @DeleteMapping(value = "/document/{document-id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
     public ResponseEntity<String> deleteDocuments(@PathVariable("document-id") Long id){
 
         if(id < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

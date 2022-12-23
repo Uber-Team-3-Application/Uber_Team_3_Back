@@ -9,6 +9,7 @@ import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.model.paginated.PassengerRidePaginated;
 import com.reesen.Reesen.service.interfaces.IPassengerService;
 import com.reesen.Reesen.service.interfaces.IRideService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,7 @@ public class PassengerController {
     private final IPassengerService passengerService;
     private final IRideService rideService;
 
+    @Autowired
     public PassengerController(IPassengerService passengerService, IRideService rideService) {
         this.passengerService = passengerService;
         this.rideService = rideService;

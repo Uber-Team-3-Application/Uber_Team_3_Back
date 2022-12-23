@@ -25,7 +25,7 @@ public class RideController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
+    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
     public ResponseEntity<RideDTO> createRide(@RequestBody CreateRideDTO rideDTO){
         RideDTO ride = this.rideService.createRideDTO(rideDTO);
         return new ResponseEntity<>(ride, HttpStatus.OK);
@@ -68,7 +68,7 @@ public class RideController {
     }
 
     @PutMapping(value = "/{id}/withdraw")
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
+    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
     public ResponseEntity<RideDTO> cancelExistingRide(@PathVariable Long id){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -82,8 +82,9 @@ public class RideController {
     }
 
     @PutMapping(value = "/{id}/panic")
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
+    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
     public ResponseEntity<RideDTO> pressedPanic(@PathVariable Long id, @RequestBody String reason){
+        // TODO: get user id from token
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(this.rideService.findOne(id).isEmpty())
@@ -96,7 +97,7 @@ public class RideController {
     }
 
     @PutMapping(value = "/{id}/accept")
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
+    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
     public ResponseEntity<RideDTO> acceptRide(@PathVariable Long id){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -110,7 +111,7 @@ public class RideController {
     }
 
     @PutMapping(value = "/{id}/end")
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
+    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
     public ResponseEntity<RideDTO> endRide(@PathVariable Long id){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -124,8 +125,9 @@ public class RideController {
     }
 
     @PutMapping(value = "/{id}/cancel")
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
+    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
     public ResponseEntity<RideDTO> cancelRide(@PathVariable Long id, @RequestBody String reason){
+
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(this.rideService.findOne(id).isEmpty())

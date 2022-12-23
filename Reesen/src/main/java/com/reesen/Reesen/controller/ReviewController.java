@@ -38,6 +38,7 @@ public class ReviewController {
     }
 
     @PostMapping("/{rideId}/vehicle/{id}")
+    @PreAuthorize("hasRole('PASSENGER')")
     public ResponseEntity<ReviewWithPassengerDTO> createReviewAboutVehicle(
             @PathVariable int id,
             @PathVariable int rideId,
@@ -49,6 +50,7 @@ public class ReviewController {
 
 
     @GetMapping("/vehicle/{id}")
+    @PreAuthorize("hasAnyRole('PASSENGER', 'DRIVER', 'ADMIN')")
     public ResponseEntity<Paginated<ReviewWithPassengerDTO>> getReviewsForVehicle(@PathVariable int id) {
 
         Vehicle vehicle = vehicleService.findOne((long) id).get();
@@ -77,6 +79,7 @@ public class ReviewController {
     }
 
     @GetMapping("/driver/{id}")
+    @PreAuthorize("hasAnyRole('PASSENGER', 'ADMIN', 'DRIVER')")
     public ResponseEntity<Paginated<ReviewWithPassengerDTO>> getReviewsForTheSpecificDriver(@PathVariable Long id) {
 
         Ride ride = rideService.findOne(id).get();
@@ -91,6 +94,7 @@ public class ReviewController {
     }
 
     @GetMapping("/{rideId}")
+    @PreAuthorize("hasAnyRole('PASSENGER', 'ADMIN', 'DRIVER')")
     public  ResponseEntity<HashSet<RideReviewDTO>> getAllReviewsForTheSpecificRide(@PathVariable Long rideId) {
 
         Ride ride = rideService.findOne(rideId).get();
