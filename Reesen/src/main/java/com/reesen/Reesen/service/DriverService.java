@@ -84,7 +84,9 @@ public class DriverService implements IDriverService {
         driver.setTelephoneNumber(driverDTO.getTelephoneNumber());
         driver.setAddress(driverDTO.getAddress());
         driver.setId(id);
-        driver.setPassword(driverDTO.getPassword());
+        if(driverDTO.getPassword() != null) {
+            driver.setPassword(passwordEncoder.encode(driverDTO.getPassword()));
+        }
         return driver;
     }
 

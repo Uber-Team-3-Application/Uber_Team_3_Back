@@ -135,7 +135,6 @@ public class DriverController {
         if(this.driverService.findByEmail(driverDTO.getEmail()) != null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-
         CreatedDriverDTO createdDriverDTO = this.driverService.createDriverDTO(driverDTO);
         return new ResponseEntity<>(createdDriverDTO, HttpStatus.OK);
     }
