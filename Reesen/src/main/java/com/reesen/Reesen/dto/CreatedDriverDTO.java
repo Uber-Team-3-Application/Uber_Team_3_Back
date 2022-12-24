@@ -1,6 +1,6 @@
 package com.reesen.Reesen.dto;
 
-import com.reesen.Reesen.model.Driver;
+import com.reesen.Reesen.model.Driver.Driver;
 
 public class CreatedDriverDTO {
 
