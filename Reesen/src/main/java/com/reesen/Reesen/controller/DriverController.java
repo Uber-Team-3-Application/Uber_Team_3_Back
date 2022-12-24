@@ -131,7 +131,6 @@ public class DriverController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CreatedDriverDTO> createDriver(@RequestBody DriverDTO driverDTO){
-        // TODO: IMPLEMENT PASSWORD HASHING BEFORE SAVING
 
         if(this.driverService.findByEmail(driverDTO.getEmail()) != null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

@@ -10,18 +10,20 @@ import com.reesen.Reesen.service.interfaces.IDriverService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public class DriverService implements IDriverService {
     private final DriverRepository driverRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public DriverService(DriverRepository driverRepository){
+    public DriverService(DriverRepository driverRepository, PasswordEncoder passwordEncoder){
         this.driverRepository = driverRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -53,7 +55,7 @@ public class DriverService implements IDriverService {
         driver.setTelephoneNumber(driverDTO.getTelephoneNumber());
         driver.setEmail(driverDTO.getEmail());
         driver.setAddress(driverDTO.getAddress());
-        driver.setPassword(driverDTO.getPassword());
+        driver.setPassword(passwordEncoder.encode(driverDTO.getPassword()));
         driver.setId(Long.parseLong("123"));
         return new CreatedDriverDTO(this.driverRepository.save(driver));
     }

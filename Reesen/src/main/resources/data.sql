@@ -23,6 +23,7 @@ insert into Users(name, surname, profile_picture, telephone_number, email, passw
 
 insert into Passenger(id, is_confirmed_mail, amount_of_money) values(3, true, 1000);
 insert into Passenger(id, is_confirmed_mail, amount_of_money) values(4, true, 3000);
+insert into Passenger(id, is_confirmed_mail, amount_of_money) values(5, true, 3000);
 
 insert into Vehicle_Type(price_per_km, name) values(120, 'STANDARD');
 insert into Vehicle_Type(price_per_km, name) values(140, 'LUXURY');
