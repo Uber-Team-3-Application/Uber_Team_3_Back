@@ -1,5 +1,6 @@
 package com.reesen.Reesen.service;
 
+import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.CreatedDriverDTO;
 import com.reesen.Reesen.dto.DriverDTO;
 import com.reesen.Reesen.model.Driver;
@@ -57,6 +58,7 @@ public class DriverService implements IDriverService {
         driver.setAddress(driverDTO.getAddress());
         driver.setPassword(passwordEncoder.encode(driverDTO.getPassword()));
         driver.setId(Long.parseLong("123"));
+        driver.setRole(Role.DRIVER);
         return new CreatedDriverDTO(this.driverRepository.save(driver));
     }
 

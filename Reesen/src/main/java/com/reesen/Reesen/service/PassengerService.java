@@ -1,5 +1,6 @@
 package com.reesen.Reesen.service;
 
+import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.PassengerDTO;
 import com.reesen.Reesen.model.Passenger;
 import com.reesen.Reesen.repository.PassengerRepository;
@@ -49,6 +50,7 @@ public class PassengerService implements IPassengerService {
         passenger.setEmail(passengerDTO.getEmail());
         passenger.setAddress(passengerDTO.getAddress());
         passenger.setPassword(passwordEncoder.encode(passengerDTO.getPassword()));
+        passenger.setRole(Role.PASSENGER);
         return new PassengerDTO(this.passengerRepository.save(passenger));
     }
 
