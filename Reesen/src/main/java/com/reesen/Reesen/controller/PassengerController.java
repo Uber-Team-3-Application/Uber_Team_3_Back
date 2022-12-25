@@ -36,7 +36,6 @@ public class PassengerController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<PassengerDTO> createPassenger(@RequestBody PassengerDTO passengerDTO){
         if(this.passengerService.findByEmail(passengerDTO.getEmail()) != null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

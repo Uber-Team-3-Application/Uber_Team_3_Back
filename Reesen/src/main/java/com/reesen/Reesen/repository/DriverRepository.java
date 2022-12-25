@@ -1,12 +1,10 @@
 package com.reesen.Reesen.repository;
 
-import com.reesen.Reesen.model.Driver;
+import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Vehicle;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public interface DriverRepository extends JpaRepository<Driver, Long> {

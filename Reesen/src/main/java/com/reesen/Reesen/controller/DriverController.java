@@ -3,6 +3,7 @@ package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.*;
+import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.service.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -134,9 +135,22 @@ public class DriverController {
         if(this.driverService.findByEmail(driverDTO.getEmail()) != null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-
         CreatedDriverDTO createdDriverDTO = this.driverService.createDriverDTO(driverDTO);
         return new ResponseEntity<>(createdDriverDTO, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/{id}/activity")
+    @PreAuthorize("hasRole('DRIVER')")
+    public ResponseEntity<String> changeDriverActivity(@PathVariable("id") Long driverId,
+            @RequestBody DriverActivityDTO driverActivityDTO){
+
+        boolean isActive = driverActivityDTO.isActive();
+        Optional<Driver> driver  = this.driverService.findOne(driverId);
+        if(driver.isPresent()){
+            driver.get().setActive(isActive);
+            this.driverService.save(driver.get());
+        }
+        return new ResponseEntity<>("Driver Activity updated!", HttpStatus.OK);
     }
 
             /**

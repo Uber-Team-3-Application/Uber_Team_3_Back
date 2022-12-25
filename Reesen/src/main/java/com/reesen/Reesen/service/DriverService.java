@@ -1,8 +1,9 @@
 package com.reesen.Reesen.service;
 
+import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.CreatedDriverDTO;
 import com.reesen.Reesen.dto.DriverDTO;
-import com.reesen.Reesen.model.Driver;
+import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.repository.DriverRepository;
@@ -10,18 +11,20 @@ import com.reesen.Reesen.service.interfaces.IDriverService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public class DriverService implements IDriverService {
     private final DriverRepository driverRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public DriverService(DriverRepository driverRepository){
+    public DriverService(DriverRepository driverRepository, PasswordEncoder passwordEncoder){
         this.driverRepository = driverRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -53,8 +56,9 @@ public class DriverService implements IDriverService {
         driver.setTelephoneNumber(driverDTO.getTelephoneNumber());
         driver.setEmail(driverDTO.getEmail());
         driver.setAddress(driverDTO.getAddress());
-        driver.setPassword(driverDTO.getPassword());
+        driver.setPassword(passwordEncoder.encode(driverDTO.getPassword()));
         driver.setId(Long.parseLong("123"));
+        driver.setRole(Role.DRIVER);
         return new CreatedDriverDTO(this.driverRepository.save(driver));
     }
 
@@ -82,7 +86,9 @@ public class DriverService implements IDriverService {
         driver.setTelephoneNumber(driverDTO.getTelephoneNumber());
         driver.setAddress(driverDTO.getAddress());
         driver.setId(id);
-        driver.setPassword(driverDTO.getPassword());
+        if(driverDTO.getPassword() != null) {
+            driver.setPassword(passwordEncoder.encode(driverDTO.getPassword()));
+        }
         return driver;
     }
 
@@ -90,6 +96,7 @@ public class DriverService implements IDriverService {
     public Vehicle getVehicle(Long driverId){
         return this.driverRepository.getVehicle(driverId);
     }
+
 
     @Override
     public Page<Driver> findAll(Pageable page){

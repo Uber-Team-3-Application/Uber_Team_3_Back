@@ -1,7 +1,7 @@
 package com.reesen.Reesen.service;
 
 import com.reesen.Reesen.dto.WorkingHoursDTO;
-import com.reesen.Reesen.model.Driver;
+import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.WorkingHours;
 import com.reesen.Reesen.repository.WorkingHoursRepository;
 import com.reesen.Reesen.service.interfaces.IWorkingHoursService;
@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Optional;
 
 @Service

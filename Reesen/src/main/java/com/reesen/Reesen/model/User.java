@@ -22,6 +22,7 @@ public class User implements Serializable {
     private String surname;
 
     @Column(name = "profilePicture")
+    @Lob
     private String profilePicture;
 
     @Column

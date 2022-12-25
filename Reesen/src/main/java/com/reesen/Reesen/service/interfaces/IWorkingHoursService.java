@@ -1,7 +1,7 @@
 package com.reesen.Reesen.service.interfaces;
 
 import com.reesen.Reesen.dto.WorkingHoursDTO;
-import com.reesen.Reesen.model.Driver;
+import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.WorkingHours;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
