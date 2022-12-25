@@ -3,6 +3,7 @@ package com.reesen.Reesen.controller;
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.dto.RideDTO;
 import com.reesen.Reesen.exceptions.BadRequestException;
+import com.reesen.Reesen.exceptions.EmailNotConfirmedException;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.paginated.Paginated;
@@ -103,7 +104,7 @@ public class UserController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDTO> logIn(@RequestBody LoginDTO login, HttpServletResponse response) {
+    public ResponseEntity<TokenDTO> logIn(@RequestBody LoginDTO login) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -114,7 +115,10 @@ public class UserController {
         try {
             TokenDTO token = new TokenDTO();
             SecurityUser userDetails = (SecurityUser) this.userService.findByUsername(login.getEmail());
-
+            boolean isEmailConfirmed = this.passengerService.getIsEmailConfirmed(login.getEmail());
+            if(!isEmailConfirmed){
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
             String tokenValue = this.jwtTokenUtil.generateToken(userDetails);
             token.setToken(tokenValue);
             token.setRefreshToken(this.jwtTokenUtil.generateRefreshToken(userDetails));
@@ -122,8 +126,6 @@ public class UserController {
                     this.authenticationManager.authenticate(
                             new UsernamePasswordAuthenticationToken(login.getEmail(),
                                     login.getPassword()));
-
-
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
