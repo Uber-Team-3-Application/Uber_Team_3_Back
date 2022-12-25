@@ -21,8 +21,6 @@ import java.util.function.Function;
 @Component
 public class JwtTokenUtil {
 
-    public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
-
     @Value("${jwt.secret}")
     private String secret;
 
@@ -45,8 +43,9 @@ public class JwtTokenUtil {
     }
 
     public Claims getAllClaims(String token){
-        return (Claims) Jwts.parser().setSigningKey(secret.getBytes(Charset.forName("UTF-8"))).parse(token).getBody();
-        //return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        return (Claims) Jwts.parser()
+                .setSigningKey(secret.getBytes(Charset.forName("UTF-8")))
+                .parse(token).getBody();
     }
 
     private Boolean isExpired(String token){
@@ -66,7 +65,9 @@ public class JwtTokenUtil {
         return new Date(System.currentTimeMillis() + (this.expiration * 1000));
     }
 
-    private Date generateRefreshExpirationDate(){return new Date(System.currentTimeMillis() + (this.refreshExpiration * 1000));}
+    private Date generateRefreshExpirationDate(){
+        return new Date(System.currentTimeMillis() + (this.refreshExpiration * 1000));
+    }
 
     private String generateToken(Map<String, Object> claims) {
 
