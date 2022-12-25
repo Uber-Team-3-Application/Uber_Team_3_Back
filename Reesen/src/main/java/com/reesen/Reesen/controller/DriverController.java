@@ -242,7 +242,7 @@ public class DriverController {
             driverDTOS.add(new CreatedDriverDTO(driver));
         }
         return new ResponseEntity<>(
-                new Paginated<CreatedDriverDTO>(drivers.getNumberOfElements(), driverDTOS), HttpStatus.OK);
+                new Paginated<>(drivers.getNumberOfElements(), driverDTOS), HttpStatus.OK);
     }
 
 
