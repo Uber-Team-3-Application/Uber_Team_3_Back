@@ -17,4 +17,5 @@ public interface IUserService {
     Set<User> getUsers();
     Page<User> findAll(Pageable page);
 
+    Integer getTotalNumberOfUsers();
 }

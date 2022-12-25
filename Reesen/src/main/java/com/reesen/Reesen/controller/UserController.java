@@ -1,5 +1,6 @@
 package com.reesen.Reesen.controller;
 
+import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.dto.RideDTO;
 import com.reesen.Reesen.exceptions.BadRequestException;
@@ -96,11 +97,19 @@ public class UserController {
 
         Set<UserTabularDTO> userDTOS = new HashSet<>();
         for (User user : users) {
-            userDTOS.add(new UserTabularDTO(user));
+            if(user.getRole() != Role.ADMIN)
+                userDTOS.add(new UserTabularDTO(user));
         }
 
         return new ResponseEntity<>(
                 new Paginated<>(users.getNumberOfElements(), userDTOS), HttpStatus.OK);
+    }
+    @GetMapping("/number-of-users")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Integer> getTotalNumberOfUsers(){
+
+        Integer totalNumber = this.userService.getTotalNumberOfUsers();
+        return new ResponseEntity<>(totalNumber, HttpStatus.OK);
     }
 
 

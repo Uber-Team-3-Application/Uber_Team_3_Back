@@ -61,5 +61,10 @@ public class UserService implements IUserService {
         return this.userRepository.findAll(page);
     }
 
+    @Override
+    public Integer getTotalNumberOfUsers() {
+        return this.userRepository.getNumberOfUsers();
+    }
+
 
 }
