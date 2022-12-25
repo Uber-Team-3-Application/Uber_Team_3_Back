@@ -2,7 +2,6 @@ package com.reesen.Reesen.controller;
 
 
 import com.reesen.Reesen.dto.*;
-import com.reesen.Reesen.mockup.*;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.service.interfaces.*;
@@ -229,7 +228,7 @@ public class DriverController {
             driverDTOS.add(new CreatedDriverDTO(driver));
         }
         return new ResponseEntity<>(
-                new Paginated<CreatedDriverDTO>(drivers.getNumberOfElements(), driverDTOS), HttpStatus.OK);
+                new Paginated<>(drivers.getNumberOfElements(), driverDTOS), HttpStatus.OK);
     }
 
 
