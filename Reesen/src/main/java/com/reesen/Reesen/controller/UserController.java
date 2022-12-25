@@ -115,6 +115,7 @@ public class UserController {
         try {
             TokenDTO token = new TokenDTO();
             SecurityUser userDetails = (SecurityUser) this.userService.findByUsername(login.getEmail());
+
             boolean isEmailConfirmed = this.passengerService.getIsEmailConfirmed(login.getEmail());
             if(!isEmailConfirmed){
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
