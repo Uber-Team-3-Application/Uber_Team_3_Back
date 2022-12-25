@@ -29,7 +29,7 @@ public class JwtTokenUtil {
     @Value("${token.expiration}")
     private Long expiration;
 
-    @Value("jwt.refreshExpiration")
+    @Value("${jwt.refreshExpiration}")
     private Long refreshExpiration;
 
     public String getUsername(String token){
