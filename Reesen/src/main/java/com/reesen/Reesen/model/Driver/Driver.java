@@ -26,6 +26,7 @@ public class Driver extends User implements Serializable {
     @JoinColumn(name="vehicleId")
     private Vehicle vehicle;
 
+
     public Driver(){
 
     }
