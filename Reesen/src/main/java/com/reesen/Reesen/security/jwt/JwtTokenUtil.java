@@ -29,6 +29,9 @@ public class JwtTokenUtil {
     @Value("${token.expiration}")
     private Long expiration;
 
+    @Value("jwt.refreshExpiration")
+    private Long refreshExpiration;
+
     public String getUsername(String token){
         return getClaim(token, Claims::getSubject);
     }
@@ -63,6 +66,8 @@ public class JwtTokenUtil {
         return new Date(System.currentTimeMillis() + (this.expiration * 1000));
     }
 
+    private Date generateRefreshExpirationDate(){return new Date(System.currentTimeMillis() + (this.refreshExpiration * 1000));}
+
     private String generateToken(Map<String, Object> claims) {
 
         try {
@@ -80,6 +85,30 @@ public class JwtTokenUtil {
                     .compact();
         }
 
+    }
+    public String generateRefreshToken(SecurityUser userDetails){
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sub", userDetails.getUsername());
+        claims.put("role", userDetails.getAuthorities());
+        claims.put("created", new Date());
+        claims.put("id", userDetails.getId());
+        return this.generateRefreshToken(claims);
+    }
+
+    private String generateRefreshToken(Map<String, Object> claims){
+        try {
+            return Jwts.builder()
+                    .setClaims(claims)
+                    .setExpiration(this.generateRefreshExpirationDate())
+                    .signWith(SignatureAlgorithm.HS512, this.secret.getBytes("UTF-8"))
+                    .compact();
+        }catch (UnsupportedEncodingException ex){
+            return Jwts.builder()
+                    .setClaims(claims)
+                    .setExpiration(this.generateRefreshExpirationDate())
+                    .signWith(SignatureAlgorithm.HS512, this.secret)
+                    .compact();
+        }
     }
 
     public Boolean validateToken(String token, UserDetails userDetails){

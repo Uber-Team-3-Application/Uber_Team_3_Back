@@ -117,7 +117,7 @@ public class UserController {
 
             String tokenValue = this.jwtTokenUtil.generateToken(userDetails);
             token.setToken(tokenValue);
-            token.setRefreshToken(tokenValue);
+            token.setRefreshToken(this.jwtTokenUtil.generateRefreshToken(userDetails));
             Authentication authentication =
                     this.authenticationManager.authenticate(
                             new UsernamePasswordAuthenticationToken(login.getEmail(),
