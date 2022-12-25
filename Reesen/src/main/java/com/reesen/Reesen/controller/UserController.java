@@ -3,7 +3,6 @@ package com.reesen.Reesen.controller;
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.dto.RideDTO;
 import com.reesen.Reesen.exceptions.BadRequestException;
-import com.reesen.Reesen.exceptions.EmailNotConfirmedException;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.paginated.Paginated;
@@ -11,6 +10,8 @@ import com.reesen.Reesen.security.SecurityUser;
 import com.reesen.Reesen.security.jwt.JwtTokenUtil;
 import com.reesen.Reesen.service.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,7 +23,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.util.*;
 
@@ -88,18 +88,19 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Paginated<UserFullDTO>> getUsers(
-            @RequestParam("page") int page,
-            @RequestParam("size") int size
+    public ResponseEntity<Paginated<UserTabularDTO>> getUsers(
+            Pageable page
     ) {
 
-        Set<UserFullDTO> users = new HashSet<>();
-        for (User user : userService.getUsers()) {
-            users.add(new UserFullDTO(user));
+        Page<User> users = this.userService.findAll(page);
+
+        Set<UserTabularDTO> userDTOS = new HashSet<>();
+        for (User user : users) {
+            userDTOS.add(new UserTabularDTO(user));
         }
-        Paginated<UserFullDTO> userPaginated = new Paginated<>(users.size());
-        userPaginated.setResults(users);
-        return new ResponseEntity<>(userPaginated, HttpStatus.OK);
+
+        return new ResponseEntity<>(
+                new Paginated<>(users.getNumberOfElements(), userDTOS), HttpStatus.OK);
     }
 
 

@@ -6,6 +6,8 @@ import com.reesen.Reesen.security.SecurityUser;
 import com.reesen.Reesen.security.UserFactory;
 import com.reesen.Reesen.service.interfaces.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -54,7 +56,10 @@ public class UserService implements IUserService {
         return new HashSet<>(this.userRepository.findAll());
     }
 
-
+    @Override
+    public Page<User> findAll(Pageable page) {
+        return this.userRepository.findAll(page);
+    }
 
 
 }
