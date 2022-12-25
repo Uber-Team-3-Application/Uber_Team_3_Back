@@ -13,6 +13,8 @@ import com.reesen.Reesen.service.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +24,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.util.*;
@@ -35,7 +39,7 @@ public class UserController {
     private final IRemarkService remarkService;
     private final IDriverService driverService;
     private final IPassengerService passengerService;
-
+    private final JavaMailSender mailSender;
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -44,13 +48,13 @@ public class UserController {
 
     @Autowired
     public UserController(IUserService userService, IMessageService messageService, IRemarkService remarkService,
-                          IDriverService driverService, IPassengerService passengerService) {
+                          IDriverService driverService, IPassengerService passengerService, JavaMailSender mailSender) {
         this.userService = userService;
         this.messageService = messageService;
         this.remarkService = remarkService;
         this.driverService = driverService;
         this.passengerService = passengerService;
-
+        this.mailSender = mailSender;
     }
 
     @GetMapping("/{id}/ride")
@@ -210,7 +214,7 @@ public class UserController {
             @RequestParam int size
     ) {
 
-User user = userService.findOne((long) id);
+        User user = userService.findOne((long) id);
         Set<Remark> remarks = remarkService.getRemarksByUser(user);
         Set<RemarkDTO> remarksDto = new HashSet<>();
         for (Remark remark : remarks) {
@@ -222,5 +226,15 @@ User user = userService.findOne((long) id);
         return new ResponseEntity<>(new Paginated<>(remarksDto.size(), remarksDto), HttpStatus.OK);
     }
 
+    @PostMapping
+    public ResponseEntity<?> sendEmail(@RequestBody EmailDTO email) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setTo(email.getTo());
+        helper.setSubject(email.getSubject());
+        helper.setText(email.getMessage(),true);
+        mailSender.send(message);
+        return new ResponseEntity<>("Email sent successfuly", HttpStatus.OK);
+    }
 
 }

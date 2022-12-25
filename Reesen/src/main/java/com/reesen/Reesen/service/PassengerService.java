@@ -80,6 +80,13 @@ public class PassengerService implements IPassengerService {
         Boolean exists = this.passengerRepository.getEmailConfirmation(username);
         if(exists == null) return true;
         return exists;
+        }
+
+    @Override
+    public void activateAccount(String email) {
+        Passenger passenger = this.passengerRepository.findByEmail(email);
+        passenger.setConfirmedMail(true);
+        this.passengerRepository.save(passenger);
 
     }
 }
