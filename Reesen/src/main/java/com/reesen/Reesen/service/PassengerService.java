@@ -77,6 +77,9 @@ public class PassengerService implements IPassengerService {
     }
     @Override
     public boolean getIsEmailConfirmed(String username){
-        return this.passengerRepository.getEmailConfirmation(username);
+        Boolean exists = this.passengerRepository.getEmailConfirmation(username);
+        if(exists == null) return true;
+        return exists;
+
     }
 }
