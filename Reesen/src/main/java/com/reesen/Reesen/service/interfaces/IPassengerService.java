@@ -18,4 +18,6 @@ public interface IPassengerService {
 	Page<Passenger> findAll(Pageable page);
 
 	Passenger getPassengerFromPassengerDTO(Long id, PassengerDTO passengerDTO);
+
+    void activateAccount(String email);
 }
