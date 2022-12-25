@@ -1,6 +1,11 @@
-package com.reesen.Reesen.model;
+package com.reesen.Reesen.model.Driver;
 
 import com.reesen.Reesen.Enums.Role;
+import com.reesen.Reesen.model.Document;
+import com.reesen.Reesen.model.Ride;
+import com.reesen.Reesen.model.User;
+import com.reesen.Reesen.model.Vehicle;
+
 import javax.persistence.*;
 
 import java.io.Serializable;
@@ -20,6 +25,7 @@ public class Driver extends User implements Serializable {
     @OneToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinColumn(name="vehicleId")
     private Vehicle vehicle;
+
 
     public Driver(){
 

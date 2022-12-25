@@ -3,7 +3,7 @@ package com.reesen.Reesen.service;
 import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.CreatedDriverDTO;
 import com.reesen.Reesen.dto.DriverDTO;
-import com.reesen.Reesen.model.Driver;
+import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.repository.DriverRepository;
@@ -96,6 +96,7 @@ public class DriverService implements IDriverService {
     public Vehicle getVehicle(Long driverId){
         return this.driverRepository.getVehicle(driverId);
     }
+
 
     @Override
     public Page<Driver> findAll(Pageable page){

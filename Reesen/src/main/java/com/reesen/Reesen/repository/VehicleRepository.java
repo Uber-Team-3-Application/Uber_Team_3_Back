@@ -1,5 +1,5 @@
 package com.reesen.Reesen.repository;
-import com.reesen.Reesen.dto.LocationDTO;
+import com.reesen.Reesen.dto.VehicleLocationWithAvailabilityDTO;
 import com.reesen.Reesen.model.Location;
 import com.reesen.Reesen.model.Vehicle;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +15,7 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
     @Query("select v.currentLocation.id from Vehicle v")
     List<Long> getAllLocationIds();
+
+    @Query("select new com.reesen.Reesen.dto.VehicleLocationWithAvailabilityDTO(dr.isActive, v.currentLocation.address, v.currentLocation.latitude, v.currentLocation.longitude) from Vehicle v inner join v.driver dr where dr.vehicle.id = v.id and dr.isActive = true")
+    List<VehicleLocationWithAvailabilityDTO> getAllLocationsWithAvailability();
 }

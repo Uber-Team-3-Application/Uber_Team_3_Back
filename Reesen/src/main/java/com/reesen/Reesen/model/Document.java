@@ -1,5 +1,7 @@
 package com.reesen.Reesen.model;
 
+import com.reesen.Reesen.model.Driver.Driver;
+
 import javax.persistence.*;
 
 import java.io.Serializable;

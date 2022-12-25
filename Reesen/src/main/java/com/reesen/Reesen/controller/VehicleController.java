@@ -1,9 +1,6 @@
 package com.reesen.Reesen.controller;
 
-import com.reesen.Reesen.dto.LocationDTO;
-import com.reesen.Reesen.dto.PassengerDTO;
-import com.reesen.Reesen.dto.VehicleDTO;
-import com.reesen.Reesen.dto.VehicleTypeDTO;
+import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.Passenger;
 import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.model.VehicleType;
@@ -53,9 +50,9 @@ public class VehicleController {
     }
 
     @GetMapping(value = "/vehicle-locations")
-    public ResponseEntity<List<LocationDTO>> getAllVehicleLocations(){
+    public ResponseEntity<List<VehicleLocationWithAvailabilityDTO>> getAllVehicleLocations(){
 
-        List<LocationDTO> locations = this.vehicleService.getAllLocations();
+        List<VehicleLocationWithAvailabilityDTO> locations = this.vehicleService.getAllLocationsWithAvailability();
 
         return new ResponseEntity<>(locations, HttpStatus.OK);
     }

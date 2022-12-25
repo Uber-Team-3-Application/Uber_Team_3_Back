@@ -1,8 +1,6 @@
 package com.reesen.Reesen.mockup;
 
 import com.reesen.Reesen.dto.CreatedDriverDTO;
-import com.reesen.Reesen.dto.DriverDTO;
-import com.reesen.Reesen.model.Driver;
 
 public class DriverMockup {
 

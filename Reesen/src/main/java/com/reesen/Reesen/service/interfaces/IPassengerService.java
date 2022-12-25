@@ -1,6 +1,7 @@
 package com.reesen.Reesen.service.interfaces;
 
 import com.reesen.Reesen.dto.PassengerDTO;
+import com.reesen.Reesen.exceptions.EmailNotConfirmedException;
 import com.reesen.Reesen.model.Passenger;
 import com.reesen.Reesen.model.Ride;
 import org.springframework.data.domain.Page;
@@ -19,5 +20,7 @@ public interface IPassengerService {
 
 	Passenger getPassengerFromPassengerDTO(Long id, PassengerDTO passengerDTO);
 
-    void activateAccount(String email);
+  void activateAccount(String email);
+  
+	boolean getIsEmailConfirmed(String username);
 }

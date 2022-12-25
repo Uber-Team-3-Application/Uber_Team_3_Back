@@ -2,6 +2,7 @@ package com.reesen.Reesen.service;
 
 import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.PassengerDTO;
+import com.reesen.Reesen.exceptions.EmailNotConfirmedException;
 import com.reesen.Reesen.model.Passenger;
 import com.reesen.Reesen.repository.PassengerRepository;
 import com.reesen.Reesen.service.interfaces.IPassengerService;
@@ -51,6 +52,7 @@ public class PassengerService implements IPassengerService {
         passenger.setAddress(passengerDTO.getAddress());
         passenger.setPassword(passwordEncoder.encode(passengerDTO.getPassword()));
         passenger.setRole(Role.PASSENGER);
+        passenger.setConfirmedMail(false);
         return new PassengerDTO(this.passengerRepository.save(passenger));
     }
 
@@ -73,12 +75,18 @@ public class PassengerService implements IPassengerService {
             passenger.setPassword(passwordEncoder.encode(passengerDTO.getPassword()));
         return passenger;
     }
+    @Override
+    public boolean getIsEmailConfirmed(String username){
+        Boolean exists = this.passengerRepository.getEmailConfirmation(username);
+        if(exists == null) return true;
+        return exists;
+        }
 
     @Override
     public void activateAccount(String email) {
         Passenger passenger = this.passengerRepository.findByEmail(email);
         passenger.setConfirmedMail(true);
         this.passengerRepository.save(passenger);
-    }
 
+    }
 }

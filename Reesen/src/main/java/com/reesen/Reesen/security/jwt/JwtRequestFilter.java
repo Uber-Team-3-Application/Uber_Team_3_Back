@@ -38,19 +38,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 try {
                     jwtToken = requestTokenHeader;
                     System.out.println(jwtToken);
-                    username = jwtTokenUtil.getUsername(jwtToken);
-                    UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
-                    if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
-                        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                                new UsernamePasswordAuthenticationToken(
-                                        userDetails,
-                                        null,
-                                        userDetails.getAuthorities());
-
-                        usernamePasswordAuthenticationToken
-                                .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-                    }
+                    authenticateToken(request, jwtToken);
                 }catch (IllegalArgumentException e) {
                     System.out.println("Unable to get JWT Token.");
                 } catch (ExpiredJwtException e) {
@@ -59,11 +47,36 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                     System.out.println("Bad JWT Token.");
                 }
             }else{
-                logger.warn("JWT TOKEN DOES NOT EXIST");
+                String refreshToken = request.getHeader("refreshToken");
+                if(refreshToken != null){
+                    allowForRefreshToken(request, refreshToken);
+                }else{
+                    logger.warn("INVALID JWT TOKEN");
+                }
             }
         }
         filterChain.doFilter(request, response);
 
     }
 
+    private void authenticateToken(HttpServletRequest request, String jwtToken) {
+        String username;
+        username = jwtTokenUtil.getUsername(jwtToken);
+        UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
+        if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                    new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities());
+
+            usernamePasswordAuthenticationToken
+                    .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+        }
+    }
+
+    private void allowForRefreshToken(HttpServletRequest request, String refreshToken) {
+       authenticateToken(request, refreshToken);
+    }
 }

@@ -3,7 +3,8 @@ package com.reesen.Reesen.service;
 import com.reesen.Reesen.dto.LocationDTO;
 import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.dto.VehicleDTO;
-import com.reesen.Reesen.model.Driver;
+import com.reesen.Reesen.dto.VehicleLocationWithAvailabilityDTO;
+import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Location;
 import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.model.VehicleType;
@@ -104,6 +105,11 @@ public class VehicleService implements IVehicleService {
             locations.add(new LocationDTO(this.vehicleRepository.getLocation(id)));
         }
         return locations;
+    }
+
+    @Override
+    public List<VehicleLocationWithAvailabilityDTO> getAllLocationsWithAvailability() {
+        return this.vehicleRepository.getAllLocationsWithAvailability();
     }
 
     @Override
