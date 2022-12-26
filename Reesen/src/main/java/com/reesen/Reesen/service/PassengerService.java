@@ -64,7 +64,7 @@ public class PassengerService implements IPassengerService {
     @Override
     public Passenger getPassengerFromPassengerDTO(Long id, PassengerDTO passengerDTO) {
         Passenger passenger = new Passenger();
-        passenger.setId(passengerDTO.getId());
+        passenger.setId(id);
         passenger.setName(passengerDTO.getName());
         passenger.setSurname(passengerDTO.getSurname());
         passenger.setProfilePicture(passengerDTO.getProfilePicture());
