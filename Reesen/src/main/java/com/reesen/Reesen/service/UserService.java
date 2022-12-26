@@ -76,7 +76,12 @@ public class UserService implements IUserService {
 
     @Override
     public boolean changePassword(String old_password, String new_password, Long id) {
-        if(!old_password.equals(new_password)) return false;
+
+        String old = this.userRepository.getUserPassword(id);
+        System.out.println(old_password);
+        System.out.println(passwordEncoder.encode(old_password));
+        System.out.println(old);
+        if(!passwordEncoder.matches(old_password, old)) return false;
 
         this.userRepository.changePassword(passwordEncoder.encode(new_password), id);
         return true;
