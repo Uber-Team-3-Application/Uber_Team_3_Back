@@ -18,4 +18,6 @@ public interface IUserService {
     Page<User> findAll(Pageable page);
 
     Integer getTotalNumberOfUsers();
+
+    boolean getIsUserBlocked(Long id);
 }

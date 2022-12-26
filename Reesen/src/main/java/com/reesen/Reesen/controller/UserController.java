@@ -188,6 +188,16 @@ public class UserController {
 
     }
 
+    @GetMapping("/{id}/is-blocked")
+    @PreAuthorize("hasAnyRole('ADMIN','DRIVER', 'PASSENGER')")
+    public ResponseEntity<Boolean> isUserBlocked(@PathVariable Long id){
+        User user = this.userService.findOne(id);
+        if(user == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        boolean isBlocked = this.userService.getIsUserBlocked(id);
+        return new ResponseEntity<>(isBlocked, HttpStatus.OK);
+    }
+
     @PutMapping("/{id}/unblock")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> unblockUser(@PathVariable int id) {

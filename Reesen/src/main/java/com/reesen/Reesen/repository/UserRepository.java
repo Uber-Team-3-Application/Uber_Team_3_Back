@@ -13,4 +13,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select COUNT(u) from User u where not u.role='ADMIN'")
     Integer getNumberOfUsers();
+
+    @Query("select u.isBlocked from User u where u.id=:id")
+    boolean getIsBlocked(Long id);
 }

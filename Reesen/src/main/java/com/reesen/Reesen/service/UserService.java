@@ -66,5 +66,10 @@ public class UserService implements IUserService {
         return this.userRepository.getNumberOfUsers();
     }
 
+    @Override
+    public boolean getIsUserBlocked(Long id) {
+        return this.userRepository.getIsBlocked(id);
+    }
+
 
 }
