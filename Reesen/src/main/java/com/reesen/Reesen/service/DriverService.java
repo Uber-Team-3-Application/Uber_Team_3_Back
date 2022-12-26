@@ -88,7 +88,10 @@ public class DriverService implements IDriverService {
         driver.setId(id);
         if(driverDTO.getPassword() != null) {
             driver.setPassword(passwordEncoder.encode(driverDTO.getPassword()));
+        }else{
+            driver.setPassword(this.driverRepository.getPasswordWithId(id));
         }
+        driver.setRole(Role.DRIVER);
         return driver;
     }
 

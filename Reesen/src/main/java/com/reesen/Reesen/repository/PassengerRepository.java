@@ -16,4 +16,7 @@ public interface PassengerRepository extends JpaRepository<Passenger, Long> {
 
     @Query("select pas.isConfirmedMail from Passenger pas where pas.email=:username")
     Boolean getEmailConfirmation(String username);
+
+    @Query("select d.password from Passenger d where d.id=:id")
+    String getPasswordWithId(Long id);
 }

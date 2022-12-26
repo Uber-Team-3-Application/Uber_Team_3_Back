@@ -86,7 +86,6 @@ public class UserController {
 
     }
 
-
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Paginated<UserTabularDTO>> getUsers(
