@@ -150,6 +150,7 @@ public class DriverController {
             driver.get().setActive(isActive);
             this.driverService.save(driver.get());
         }
+        System.out.println(driverId);
         return new ResponseEntity<>("Driver Activity updated!", HttpStatus.OK);
     }
 

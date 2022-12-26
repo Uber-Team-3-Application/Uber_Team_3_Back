@@ -2,20 +2,20 @@ package com.reesen.Reesen.dto;
 
 public class DriverActivityDTO {
 
-    private boolean isActive;
+    private boolean active;
 
 
-    public DriverActivityDTO(boolean isActive) {
-        this.isActive = isActive;
+    public DriverActivityDTO(boolean active) {
+        this.active = active;
     }
     public DriverActivityDTO() {
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        this.active = active;
     }
 }
