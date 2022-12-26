@@ -87,10 +87,7 @@ public class PassengerService implements IPassengerService {
         }
 
     @Override
-    public void activateAccount(String email) {
-        Passenger passenger = this.passengerRepository.findByEmail(email);
-        passenger.setConfirmedMail(true);
-        this.passengerRepository.save(passenger);
-
+    public void activateAccount(Long passengerId) {
+        this.passengerRepository.activateAccount(passengerId);
     }
 }

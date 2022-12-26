@@ -2,11 +2,9 @@ package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.PassengerDTO;
 import com.reesen.Reesen.dto.RideDTO;
-import com.reesen.Reesen.mockup.PassengerRideMockup;
 import com.reesen.Reesen.model.Passenger;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.paginated.Paginated;
-import com.reesen.Reesen.model.paginated.PassengerRidePaginated;
 import com.reesen.Reesen.service.interfaces.IPassengerService;
 import com.reesen.Reesen.service.interfaces.IRideService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import com.reesen.Reesen.security.jwt.JwtTokenUtil;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -29,10 +28,13 @@ public class PassengerController {
     private final IPassengerService passengerService;
     private final IRideService rideService;
 
+    private final JwtTokenUtil tokens;
+
     @Autowired
-    public PassengerController(IPassengerService passengerService, IRideService rideService) {
+    public PassengerController(IPassengerService passengerService, IRideService rideService, JwtTokenUtil tokens) {
         this.passengerService = passengerService;
         this.rideService = rideService;
+        this.tokens = tokens;
     }
 
     @PostMapping
@@ -46,13 +48,13 @@ public class PassengerController {
     @GetMapping(value = "/activate/{activationId}")
     @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<String> activatePassenger(@PathVariable Long activationId){
-        return new ResponseEntity<>("Successful account activation", HttpStatus.OK);
+        return new ResponseEntity<>(tokens.generateActivationEmailToken(activationId), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/activate/{email}")
+    @GetMapping(value = "/activate/account/{passengerId}")
     @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
-    public ResponseEntity<String> activatePassenger(@PathVariable String email){
-        passengerService.activateAccount(email);
+    public ResponseEntity<String> activatePassengerAccount(@PathVariable Long passengerId){
+        passengerService.activateAccount(passengerId);
         return new ResponseEntity<>("Successful account activation", HttpStatus.OK);
     }
 

@@ -20,7 +20,7 @@ public interface IPassengerService {
 
 	Passenger getPassengerFromPassengerDTO(Long id, PassengerDTO passengerDTO);
 
-  void activateAccount(String email);
+  void activateAccount(Long passengerId);
   
 	boolean getIsEmailConfirmed(String username);
 }

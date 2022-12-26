@@ -11,8 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -112,8 +111,18 @@ public class JwtTokenUtil {
         }
     }
 
+
+
     public Boolean validateToken(String token, UserDetails userDetails){
         final String username = getUsername(token);
         return (username.equals(userDetails.getUsername()) && !isExpired(token));
     }
+
+    public String generateActivationEmailToken(Long passengerId){
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("passengerId", passengerId);
+        claims.put("expirationDate", LocalDateTime.now().plusHours(3));
+        return this.generateToken(claims);
+    }
+    
 }
