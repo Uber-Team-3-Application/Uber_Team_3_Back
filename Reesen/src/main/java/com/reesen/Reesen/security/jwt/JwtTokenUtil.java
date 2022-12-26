@@ -124,5 +124,13 @@ public class JwtTokenUtil {
         claims.put("expirationDate", LocalDateTime.now().plusHours(3));
         return this.generateToken(claims);
     }
-    
+
+    public String generateResetPasswordEmailToken(Long userId){
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("expirationDate", LocalDateTime.now().plusHours(3));
+        claims.put("code", (int)(Math.random() * 900000) + 100000 );
+        return this.generateToken(claims);
+    }
+
 }
