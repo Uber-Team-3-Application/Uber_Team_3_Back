@@ -20,4 +20,6 @@ public interface IUserService {
     Integer getTotalNumberOfUsers();
 
     boolean getIsUserBlocked(Long id);
+
+    boolean changePassword(String old_password, String new_password, Long id);
 }

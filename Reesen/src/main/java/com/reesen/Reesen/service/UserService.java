@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -20,12 +21,14 @@ public class UserService implements IUserService {
 
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -69,6 +72,15 @@ public class UserService implements IUserService {
     @Override
     public boolean getIsUserBlocked(Long id) {
         return this.userRepository.getIsBlocked(id);
+    }
+
+    @Override
+    public boolean changePassword(String old_password, String new_password, Long id) {
+        if(!old_password.equals(new_password)) return false;
+
+        this.userRepository.changePassword(passwordEncoder.encode(new_password), id);
+        return true;
+
     }
 
 

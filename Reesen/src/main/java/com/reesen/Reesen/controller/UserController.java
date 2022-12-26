@@ -208,6 +208,23 @@ public class UserController {
 
     }
 
+    @PutMapping("/{id}/changePassword")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
+    public ResponseEntity<String> changePassword(
+            @RequestBody ChangePasswordDTO changePasswordDTO,
+            @PathVariable Long id) {
+        User user = this.userService.findOne(id);
+        if(user == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        boolean passwordChanged = this.userService.changePassword(changePasswordDTO.getOld_password(), changePasswordDTO.getNew_password(), id);
+        if(!passwordChanged) return new ResponseEntity<>("Current password is not matching", HttpStatus.BAD_REQUEST);
+
+        return new ResponseEntity<>("Password successfully changed", HttpStatus.NO_CONTENT);
+
+    }
+
+
+
     @PostMapping("/{id}/note")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RemarkDTO> createNote(

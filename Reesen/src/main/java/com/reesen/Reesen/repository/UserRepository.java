@@ -2,6 +2,7 @@ package com.reesen.Reesen.repository;
 
 import com.reesen.Reesen.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
@@ -16,4 +17,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select u.isBlocked from User u where u.id=:id")
     boolean getIsBlocked(Long id);
+
+    @Modifying
+    @Query("update User u set u.password=:password where u.id=:id")
+    void changePassword(String password, Long id);
 }
