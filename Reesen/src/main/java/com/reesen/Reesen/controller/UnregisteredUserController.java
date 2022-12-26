@@ -52,7 +52,7 @@ public class UnregisteredUserController {
             }
         }
 
-        double estimatedTimeInMinutes = (amountDistance / 80) * 60;
+        double estimatedTimeInMinutes = (amountDistance / 80) * 60 * 2;
         EstimatedTimeDTO timeDTO = new EstimatedTimeDTO((int) estimatedTimeInMinutes, (int)estimatedCost);
         return new ResponseEntity<>(timeDTO, HttpStatus.OK);
     }
