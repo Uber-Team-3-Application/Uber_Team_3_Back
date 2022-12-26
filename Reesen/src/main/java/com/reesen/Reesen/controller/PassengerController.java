@@ -105,11 +105,11 @@ public class PassengerController {
         if(this.passengerService.findOne(id).isEmpty())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         Passenger passenger = this.passengerService.findByEmail(passengerDTO.getEmail());
-        if(passenger != null && !passenger.getId().equals(id.toString())){
+        if(passenger != null && !passenger.getId().toString().equals(id.toString())){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         passenger = this.passengerService.getPassengerFromPassengerDTO(id, passengerDTO);
-        this.passengerService.save(passenger);
+        passenger = this.passengerService.save(passenger);
         PassengerDTO updatedPassenger = new PassengerDTO(passenger);
         return new ResponseEntity<>(updatedPassenger, HttpStatus.OK);
     }

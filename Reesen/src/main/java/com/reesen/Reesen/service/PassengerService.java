@@ -64,7 +64,7 @@ public class PassengerService implements IPassengerService {
     @Override
     public Passenger getPassengerFromPassengerDTO(Long id, PassengerDTO passengerDTO) {
         Passenger passenger = new Passenger();
-        passenger.setId(passengerDTO.getId());
+        passenger.setId(id);
         passenger.setName(passengerDTO.getName());
         passenger.setSurname(passengerDTO.getSurname());
         passenger.setProfilePicture(passengerDTO.getProfilePicture());
@@ -73,6 +73,10 @@ public class PassengerService implements IPassengerService {
         passenger.setAddress(passengerDTO.getAddress());
         if(passengerDTO.getPassword() != null)
             passenger.setPassword(passwordEncoder.encode(passengerDTO.getPassword()));
+        else{
+            passenger.setPassword(this.passengerRepository.getPasswordWithId(id));
+        }
+        passenger.setRole(Role.PASSENGER);
         return passenger;
     }
     @Override
