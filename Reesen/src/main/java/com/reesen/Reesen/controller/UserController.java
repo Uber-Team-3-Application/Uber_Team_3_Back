@@ -180,8 +180,8 @@ public class UserController {
 
     @PutMapping("/{id}/block")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> blockUser(@PathVariable int id) {
-        User user = this.userService.findOne((long) id);
+    public ResponseEntity<Void> blockUser(@PathVariable Long id) {
+        User user = this.userService.findOne(id);
         user.setBlocked(true);
         userService.save(user);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
