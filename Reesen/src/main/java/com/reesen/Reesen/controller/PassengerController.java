@@ -49,6 +49,13 @@ public class PassengerController {
         return new ResponseEntity<>("Successful account activation", HttpStatus.OK);
     }
 
+    @GetMapping(value = "/activate/{email}")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
+    public ResponseEntity<String> activatePassenger(@PathVariable String email){
+        passengerService.activateAccount(email);
+        return new ResponseEntity<>("Successful account activation", HttpStatus.OK);
+    }
+
     @GetMapping
     @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<Paginated<PassengerDTO>> getPassengers(Pageable page){
