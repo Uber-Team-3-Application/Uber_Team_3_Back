@@ -1,9 +1,9 @@
 package com.reesen.Reesen.controller;
 
+import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.dto.RideDTO;
 import com.reesen.Reesen.exceptions.BadRequestException;
-import com.reesen.Reesen.exceptions.EmailNotConfirmedException;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.paginated.Paginated;
@@ -11,6 +11,8 @@ import com.reesen.Reesen.security.SecurityUser;
 import com.reesen.Reesen.security.jwt.JwtTokenUtil;
 import com.reesen.Reesen.service.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -23,6 +25,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -89,21 +92,29 @@ public class UserController {
 
     }
 
-
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Paginated<UserFullDTO>> getUsers(
-            @RequestParam("page") int page,
-            @RequestParam("size") int size
+    public ResponseEntity<Paginated<UserTabularDTO>> getUsers(
+            Pageable page
     ) {
 
-        Set<UserFullDTO> users = new HashSet<>();
-        for (User user : userService.getUsers()) {
-            users.add(new UserFullDTO(user));
+        Page<User> users = this.userService.findAll(page);
+
+        Set<UserTabularDTO> userDTOS = new HashSet<>();
+        for (User user : users) {
+            if(user.getRole() != Role.ADMIN)
+                userDTOS.add(new UserTabularDTO(user));
         }
-        Paginated<UserFullDTO> userPaginated = new Paginated<>(users.size());
-        userPaginated.setResults(users);
-        return new ResponseEntity<>(userPaginated, HttpStatus.OK);
+
+        return new ResponseEntity<>(
+                new Paginated<>(users.getNumberOfElements(), userDTOS), HttpStatus.OK);
+    }
+    @GetMapping("/number-of-users")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Integer> getTotalNumberOfUsers(){
+
+        Integer totalNumber = this.userService.getTotalNumberOfUsers();
+        return new ResponseEntity<>(totalNumber, HttpStatus.OK);
     }
 
 
@@ -175,12 +186,22 @@ public class UserController {
 
     @PutMapping("/{id}/block")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> blockUser(@PathVariable int id) {
-        User user = this.userService.findOne((long) id);
+    public ResponseEntity<Void> blockUser(@PathVariable Long id) {
+        User user = this.userService.findOne(id);
         user.setBlocked(true);
         userService.save(user);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
+    }
+
+    @GetMapping("/{id}/is-blocked")
+    @PreAuthorize("hasAnyRole('ADMIN','DRIVER', 'PASSENGER')")
+    public ResponseEntity<Boolean> isUserBlocked(@PathVariable Long id){
+        User user = this.userService.findOne(id);
+        if(user == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        boolean isBlocked = this.userService.getIsUserBlocked(id);
+        return new ResponseEntity<>(isBlocked, HttpStatus.OK);
     }
 
     @PutMapping("/{id}/unblock")
@@ -192,6 +213,23 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
     }
+
+    @PutMapping("/{id}/changePassword")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
+    public ResponseEntity changePassword(
+            @RequestBody ChangePasswordDTO changePasswordDTO,
+            @PathVariable Long id) {
+        User user = this.userService.findOne(id);
+        if(user == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        boolean passwordChanged = this.userService.changePassword(changePasswordDTO.getOld_password(), changePasswordDTO.getNew_password(), id);
+        if(!passwordChanged) return new ResponseEntity<>("Current password is not matching", HttpStatus.BAD_REQUEST);
+
+        return new ResponseEntity<>("Password successfully changed", HttpStatus.NO_CONTENT);
+
+    }
+
+
 
     @PostMapping("/{id}/note")
     @PreAuthorize("hasRole('ADMIN')")
