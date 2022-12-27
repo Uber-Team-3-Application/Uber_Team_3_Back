@@ -138,6 +138,49 @@ public class DriverService implements IDriverService {
         return this.driverEditBasicInfoRepository.save(driverEditBasicInformation);
     }
 
+    @Override
+    public Optional<DriverEditVehicle> findOneEditVehicleRequest(Long editRequestId) {
+        return this.driverEditVehicleInfoRepository.findById(editRequestId);
+    }
+
+    @Override
+    public Optional<DriverEditBasicInformation> findOneEditProfileRequest(Long editRequestId) {
+        return this.driverEditBasicInfoRepository.findById(editRequestId);
+    }
+
+    @Override
+    public void declineProfileEditRequest(Long editRequestId) {
+        this.driverEditBasicInfoRepository.deleteById(editRequestId);
+    }
+
+    @Override
+    public void declineVehicleEditRequest(Long editRequestId) {
+
+        this.driverEditVehicleInfoRepository.deleteById(editRequestId);
+    }
+
+    @Override
+    public void updateDriverBasedOnEditRequest(Driver driver, DriverEditBasicInformation driverEditBasicInformation) {
+        driver.setName(driverEditBasicInformation.getName());
+        driver.setSurname(driverEditBasicInformation.getSurname());
+        driver.setProfilePicture(driverEditBasicInformation.getProfilePicture());
+        driver.setTelephoneNumber(driverEditBasicInformation.getTelephoneNumber());
+        driver.setEmail(driverEditBasicInformation.getEmail());
+        driver.setAddress(driverEditBasicInformation.getAddress());
+        this.driverRepository.save(driver);
+    }
+
+    @Override
+    public Vehicle updateVehicleBasedOnEditRequest(Driver driver, DriverEditVehicle driverEditVehicle) {
+        Vehicle vehicle = this.getVehicle(driverEditVehicle.getDriverId());
+        vehicle.setModel(driverEditVehicle.getVModel());
+        vehicle.setRegistrationPlate(driverEditVehicle.getVRegistrationPlate());
+        vehicle.setPassengerSeats(driverEditVehicle.getVNumberOfSeats());
+        vehicle.setBabyAccessible(driverEditVehicle.isVIsBabyAccessible());
+        vehicle.setPetAccessible(driverEditVehicle.isVIsPetAccessible());
+        return vehicle;
+    }
+
 
     @Override
     public Page<Driver> findAll(Pageable page){

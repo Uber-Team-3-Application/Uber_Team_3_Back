@@ -18,10 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @CrossOrigin
 @RestController
@@ -457,7 +454,7 @@ public class DriverController {
         List<DriverEditBasicInformation> driverEditBasicInformation =
                 this.driverService.getDriverEditBasicInfo();
         if(driverEditBasicInformation.size() == 0)
-            return new ResponseEntity("NO EDIT REQUESTS", HttpStatus.NOT_FOUND);
+            return new ResponseEntity(new ArrayList<>(), HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(driverEditBasicInformation, HttpStatus.OK);
 
     }
@@ -468,9 +465,74 @@ public class DriverController {
         List<DriverEditVehicle> driverEditVehicleInformation =
                 this.driverService.getDriverEditVehicle();
         if(driverEditVehicleInformation.size() == 0)
-            return new ResponseEntity("NO EDIT REQUESTS", HttpStatus.NOT_FOUND);
+            return new ResponseEntity(new ArrayList<>(), HttpStatus.NOT_FOUND);
 
         return new ResponseEntity<>(driverEditVehicleInformation, HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/{id}/accept-vehicle-edit-request")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> acceptVehicleEditRequest(@PathVariable("id") Long editRequestId){
+        Optional<DriverEditVehicle> driverEditBasicInformation =
+                this.driverService.findOneEditVehicleRequest(editRequestId);
+
+        if(driverEditBasicInformation.isEmpty()) return new ResponseEntity<>("Invalid id", HttpStatus.NOT_FOUND);
+
+        Optional<Driver> driver = this.driverService.findOne(driverEditBasicInformation.get().getDriverId());
+        if(driver.isEmpty()) return new ResponseEntity<>("Non existing driver", HttpStatus.BAD_REQUEST);
+
+        Vehicle vehicle = this.driverService.updateVehicleBasedOnEditRequest(driver.get(), driverEditBasicInformation.get());
+        this.vehicleService.save(vehicle);
+
+        this.driverService.declineVehicleEditRequest(editRequestId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/{id}/accept-profile-edit-request")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> acceptProfileEditRequest(@PathVariable("id") Long editRequestId){
+
+
+        Optional<DriverEditBasicInformation> driverEditBasicInformation =
+                this.driverService.findOneEditProfileRequest(editRequestId);
+
+        if(driverEditBasicInformation.isEmpty()) return new ResponseEntity<>("Invalid id", HttpStatus.NOT_FOUND);
+
+        // find driver
+        Optional<Driver> driver = this.driverService.findOne(driverEditBasicInformation.get().getDriverId());
+        if(driver.isEmpty()) return new ResponseEntity<>("Non existing driver", HttpStatus.BAD_REQUEST);
+
+        this.driverService.updateDriverBasedOnEditRequest(driver.get(), driverEditBasicInformation.get());
+        this.driverService.declineProfileEditRequest(editRequestId);
+        return new ResponseEntity<>(HttpStatus.OK);
+
+    }
+
+    @DeleteMapping(value = "/{id}/decline-vehicle-edit-request")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> declineVehicleEditRequest(@PathVariable("id") Long editRequestId){
+
+        Optional<DriverEditVehicle> driverEditBasicInformation =
+                this.driverService.findOneEditVehicleRequest(editRequestId);
+
+        if(driverEditBasicInformation.isEmpty()) return new ResponseEntity<>("Invalid id", HttpStatus.NOT_FOUND);
+
+        this.driverService.declineVehicleEditRequest(editRequestId);
+
+        return new ResponseEntity<>("Deleted request.", HttpStatus.OK);
+
+    }
+
+    @DeleteMapping(value = "/{id}/decline-profile-edit-request")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> declineProfileEditRequest(@PathVariable("id") Long editRequestId){
+        Optional<DriverEditBasicInformation> driverEditBasicInformation =
+                this.driverService.findOneEditProfileRequest(editRequestId);
+
+        if(driverEditBasicInformation.isEmpty()) return new ResponseEntity("Invalid id", HttpStatus.NOT_FOUND);
+        this.driverService.declineProfileEditRequest(editRequestId);
+        return new ResponseEntity<>("Deleted request.", HttpStatus.OK);
+
     }
 
 }

@@ -38,4 +38,15 @@ public interface IDriverService {
     DriverEditVehicle saveEditVehicle(Vehicle vehicle, Long driverId);
     DriverEditBasicInformation saveEditBasicInfo(Driver driver, Long driverId);
 
+    Optional<DriverEditVehicle> findOneEditVehicleRequest(Long editRequestId);
+
+    Optional<DriverEditBasicInformation> findOneEditProfileRequest(Long editRequestId);
+
+    void declineProfileEditRequest(Long editRequestId);
+
+    void declineVehicleEditRequest(Long editRequestId);
+
+    void updateDriverBasedOnEditRequest(Driver driver, DriverEditBasicInformation driverEditBasicInformation);
+
+    Vehicle updateVehicleBasedOnEditRequest(Driver driver, DriverEditVehicle driverEditVehicle);
 }
