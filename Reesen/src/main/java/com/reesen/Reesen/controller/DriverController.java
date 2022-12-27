@@ -460,6 +460,8 @@ public class DriverController {
     public ResponseEntity<List<DriverEditBasicInformation>> getProfileEditRequests(){
         List<DriverEditBasicInformation> driverEditBasicInformation =
                 this.driverService.getDriverEditBasicInfo();
+        if(driverEditBasicInformation.size() == 0)
+            return new ResponseEntity("NO EDIT REQUESTS", HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(driverEditBasicInformation, HttpStatus.OK);
 
     }
@@ -469,6 +471,9 @@ public class DriverController {
     public ResponseEntity<List<DriverEditVehicle>> getVehicleEditRequests(){
         List<DriverEditVehicle> driverEditVehicleInformation =
                 this.driverService.getDriverEditVehicle();
+        if(driverEditVehicleInformation.size() == 0)
+            return new ResponseEntity("NO EDIT REQUESTS", HttpStatus.NOT_FOUND);
+
         return new ResponseEntity<>(driverEditVehicleInformation, HttpStatus.OK);
     }
 
