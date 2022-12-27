@@ -54,8 +54,27 @@ public class DriverController {
      *
      * **/
     @PutMapping(value = "/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
+    @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<CreatedDriverDTO> updateDriver(@RequestBody DriverDTO driverDTO, @PathVariable Long id){
+
+        if(this.driverService.findOne(id).isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Driver driver = this.driverService.findByEmail(driverDTO.getEmail());
+        if(driver!= null && !driver.getId().toString().equals(id.toString())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        driver = this.driverService.getDriverFromDriverDTO(id, driverDTO);
+        this.driverService.save(driver);
+        CreatedDriverDTO updatedDriver = new CreatedDriverDTO(driver);
+        return new ResponseEntity<>(updatedDriver, HttpStatus.OK);
+
+
+
+    }
+
+    @PutMapping(value = "/{id}/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CreatedDriverDTO> updateDriverAsAdmin(@RequestBody DriverDTO driverDTO, @PathVariable Long id){
 
         if(this.driverService.findOne(id).isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -78,8 +97,33 @@ public class DriverController {
              *
              * **/
     @PutMapping(value = "/{id}/vehicle")
-    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
+    @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<VehicleDTO> updateVehicle(@RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId){
+
+        if(driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Optional<Driver> driver = this.driverService.findOne(driverId);
+        if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Vehicle vehicle = this.driverService.getVehicle(driverId);
+        // if ! exists -> create
+        if(vehicle == null){
+            vehicle = this.vehicleService.createVehicle(vehicleDTO, driver.get());
+        }else{
+            // if exists -> edit
+            vehicle = this.vehicleService.editVehicle(vehicle, vehicleDTO);
+        }
+        vehicle = this.vehicleService.save(vehicle);
+        driver.get().setVehicle(vehicle);
+        this.driverService.save(driver.get());
+
+        return new ResponseEntity<>(new VehicleDTO(vehicle), HttpStatus.OK);
+    }
+
+
+    @PutMapping(value = "/{id}/vehicle-admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<VehicleDTO> updateVehicleAsAdmin(@RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId){
 
         if(driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
