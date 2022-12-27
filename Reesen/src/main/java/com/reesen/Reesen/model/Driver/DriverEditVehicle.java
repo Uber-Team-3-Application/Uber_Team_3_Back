@@ -1,5 +1,6 @@
 package com.reesen.Reesen.model.Driver;
 
+import com.reesen.Reesen.model.Vehicle;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,15 @@ public class DriverEditVehicle implements Serializable {
 
     @Column
     private boolean vIsPetAccessible;
+
+    public DriverEditVehicle(Vehicle vehicle, Long driverId){
+        this.driverId = driverId;
+        this.vModel = vehicle.getModel();
+        this.vRegistrationPlate = vehicle.getRegistrationPlate();
+        this.vNumberOfSeats = vehicle.getPassengerSeats();
+        this.vIsBabyAccessible = vehicle.isBabyAccessible();
+        this.vIsPetAccessible = vehicle.isPetAccessible();
+    }
 
     public DriverEditVehicle(Long id, Long driverId, String vModel, String vRegistrationPlate, int vNumberOfSeats, boolean vIsBabyAccessible, boolean vIsPetAccessible) {
         this.id = id;

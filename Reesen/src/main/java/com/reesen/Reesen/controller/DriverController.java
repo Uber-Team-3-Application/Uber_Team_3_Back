@@ -4,6 +4,8 @@ package com.reesen.Reesen.controller;
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.Driver.Driver;
+import com.reesen.Reesen.model.Driver.DriverEditBasicInformation;
+import com.reesen.Reesen.model.Driver.DriverEditVehicle;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.service.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @CrossOrigin
 @RestController
@@ -54,8 +53,29 @@ public class DriverController {
      *
      * **/
     @PutMapping(value = "/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
+    @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<CreatedDriverDTO> updateDriver(@RequestBody DriverDTO driverDTO, @PathVariable Long id){
+
+        if(this.driverService.findOne(id).isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Driver driver = this.driverService.findByEmail(driverDTO.getEmail());
+
+        if(driver!= null && !driver.getId().toString().equals(id.toString())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        driver = this.driverService.getDriverFromDriverDTO(id, driverDTO);
+
+        this.driverService.saveEditBasicInfo(driver, id);
+        CreatedDriverDTO updatedDriver = new CreatedDriverDTO(driver);
+        return new ResponseEntity<>(updatedDriver, HttpStatus.OK);
+
+
+
+    }
+
+    @PutMapping(value = "/{id}/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CreatedDriverDTO> updateDriverAsAdmin(@RequestBody DriverDTO driverDTO, @PathVariable Long id){
 
         if(this.driverService.findOne(id).isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -78,8 +98,27 @@ public class DriverController {
              *
              * **/
     @PutMapping(value = "/{id}/vehicle")
-    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
+    @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<VehicleDTO> updateVehicle(@RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId){
+
+        if(driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Optional<Driver> driver = this.driverService.findOne(driverId);
+        if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Vehicle vehicle = this.driverService.getVehicle(driverId);
+        if(vehicle == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        vehicle = this.vehicleService.createVehicle(vehicleDTO, driver.get());
+        this.driverService.saveEditVehicle(vehicle, driverId);
+        return new ResponseEntity<>(new VehicleDTO(vehicle), HttpStatus.OK);
+    }
+
+
+    @PutMapping(value = "/{id}/vehicle-admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<VehicleDTO> updateVehicleAsAdmin(@RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId){
 
         if(driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
@@ -400,6 +439,100 @@ public class DriverController {
 
         this.documentService.delete(id);
         return new ResponseEntity<>("Driver document deleted successfully", HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping(value = "/total-edit-requests")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Integer> getTotalEditRequests(){
+
+        int totalEditRequests = this.driverService.getTotalEditRequests();
+        return new ResponseEntity<>(totalEditRequests, HttpStatus.OK);
+    }
+    @GetMapping(value = "/profile-edit-requests")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<DriverEditBasicInformation>> getProfileEditRequests(){
+        List<DriverEditBasicInformation> driverEditBasicInformation =
+                this.driverService.getDriverEditBasicInfo();
+        if(driverEditBasicInformation.size() == 0)
+            return new ResponseEntity(new ArrayList<>(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(driverEditBasicInformation, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/vehicle-edit-requests")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<DriverEditVehicle>> getVehicleEditRequests(){
+        List<DriverEditVehicle> driverEditVehicleInformation =
+                this.driverService.getDriverEditVehicle();
+        if(driverEditVehicleInformation.size() == 0)
+            return new ResponseEntity(new ArrayList<>(), HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(driverEditVehicleInformation, HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/{id}/accept-vehicle-edit-request")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> acceptVehicleEditRequest(@PathVariable("id") Long editRequestId){
+        Optional<DriverEditVehicle> driverEditBasicInformation =
+                this.driverService.findOneEditVehicleRequest(editRequestId);
+
+        if(driverEditBasicInformation.isEmpty()) return new ResponseEntity<>("Invalid id", HttpStatus.NOT_FOUND);
+
+        Optional<Driver> driver = this.driverService.findOne(driverEditBasicInformation.get().getDriverId());
+        if(driver.isEmpty()) return new ResponseEntity<>("Non existing driver", HttpStatus.BAD_REQUEST);
+
+        Vehicle vehicle = this.driverService.updateVehicleBasedOnEditRequest(driver.get(), driverEditBasicInformation.get());
+        this.vehicleService.save(vehicle);
+
+        this.driverService.declineVehicleEditRequest(editRequestId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/{id}/accept-profile-edit-request")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> acceptProfileEditRequest(@PathVariable("id") Long editRequestId){
+
+
+        Optional<DriverEditBasicInformation> driverEditBasicInformation =
+                this.driverService.findOneEditProfileRequest(editRequestId);
+
+        if(driverEditBasicInformation.isEmpty()) return new ResponseEntity<>("Invalid id", HttpStatus.NOT_FOUND);
+
+        // find driver
+        Optional<Driver> driver = this.driverService.findOne(driverEditBasicInformation.get().getDriverId());
+        if(driver.isEmpty()) return new ResponseEntity<>("Non existing driver", HttpStatus.BAD_REQUEST);
+
+        this.driverService.updateDriverBasedOnEditRequest(driver.get(), driverEditBasicInformation.get());
+        this.driverService.declineProfileEditRequest(editRequestId);
+        return new ResponseEntity<>(HttpStatus.OK);
+
+    }
+
+    @DeleteMapping(value = "/{id}/decline-vehicle-edit-request")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> declineVehicleEditRequest(@PathVariable("id") Long editRequestId){
+
+        Optional<DriverEditVehicle> driverEditBasicInformation =
+                this.driverService.findOneEditVehicleRequest(editRequestId);
+
+        if(driverEditBasicInformation.isEmpty()) return new ResponseEntity<>("Invalid id", HttpStatus.NOT_FOUND);
+
+        this.driverService.declineVehicleEditRequest(editRequestId);
+
+        return new ResponseEntity<>("Deleted request.", HttpStatus.OK);
+
+    }
+
+    @DeleteMapping(value = "/{id}/decline-profile-edit-request")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> declineProfileEditRequest(@PathVariable("id") Long editRequestId){
+        Optional<DriverEditBasicInformation> driverEditBasicInformation =
+                this.driverService.findOneEditProfileRequest(editRequestId);
+
+        if(driverEditBasicInformation.isEmpty()) return new ResponseEntity("Invalid id", HttpStatus.NOT_FOUND);
+        this.driverService.declineProfileEditRequest(editRequestId);
+        return new ResponseEntity<>("Deleted request.", HttpStatus.OK);
+
     }
 
 }
