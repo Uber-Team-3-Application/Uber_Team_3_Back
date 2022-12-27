@@ -114,6 +114,8 @@ public class DriverService implements IDriverService {
         return this.driverEditBasicInfoRepository.countTotal() + this.driverEditVehicleInfoRepository.countTotal();
     }
 
+
+
     @Override
     public List<DriverEditVehicle> getDriverEditVehicle() {
         return this.driverEditVehicleInfoRepository.findAll();
@@ -122,6 +124,18 @@ public class DriverService implements IDriverService {
     @Override
     public List<DriverEditBasicInformation> getDriverEditBasicInfo() {
         return this.driverEditBasicInfoRepository.findAll();
+    }
+
+    @Override
+    public DriverEditVehicle saveEditVehicle(Vehicle vehicle, Long driverId) {
+        DriverEditVehicle driverEditVehicle = new DriverEditVehicle(vehicle, driverId);
+        return this.driverEditVehicleInfoRepository.save(driverEditVehicle);
+    }
+
+    @Override
+    public DriverEditBasicInformation saveEditBasicInfo(Driver driver, Long driverId) {
+        DriverEditBasicInformation driverEditBasicInformation = new DriverEditBasicInformation(driver, driverId);
+        return this.driverEditBasicInfoRepository.save(driverEditBasicInformation);
     }
 
 

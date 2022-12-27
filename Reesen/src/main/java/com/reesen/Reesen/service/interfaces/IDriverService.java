@@ -34,4 +34,8 @@ public interface IDriverService {
     List<DriverEditVehicle> getDriverEditVehicle();
 
     List<DriverEditBasicInformation> getDriverEditBasicInfo();
+
+    DriverEditVehicle saveEditVehicle(Vehicle vehicle, Long driverId);
+    DriverEditBasicInformation saveEditBasicInfo(Driver driver, Long driverId);
+
 }
