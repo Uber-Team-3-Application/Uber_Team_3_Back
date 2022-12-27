@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface VehicleTypeRepository extends JpaRepository<VehicleType, Long> {
 
-    public VehicleType findByName(VehicleName name);
+    VehicleType findByName(VehicleName name);
 }

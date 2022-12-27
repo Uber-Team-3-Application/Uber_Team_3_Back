@@ -446,4 +446,12 @@ public class DriverController {
         return new ResponseEntity<>("Driver document deleted successfully", HttpStatus.NO_CONTENT);
     }
 
+    @GetMapping(value = "/total-edit-requests")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Integer> getTotalEditRequests(){
+
+        int totalEditRequests = this.driverService.getTotalEditRequests();
+        return new ResponseEntity<>(totalEditRequests, HttpStatus.OK);
+    }
+
 }

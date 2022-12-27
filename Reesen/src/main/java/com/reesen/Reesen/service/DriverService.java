@@ -6,6 +6,8 @@ import com.reesen.Reesen.dto.DriverDTO;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.model.paginated.Paginated;
+import com.reesen.Reesen.repository.DriverEditBasicInfoRepository;
+import com.reesen.Reesen.repository.DriverEditVehicleInfoRepository;
 import com.reesen.Reesen.repository.DriverRepository;
 import com.reesen.Reesen.service.interfaces.IDriverService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +22,15 @@ import java.util.Optional;
 public class DriverService implements IDriverService {
     private final DriverRepository driverRepository;
     private final PasswordEncoder passwordEncoder;
+    private final DriverEditBasicInfoRepository driverEditBasicInfoRepository;
+    private final DriverEditVehicleInfoRepository driverEditVehicleInfoRepository;
 
     @Autowired
-    public DriverService(DriverRepository driverRepository, PasswordEncoder passwordEncoder){
+    public DriverService(DriverRepository driverRepository, PasswordEncoder passwordEncoder, DriverEditBasicInfoRepository driverEditBasicInfoRepository, DriverEditVehicleInfoRepository driverEditVehicleInfoRepository){
         this.driverRepository = driverRepository;
         this.passwordEncoder = passwordEncoder;
+        this.driverEditBasicInfoRepository = driverEditBasicInfoRepository;
+        this.driverEditVehicleInfoRepository = driverEditVehicleInfoRepository;
     }
 
     @Override
@@ -98,6 +104,11 @@ public class DriverService implements IDriverService {
     @Override
     public Vehicle getVehicle(Long driverId){
         return this.driverRepository.getVehicle(driverId);
+    }
+
+    @Override
+    public int getTotalEditRequests() {
+        return this.driverEditBasicInfoRepository.countTotal() + this.driverEditVehicleInfoRepository.countTotal();
     }
 
 

@@ -26,4 +26,5 @@ public interface IDriverService {
 
     Vehicle getVehicle(Long driverId);
 
+    int getTotalEditRequests();
 }
