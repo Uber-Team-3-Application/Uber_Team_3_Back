@@ -13,6 +13,7 @@ public class RemarkDTO {
     public RemarkDTO(Remark remark) {
         this.id = remark.getId();
         this.message = remark.getMessage();
+        this.date = remark.getDateOfRemark();
     }
 
 

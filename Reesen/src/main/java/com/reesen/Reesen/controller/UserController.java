@@ -13,6 +13,7 @@ import com.reesen.Reesen.service.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -234,13 +235,14 @@ public class UserController {
     @PostMapping("/{id}/note")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RemarkDTO> createNote(
-            @PathVariable int id,
+            @PathVariable Long id,
             @RequestBody String message
     ) {
-        User user = userService.findOne((long) id);
-        Remark remark = new Remark(message, user);
+        User user = userService.findOne(id);
+        Remark remark = new Remark(message,  Date.from(Instant.now()), user);
+        System.out.println(remark.getMessage());
         remark = remarkService.save(remark);
-        RemarkDTO remarkDto = new RemarkDTO((long) id, Date.from(Instant.now()), remark.getMessage());
+        RemarkDTO remarkDto = new RemarkDTO(remark);
         return new  ResponseEntity<>(remarkDto, HttpStatus.OK);
     }
 
@@ -257,7 +259,6 @@ public class UserController {
         Set<RemarkDTO> remarksDto = new HashSet<>();
         for (Remark remark : remarks) {
             RemarkDTO remarkDTO = new RemarkDTO(remark);
-            remarkDTO.setDate(Date.from(Instant.now()));
             remarksDto.add(remarkDTO);
         }
 

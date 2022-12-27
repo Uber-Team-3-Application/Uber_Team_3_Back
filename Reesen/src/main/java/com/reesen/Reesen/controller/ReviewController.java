@@ -69,8 +69,6 @@ public class ReviewController {
             @PathVariable Long id,
             @PathVariable Long rideId,
             @RequestBody ReviewDTO reviewDTO
-
-            // POZVATI JWT_TOKEN_UTIL
     )
     {
 

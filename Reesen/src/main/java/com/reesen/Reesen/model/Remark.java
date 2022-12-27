@@ -3,6 +3,7 @@ package com.reesen.Reesen.model;
 import javax.persistence.*;
 
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 public class Remark implements Serializable {
@@ -14,6 +15,9 @@ public class Remark implements Serializable {
     @Column
     private String message;
 
+    @Column
+    private Date dateOfRemark;
+
     @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     private User user;
@@ -24,6 +28,20 @@ public class Remark implements Serializable {
     public Remark(String message, User user) {
         this.message = message;
         this.user = user;
+    }
+
+    public Remark(String message, Date dateOfRemark, User user) {
+        this.message = message;
+        this.dateOfRemark = dateOfRemark;
+        this.user = user;
+    }
+
+    public Date getDateOfRemark() {
+        return dateOfRemark;
+    }
+
+    public void setDateOfRemark(Date dateOfRemark) {
+        this.dateOfRemark = dateOfRemark;
     }
 
     public Long getId() {
