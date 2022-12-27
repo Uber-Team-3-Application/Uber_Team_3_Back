@@ -22,7 +22,7 @@ public interface IVehicleService {
 
     VehicleType findVehicleTypeByName(VehicleName name);
 
-    Optional<VehicleType> findType(Long id);
+    VehicleType findType(Long id);
     Location findLocation(Long id);
 
     Vehicle setCurrentLocation(Vehicle vehicle, LocationDTO locationDTO);
