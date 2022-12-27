@@ -4,6 +4,8 @@ package com.reesen.Reesen.controller;
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.Driver.Driver;
+import com.reesen.Reesen.model.Driver.DriverEditBasicInformation;
+import com.reesen.Reesen.model.Driver.DriverEditVehicle;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.service.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -452,6 +454,22 @@ public class DriverController {
 
         int totalEditRequests = this.driverService.getTotalEditRequests();
         return new ResponseEntity<>(totalEditRequests, HttpStatus.OK);
+    }
+    @GetMapping(value = "/profile-edit-requests")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<DriverEditBasicInformation>> getProfileEditRequests(){
+        List<DriverEditBasicInformation> driverEditBasicInformation =
+                this.driverService.getDriverEditBasicInfo();
+        return new ResponseEntity<>(driverEditBasicInformation, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/vehicle-edit-requests")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<DriverEditVehicle>> getVehicleEditRequests(){
+        List<DriverEditVehicle> driverEditVehicleInformation =
+                this.driverService.getDriverEditVehicle();
+        return new ResponseEntity<>(driverEditVehicleInformation, HttpStatus.OK);
     }
 
 }

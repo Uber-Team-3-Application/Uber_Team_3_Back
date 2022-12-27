@@ -4,6 +4,8 @@ import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.CreatedDriverDTO;
 import com.reesen.Reesen.dto.DriverDTO;
 import com.reesen.Reesen.model.Driver.Driver;
+import com.reesen.Reesen.model.Driver.DriverEditBasicInformation;
+import com.reesen.Reesen.model.Driver.DriverEditVehicle;
 import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.repository.DriverEditBasicInfoRepository;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -109,6 +112,16 @@ public class DriverService implements IDriverService {
     @Override
     public int getTotalEditRequests() {
         return this.driverEditBasicInfoRepository.countTotal() + this.driverEditVehicleInfoRepository.countTotal();
+    }
+
+    @Override
+    public List<DriverEditVehicle> getDriverEditVehicle() {
+        return this.driverEditVehicleInfoRepository.findAll();
+    }
+
+    @Override
+    public List<DriverEditBasicInformation> getDriverEditBasicInfo() {
+        return this.driverEditBasicInfoRepository.findAll();
     }
 
 
