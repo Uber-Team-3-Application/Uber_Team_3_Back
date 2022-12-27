@@ -66,10 +66,6 @@ public class VehicleService implements IVehicleService {
         vehicle.setBabyAccessible(vehicleDTO.isBabyTransport());
         vehicle.setRegistrationPlate(vehicle.getRegistrationPlate());
         Location location = vehicleRepository.getLocation(vehicle.getId());
-        location.setAddress(vehicleDTO.getCurrentLocation().getAddress());
-        location.setLatitude(vehicleDTO.getCurrentLocation().getLatitude());
-        location.setLongitude(vehicleDTO.getCurrentLocation().getLongitude());
-        location = this.locationRepository.save(location);
         vehicle.setCurrentLocation(location);
         return vehicle;
 
@@ -80,8 +76,8 @@ public class VehicleService implements IVehicleService {
     }
 
     @Override
-    public Optional<VehicleType> findType(Long id){
-        return this.vehicleTypeRepository.findById(id);
+    public VehicleType findType(Long id){
+        return this.vehicleRepository.getVehicleType(id);
     }
 
     @Override

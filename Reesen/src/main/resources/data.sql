@@ -29,24 +29,24 @@ insert into Vehicle_Type(price_per_km, name) values(120, 'STANDARD');
 insert into Vehicle_Type(price_per_km, name) values(140, 'LUXURY');
 insert into Vehicle_Type(price_per_km, name) values(130, 'VAN');
 
-insert into location(id, address, latitude, longitude) values(1, 'Radnicka 19, Novi Sad', 45.249101856630546, 19.848034);
-insert into location(id, address, latitude, longitude) values(2, 'Zeleznicka 2, Novi Sad', 45.2493924092008, 19.840783700998372 );
-insert into location(id, address, latitude, longitude) values(3, 'Cerska 34, Lacarak', 44.997668, 19.557723 );
+insert into location(address, latitude, longitude) values('Radnicka 19, Novi Sad', 45.249101856630546, 19.848034);
+insert into location(address, latitude, longitude) values('Zeleznicka 2, Novi Sad', 45.2493924092008, 19.840783700998372 );
+insert into location( address, latitude, longitude) values('Cerska 34, Lacarak', 44.997668, 19.557723 );
 
 insert into Vehicle
-    (id, is_baby_accessible, is_pet_accessible, model, number_of_seats, registration_plate, current_location_id, vehicle_type_id)
+    (is_baby_accessible, is_pet_accessible, model, number_of_seats, registration_plate, current_location_id, vehicle_type_id)
     values
-    (1, true, true, 'Audi A3', 4, 'KK077KK', 1, 1);
+    (true, true, 'Audi A3', 4, 'KK077KK', 1, 1);
 
 insert into Vehicle
-(id, is_baby_accessible, is_pet_accessible, model, number_of_seats, registration_plate, current_location_id, vehicle_type_id)
+(is_baby_accessible, is_pet_accessible, model, number_of_seats, registration_plate, current_location_id, vehicle_type_id)
 values
-(2, true, true, 'Opel Astra G', 4, 'SM333RK', 2, 1);
+(true, true, 'Opel Astra G', 4, 'SM333RK', 2, 1);
 
 insert into Vehicle
-(id, is_baby_accessible, is_pet_accessible, model, number_of_seats, registration_plate, current_location_id, vehicle_type_id)
+( is_baby_accessible, is_pet_accessible, model, number_of_seats, registration_plate, current_location_id, vehicle_type_id)
 values
-(3, true, true, 'Mecedes Benz C class', 4, 'SM077CF', 3, 2);
+(true, true, 'Mecedes Benz C class', 4, 'SM077CF', 3, 2);
 
 insert into Drivers(id, vehicle_id) values(1, 2);
 insert into Drivers(id, vehicle_id) values(2, 1);

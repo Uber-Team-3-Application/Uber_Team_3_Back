@@ -192,7 +192,7 @@ public class DriverController {
         Optional<Driver> driver = this.driverService.findOne(driverId);
         if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-
+        System.out.println(vehicleDTO.getVehicleType());
         Location location = this.locationService.getLocation(vehicleDTO.getCurrentLocation());
         Vehicle vehicle = this.vehicleService.createVehicle(vehicleDTO,location);
         vehicle.setDriver(driver.get());
@@ -297,9 +297,9 @@ public class DriverController {
         Vehicle vehicle = this.driverService.getVehicle(id);
         if(vehicle == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        Optional<VehicleType> type = this.vehicleService.findType(vehicle.getId());
+        VehicleType type = this.vehicleService.findType(vehicle.getId());
         Location location = this.vehicleService.findLocation(vehicle.getId());
-        type.ifPresent(vehicle::setType);
+        vehicle.setType(type);
         vehicle.setCurrentLocation(location);
 
         return new ResponseEntity<>(new VehicleDTO(vehicle), HttpStatus.OK);
