@@ -22,11 +22,8 @@ public class VehicleDTO {
     public VehicleDTO(Vehicle vehicle){
         this.id = vehicle.getId();
         this.driverId = vehicle.getDriver().getId();
-        if(vehicle.getType() != null)
-            this.vehicleType = vehicle.getType().getName().toString();
-        else
-            this.vehicleType = VehicleTypeDTO.STANDARDNO.toString();
         this.model = vehicle.getModel();
+        this.vehicleType = vehicle.getType().getName().toString();
         this.licenseNumber = vehicle.getRegistrationPlate();
         this.currentLocation = new CurrentLocationDTO(vehicle.getCurrentLocation());
         this.passengerSeats = vehicle.getPassengerSeats();
