@@ -50,4 +50,9 @@ public class VehicleType implements Serializable {
     public void setName(VehicleName name) {
         this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return this.name.toString();
+    }
 }

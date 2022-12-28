@@ -59,13 +59,24 @@ public class VehicleService implements IVehicleService {
 
     @Override
     public Vehicle editVehicle(Vehicle vehicle, VehicleDTO vehicleDTO){
-        vehicle.setType(this.findVehicleTypeByName(VehicleName.getVehicleName(vehicleDTO.getVehicleType())));
+
         vehicle.setPassengerSeats(vehicleDTO.getPassengerSeats());
         vehicle.setModel(vehicleDTO.getModel());
-        vehicle.setPetAccessible(vehicle.isPetAccessible());
+        vehicle.setPetAccessible(vehicleDTO.isPetTransport());
         vehicle.setBabyAccessible(vehicleDTO.isBabyTransport());
-        vehicle.setRegistrationPlate(vehicle.getRegistrationPlate());
+        vehicle.setRegistrationPlate(vehicleDTO.getLicenseNumber());
+        if(vehicleDTO.getVehicleType() != null) {
+            VehicleName vehicleName = VehicleName.getVehicleName(vehicleDTO.getVehicleType());
+            vehicle.setType(this.findVehicleTypeByName(vehicleName));
+        }
         Location location = vehicleRepository.getLocation(vehicle.getId());
+        if(location == null){
+            location = new Location();
+            location.setLatitude(vehicleDTO.getCurrentLocation().getLatitude());
+            location.setLongitude(vehicleDTO.getCurrentLocation().getLongitude());
+            location.setAddress(vehicleDTO.getCurrentLocation().getAddress());
+        }
+        location = this.locationRepository.save(location);
         vehicle.setCurrentLocation(location);
         return vehicle;
 

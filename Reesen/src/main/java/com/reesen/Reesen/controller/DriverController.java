@@ -56,12 +56,12 @@ public class DriverController {
     @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<CreatedDriverDTO> updateDriver(@RequestBody DriverDTO driverDTO, @PathVariable Long id){
 
-        if(this.driverService.findOne(id).isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(this.driverService.findOne(id).isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
 
         Driver driver = this.driverService.findByEmail(driverDTO.getEmail());
 
         if(driver!= null && !driver.getId().toString().equals(id.toString())) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("Invalid data. For example bad email format.", HttpStatus.BAD_REQUEST);
         }
         driver = this.driverService.getDriverFromDriverDTO(id, driverDTO);
 
@@ -104,7 +104,7 @@ public class DriverController {
         if(driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Optional<Driver> driver = this.driverService.findOne(driverId);
-        if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(driver.isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
 
         Vehicle vehicle = this.driverService.getVehicle(driverId);
         if(vehicle == null){
@@ -133,7 +133,7 @@ public class DriverController {
             // if exists -> edit
             vehicle = this.vehicleService.editVehicle(vehicle, vehicleDTO);
         }
-        vehicle = this.vehicleService.save(vehicle);
+        this.vehicleService.save(vehicle);
         driver.get().setVehicle(vehicle);
         this.driverService.save(driver.get());
 
@@ -155,7 +155,7 @@ public class DriverController {
         if(workingHourId < 1 ) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Optional<WorkingHours> workingHours = this.workingHoursService.findOne(workingHourId);
-        if(workingHours.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(workingHours.isEmpty()) return new ResponseEntity("Working hour does not exist", HttpStatus.NOT_FOUND);
 
         WorkingHours updatedWH = this.workingHoursService.editWorkingHours(workingHours.get(), workingHoursDTO);
         this.workingHoursService.save(updatedWH);
@@ -172,7 +172,7 @@ public class DriverController {
     public ResponseEntity<CreatedDriverDTO> createDriver(@RequestBody DriverDTO driverDTO){
 
         if(this.driverService.findByEmail(driverDTO.getEmail()) != null)
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("User with that email already exists!", HttpStatus.BAD_REQUEST);
 
         CreatedDriverDTO createdDriverDTO = this.driverService.createDriverDTO(driverDTO);
         return new ResponseEntity<>(createdDriverDTO, HttpStatus.OK);
@@ -206,7 +206,7 @@ public class DriverController {
         if(driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Optional<Driver> driver = this.driverService.findOne(driverId);
-        if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(driver.isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
 
         Document document = new Document(documentDTO.getName(), documentDTO.getDocumentImage(), driver.get());
         document = this.documentService.save(document);
@@ -229,7 +229,7 @@ public class DriverController {
         if(driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Optional<Driver> driver = this.driverService.findOne(driverId);
-        if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(driver.isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
 
         System.out.println(vehicleDTO.getVehicleType());
         Location location = this.locationService.getLocation(vehicleDTO.getCurrentLocation());
@@ -257,7 +257,7 @@ public class DriverController {
         if(driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Optional<Driver> driver = this.driverService.findOne(driverId);
-        if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(driver.isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
 
         WorkingHours workingHours = this.workingHoursService.createWorkingHours(workingHoursDTO, driver.get());
         workingHours = this.workingHoursService.save(workingHours);
@@ -290,10 +290,10 @@ public class DriverController {
     @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER', 'ADMIN')")
     public ResponseEntity<CreatedDriverDTO> getDriver(@PathVariable Long id){
 
-        if(id < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(id < 1) return new ResponseEntity("Invalid ID format!", HttpStatus.BAD_REQUEST);
 
         Optional<Driver> driver = this.driverService.findOne(id);
-        if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(driver.isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
 
         CreatedDriverDTO driverDTO = new CreatedDriverDTO(driver.get());
 
@@ -314,7 +314,7 @@ public class DriverController {
         if(id < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Optional<Driver> driver = this.driverService.findOne(id);
-        if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(driver.isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
 
         List<Document> documents = this.documentService.findAllByDriverId(driver.get().getId());
 
@@ -331,10 +331,10 @@ public class DriverController {
     public ResponseEntity<VehicleDTO> getVehicle(@PathVariable("id") Long id){
         if(id < 1 ) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        if(this.driverService.findOne(id).isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(this.driverService.findOne(id).isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
 
         Vehicle vehicle = this.driverService.getVehicle(id);
-        if(vehicle == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(vehicle == null) return new ResponseEntity("Vehicle is not assigned!", HttpStatus.BAD_REQUEST);
 
         VehicleType type = this.vehicleService.findType(vehicle.getId());
         Location location = this.vehicleService.findLocation(vehicle.getId());
@@ -359,7 +359,7 @@ public class DriverController {
     )
     {
         Optional<Driver> driver = this.driverService.findOne(driverId);
-        if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(driver.isEmpty()) return new ResponseEntity("Driver does not exist", HttpStatus.NOT_FOUND);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         LocalDateTime dateFrom = LocalDateTime.parse(from, formatter);
@@ -386,7 +386,7 @@ public class DriverController {
         if(workingHourId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Optional<WorkingHours> workingHours = this.workingHoursService.findOne(workingHourId);
-        if(workingHours.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(workingHours.isEmpty()) return new ResponseEntity("Working hour does not exist!", HttpStatus.NOT_FOUND);
 
         return new ResponseEntity<>(new WorkingHoursDTO(workingHours.get()), HttpStatus.OK);
     }
@@ -407,7 +407,7 @@ public class DriverController {
     {
 
         Optional<Driver> driver = this.driverService.findOne(driverId);
-        if(driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(driver.isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
 
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -435,7 +435,7 @@ public class DriverController {
     public ResponseEntity<String> deleteDocuments(@PathVariable("document-id") Long id){
 
         if(id < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(this.documentService.findOne(id).isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(this.documentService.findOne(id).isEmpty()) return new ResponseEntity<>("Document does not exist!", HttpStatus.NOT_FOUND);
 
         this.documentService.delete(id);
         return new ResponseEntity<>("Driver document deleted successfully", HttpStatus.NO_CONTENT);
