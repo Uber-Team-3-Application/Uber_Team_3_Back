@@ -38,6 +38,9 @@ public class DriverEditVehicle implements Serializable {
     @Column
     private boolean vIsPetAccessible;
 
+    @Column
+    private String vtype;
+
     public DriverEditVehicle(Vehicle vehicle, Long driverId){
         this.driverId = driverId;
         this.vModel = vehicle.getModel();
@@ -45,9 +48,11 @@ public class DriverEditVehicle implements Serializable {
         this.vNumberOfSeats = vehicle.getPassengerSeats();
         this.vIsBabyAccessible = vehicle.isBabyAccessible();
         this.vIsPetAccessible = vehicle.isPetAccessible();
+        this.vtype = vehicle.getType().getName().toString();
+
     }
 
-    public DriverEditVehicle(Long id, Long driverId, String vModel, String vRegistrationPlate, int vNumberOfSeats, boolean vIsBabyAccessible, boolean vIsPetAccessible) {
+    public DriverEditVehicle(Long id, Long driverId, String vModel, String vRegistrationPlate, int vNumberOfSeats, boolean vIsBabyAccessible, boolean vIsPetAccessible, String vtype) {
         this.id = id;
         this.driverId = driverId;
         this.vModel = vModel;
@@ -55,14 +60,16 @@ public class DriverEditVehicle implements Serializable {
         this.vNumberOfSeats = vNumberOfSeats;
         this.vIsBabyAccessible = vIsBabyAccessible;
         this.vIsPetAccessible = vIsPetAccessible;
+        this.vtype = vtype;
     }
 
-    public DriverEditVehicle(Long driverId, String vModel, String vRegistrationPlate, int vNumberOfSeats, boolean vIsBabyAccessible, boolean vIsPetAccessible) {
+    public DriverEditVehicle(Long driverId, String vModel, String vRegistrationPlate, int vNumberOfSeats, boolean vIsBabyAccessible, boolean vIsPetAccessible, String vtype) {
         this.driverId = driverId;
         this.vModel = vModel;
         this.vRegistrationPlate = vRegistrationPlate;
         this.vNumberOfSeats = vNumberOfSeats;
         this.vIsBabyAccessible = vIsBabyAccessible;
         this.vIsPetAccessible = vIsPetAccessible;
+        this.vtype = vtype;
     }
 }

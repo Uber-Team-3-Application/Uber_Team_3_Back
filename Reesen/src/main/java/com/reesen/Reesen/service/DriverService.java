@@ -1,16 +1,19 @@
 package com.reesen.Reesen.service;
 
 import com.reesen.Reesen.Enums.Role;
+import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.dto.CreatedDriverDTO;
 import com.reesen.Reesen.dto.DriverDTO;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Driver.DriverEditBasicInformation;
 import com.reesen.Reesen.model.Driver.DriverEditVehicle;
 import com.reesen.Reesen.model.Vehicle;
+import com.reesen.Reesen.model.VehicleType;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.repository.DriverEditBasicInfoRepository;
 import com.reesen.Reesen.repository.DriverEditVehicleInfoRepository;
 import com.reesen.Reesen.repository.DriverRepository;
+import com.reesen.Reesen.repository.VehicleTypeRepository;
 import com.reesen.Reesen.service.interfaces.IDriverService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,13 +30,15 @@ public class DriverService implements IDriverService {
     private final PasswordEncoder passwordEncoder;
     private final DriverEditBasicInfoRepository driverEditBasicInfoRepository;
     private final DriverEditVehicleInfoRepository driverEditVehicleInfoRepository;
+    private final VehicleTypeRepository vehicleTypeRepository;
 
     @Autowired
-    public DriverService(DriverRepository driverRepository, PasswordEncoder passwordEncoder, DriverEditBasicInfoRepository driverEditBasicInfoRepository, DriverEditVehicleInfoRepository driverEditVehicleInfoRepository){
+    public DriverService(DriverRepository driverRepository, PasswordEncoder passwordEncoder, DriverEditBasicInfoRepository driverEditBasicInfoRepository, DriverEditVehicleInfoRepository driverEditVehicleInfoRepository, VehicleTypeRepository vehicleTypeRepository){
         this.driverRepository = driverRepository;
         this.passwordEncoder = passwordEncoder;
         this.driverEditBasicInfoRepository = driverEditBasicInfoRepository;
         this.driverEditVehicleInfoRepository = driverEditVehicleInfoRepository;
+        this.vehicleTypeRepository = vehicleTypeRepository;
     }
 
     @Override
@@ -174,13 +179,16 @@ public class DriverService implements IDriverService {
     public Vehicle updateVehicleBasedOnEditRequest(Driver driver, DriverEditVehicle driverEditVehicle) {
         Vehicle vehicle = this.getVehicle(driverEditVehicle.getDriverId());
         vehicle.setModel(driverEditVehicle.getVModel());
+        vehicle.setType(this.findVehicleTypeByName(VehicleName.getVehicleName(driverEditVehicle.getVtype())));
         vehicle.setRegistrationPlate(driverEditVehicle.getVRegistrationPlate());
         vehicle.setPassengerSeats(driverEditVehicle.getVNumberOfSeats());
         vehicle.setBabyAccessible(driverEditVehicle.isVIsBabyAccessible());
         vehicle.setPetAccessible(driverEditVehicle.isVIsPetAccessible());
         return vehicle;
     }
-
+    public VehicleType findVehicleTypeByName(VehicleName name){
+        return this.vehicleTypeRepository.findByName(name);
+    }
 
     @Override
     public Page<Driver> findAll(Pageable page){
