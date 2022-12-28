@@ -100,7 +100,7 @@ public class PassengerController {
     }
 
     @PutMapping(value = "/{id}")
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PASSENGER')")
     public ResponseEntity<PassengerDTO> updatePassenger(@RequestBody PassengerDTO passengerDTO, @PathVariable Long id){
         if(this.passengerService.findOne(id).isEmpty())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

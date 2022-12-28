@@ -71,11 +71,8 @@ public class PassengerService implements IPassengerService {
         passenger.setTelephoneNumber(passengerDTO.getTelephoneNumber());
         passenger.setEmail(passengerDTO.getEmail());
         passenger.setAddress(passengerDTO.getAddress());
-        if(passengerDTO.getPassword() != null)
-            passenger.setPassword(passwordEncoder.encode(passengerDTO.getPassword()));
-        else{
-            passenger.setPassword(this.passengerRepository.getPasswordWithId(id));
-        }
+        passenger.setConfirmedMail(passengerDTO.isConfirmedMail());
+        passenger.setPassword(this.passengerRepository.getPasswordWithId(id));
         passenger.setRole(Role.PASSENGER);
         return passenger;
     }

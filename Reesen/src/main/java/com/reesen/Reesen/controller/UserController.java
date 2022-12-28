@@ -219,7 +219,7 @@ public class UserController {
 
     @PutMapping("/{id}/changePassword")
     @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
-    public ResponseEntity changePassword(
+    public ResponseEntity<String> changePassword(
             @RequestBody ChangePasswordDTO changePasswordDTO,
             @PathVariable Long id) {
         User user = this.userService.findOne(id);
