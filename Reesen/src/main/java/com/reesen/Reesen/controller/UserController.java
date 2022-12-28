@@ -267,7 +267,7 @@ public class UserController {
         return new ResponseEntity<>(new Paginated<>(remarksDto.size(), remarksDto), HttpStatus.OK);
     }
 
-    @PostMapping
+    @PostMapping("/mail")
     public ResponseEntity<?> sendEmail(@RequestBody EmailDTO email) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -277,7 +277,6 @@ public class UserController {
         mailSender.send(message);
         return new ResponseEntity<>("Email sent successfuly", HttpStatus.OK);
     }
-
     @GetMapping("/{id}/resetPassword")
     public ResponseEntity<String> resetPassword(@PathVariable Long id){
         return new ResponseEntity<>(tokens.generateResetPasswordEmailToken(id), HttpStatus.OK);
@@ -289,8 +288,8 @@ public class UserController {
         return new ResponseEntity<>("Password successfully changed", HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/email/{email}")
-    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
+    @GetMapping("/email")
+    public ResponseEntity<User> getUserByEmail(@RequestBody String email) {
         return new ResponseEntity<>( this.userService.findByEmail(email).get(), HttpStatus.OK);
     }
 
