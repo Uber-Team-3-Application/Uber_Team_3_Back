@@ -19,6 +19,6 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
     @Query("select d.password from Driver d where d.id=:id")
     String getPasswordWithId(Long id);
 
-    @Query("select d from DriverRides d where d")
+    @Query("select d from Driver d where :ride member of d.rides")
     Driver findDriverWhereRideEquals(Ride ride);
 }

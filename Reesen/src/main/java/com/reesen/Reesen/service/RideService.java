@@ -24,15 +24,17 @@ public class RideService implements IRideService {
 	private final VehicleTypeRepository vehicleTypeRepository;
 	private final PanicRepository panicRepository;
 	private final DriverRepository driverRepository;
+	private final DeductionRepository deductionRepository;
 
     @Autowired
-    public RideService(RideRepository rideRepository, RouteRepository routeRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, DriverRepository driverRepository){
+    public RideService(RideRepository rideRepository, RouteRepository routeRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, DriverRepository driverRepository, DeductionRepository deductionRepository){
         this.rideRepository = rideRepository;
 		this.routeRepository = routeRepository;
 		this.passengerRepository = passengerRepository;
 		this.vehicleTypeRepository = vehicleTypeRepository;
 		this.panicRepository = panicRepository;
 		this.driverRepository = driverRepository;
+		this.deductionRepository = deductionRepository;
 	}
 
 	@Override
@@ -107,10 +109,19 @@ public class RideService implements IRideService {
 
 	@Override
 	public Page<Ride> findAll(Pageable page) {
-		List<Ride> rides = this.rideRepository.findAll(page).stream().toList();
+		Page<Ride> rides = this.rideRepository.findAll(page);
 		for(Ride ride: rides){
 			ride.setDriver(this.driverRepository.findDriverWhereRideEquals(ride));
+			ride.setPassengers(this.passengerRepository.findPassengersWhereRideEquals(ride));
+			Optional<Deduction> deduction = this.deductionRepository.findDeductionWhereRideEquals(ride);
+			if(deduction.isPresent()) ride.setDeduction(deduction.get());
+			else ride.setDeduction(null);
+			//ride.setVehicleType();
+			//ride.setLocations();
+			//ride.setReview();
 		}
+
+		return rides;
 	}
 
 	public Page<Ride> findAll(Long driverId, Pageable page, Date from, Date to){

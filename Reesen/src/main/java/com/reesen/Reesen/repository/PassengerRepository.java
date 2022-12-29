@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.util.Set;
 
 @Repository
 public interface PassengerRepository extends JpaRepository<Passenger, Long> {
@@ -27,4 +28,7 @@ public interface PassengerRepository extends JpaRepository<Passenger, Long> {
     @Modifying
     @Query("update Passenger p set p.isConfirmedMail=:true where p.id=:passengerId")
     void activateAccount(Long passengerId);
+
+    @Query("select p from Passenger p where :ride member of p.rides")
+    Set<Passenger> findPassengersWhereRideEquals(Ride ride);
 }
