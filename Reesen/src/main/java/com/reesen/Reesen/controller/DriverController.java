@@ -16,10 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @CrossOrigin
 @RestController
@@ -357,9 +354,9 @@ public class DriverController {
      *  GET Rides
      *
      * **/
-
+    @CrossOrigin
     @GetMapping(value = "/{id}/ride")
-    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
+//    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
     public ResponseEntity<Paginated<DriverRideDTO>> getRides(
             @PathVariable("id") Long driverId,
             Pageable page,
@@ -372,11 +369,10 @@ public class DriverController {
 
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        LocalDateTime dateFrom = LocalDateTime.parse(from, formatter);
-        LocalDateTime dateTo = LocalDateTime.parse(to, formatter);
+        Date dateFrom = java.sql.Timestamp.valueOf(LocalDateTime.parse(from, formatter));
+        Date dateTo = java.sql.Timestamp.valueOf(LocalDateTime.parse(to, formatter));
 
         Page<Ride> driversRides = this.rideService.findAll(driverId, page, dateFrom, dateTo);
-
         Set<DriverRideDTO> rideDTOs = new HashSet<>();
 
         for(Ride ride:driversRides){

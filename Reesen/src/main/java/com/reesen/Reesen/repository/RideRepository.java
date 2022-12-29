@@ -20,17 +20,17 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
 
     public Page<Ride> findAllByDriverIdAndTimeOfStartAfterAndTimeOfEndBefore(
             Long driverId,
-            LocalDateTime timeOfStart,
-            LocalDateTime timeOfEnd,
+            Date timeOfStart,
+            Date timeOfEnd,
             Pageable page);
 
     public Page<Ride> findAllByDriverIdAndTimeOfStartAfter(
             Long driverId,
-            LocalDateTime timeOfStart,
+            Date timeOfStart,
             Pageable page);
 
     public Page<Ride> findAllByDriverIdAndTimeOfEndBefore(
             Long driverId,
-            LocalDateTime timeOfEnd,
+            Date timeOfEnd,
             Pageable page);
 }

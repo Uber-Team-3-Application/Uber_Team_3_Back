@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -105,7 +106,7 @@ public class RideService implements IRideService {
 		return ride;
 	}
 
-	public Page<Ride> findAll(Long driverId, Pageable page, LocalDateTime from, LocalDateTime to){
+	public Page<Ride> findAll(Long driverId, Pageable page, Date from, Date to){
 		if(from == null && to == null)
 			return this.rideRepository.findAllByDriverId(driverId, page);
 		if(to != null && from == null)

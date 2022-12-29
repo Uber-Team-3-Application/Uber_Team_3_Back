@@ -31,7 +31,7 @@ public interface IRideService {
 
 	Ride acceptRide(Ride ride);
 
-	Page<Ride> findAll(Long driverId, Pageable page, LocalDateTime from, LocalDateTime to);
+	Page<Ride> findAll(Long driverId, Pageable page, Date from, Date to);
 
 	Ride findPassengerActiveRide(Long passengerId);
 }
