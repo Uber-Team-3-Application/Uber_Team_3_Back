@@ -92,7 +92,9 @@ public class DriverService implements IDriverService {
     }
 
     public Driver getDriverFromDriverDTO(Long id, DriverDTO driverDTO){
+        Optional<Driver> optDriver = this.driverRepository.findById(id);
         Driver driver = new Driver();
+        if(optDriver.isPresent()) driver = optDriver.get();
         driver.setEmail(driverDTO.getEmail());
         driver.setName(driverDTO.getName());
         driver.setSurname(driverDTO.getSurname());
@@ -106,6 +108,7 @@ public class DriverService implements IDriverService {
             driver.setPassword(this.driverRepository.getPasswordWithId(id));
         }
         driver.setRole(Role.DRIVER);
+
         return driver;
     }
 

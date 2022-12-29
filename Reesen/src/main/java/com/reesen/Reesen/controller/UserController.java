@@ -191,6 +191,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> blockUser(@PathVariable Long id) {
         User user = this.userService.findOne(id);
+        System.out.println(id);
         user.setBlocked(true);
         userService.save(user);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
