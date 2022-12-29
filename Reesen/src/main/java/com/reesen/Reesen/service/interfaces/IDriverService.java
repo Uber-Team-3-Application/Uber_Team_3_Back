@@ -49,4 +49,5 @@ public interface IDriverService {
     void updateDriverBasedOnEditRequest(Driver driver, DriverEditBasicInformation driverEditBasicInformation);
 
     Vehicle updateVehicleBasedOnEditRequest(Driver driver, DriverEditVehicle driverEditVehicle);
+
 }

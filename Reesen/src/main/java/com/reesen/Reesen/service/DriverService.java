@@ -189,6 +189,8 @@ public class DriverService implements IDriverService {
         vehicle.setPetAccessible(driverEditVehicle.isVIsPetAccessible());
         return vehicle;
     }
+
+
     public VehicleType findVehicleTypeByName(VehicleName name){
         return this.vehicleTypeRepository.findByName(name);
     }

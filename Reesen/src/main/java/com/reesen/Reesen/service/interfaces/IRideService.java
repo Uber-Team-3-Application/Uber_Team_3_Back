@@ -30,6 +30,7 @@ public interface IRideService {
 	Ride endRide(Ride ride);
 
 	Ride acceptRide(Ride ride);
+	Page<Ride> findAll(Pageable page);
 
 	Page<Ride> findAll(Long driverId, Pageable page, Date from, Date to);
 

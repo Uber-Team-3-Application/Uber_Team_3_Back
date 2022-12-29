@@ -1,17 +1,25 @@
 package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.CreateRideDTO;
+import com.reesen.Reesen.dto.CreatedDriverDTO;
 import com.reesen.Reesen.dto.RideDTO;
 import com.reesen.Reesen.mockup.RideMockup;
 import com.reesen.Reesen.mockup.RidePanicMockup;
+import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Ride;
+import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.service.interfaces.IRideService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @CrossOrigin
 @RestController
@@ -29,6 +37,21 @@ public class RideController {
     public ResponseEntity<RideDTO> createRide(@RequestBody CreateRideDTO rideDTO){
         RideDTO ride = this.rideService.createRideDTO(rideDTO);
         return new ResponseEntity<>(ride, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/all-rides")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Paginated<RideDTO>> getDriverIds(
+            Pageable page
+    ){
+
+        Page<Ride> rides = this.rideService.findAll(page);
+        Set<RideDTO> rideDTOS = new HashSet<>();
+        for(Ride ride: rides){
+            rideDTOS.add(new RideDTO(ride));
+        }
+        return new ResponseEntity<>(
+                new Paginated<>(rides.getNumberOfElements(), rideDTOS), HttpStatus.OK);
     }
 
     @GetMapping(value = "/driver/{driverId}/active")

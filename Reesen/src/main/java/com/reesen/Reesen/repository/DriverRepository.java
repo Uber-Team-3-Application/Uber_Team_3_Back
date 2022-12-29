@@ -1,6 +1,7 @@
 package com.reesen.Reesen.repository;
 
 import com.reesen.Reesen.model.Driver.Driver;
+import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.Vehicle;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,4 +18,7 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
 
     @Query("select d.password from Driver d where d.id=:id")
     String getPasswordWithId(Long id);
+
+    @Query("select d from DriverRides d where d")
+    Driver findDriverWhereRideEquals(Ride ride);
 }

@@ -11,10 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import java.time.LocalDateTime;
 
@@ -26,14 +23,16 @@ public class RideService implements IRideService {
 	private final PassengerRepository passengerRepository;
 	private final VehicleTypeRepository vehicleTypeRepository;
 	private final PanicRepository panicRepository;
+	private final DriverRepository driverRepository;
 
     @Autowired
-    public RideService(RideRepository rideRepository, RouteRepository routeRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository){
+    public RideService(RideRepository rideRepository, RouteRepository routeRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, DriverRepository driverRepository){
         this.rideRepository = rideRepository;
 		this.routeRepository = routeRepository;
 		this.passengerRepository = passengerRepository;
 		this.vehicleTypeRepository = vehicleTypeRepository;
 		this.panicRepository = panicRepository;
+		this.driverRepository = driverRepository;
 	}
 
 	@Override
@@ -104,6 +103,14 @@ public class RideService implements IRideService {
 	public Ride acceptRide(Ride ride) {
 		ride.setStatus(RideStatus.ACCEPTED);
 		return ride;
+	}
+
+	@Override
+	public Page<Ride> findAll(Pageable page) {
+		List<Ride> rides = this.rideRepository.findAll(page).stream().toList();
+		for(Ride ride: rides){
+			ride.setDriver(this.driverRepository.findDriverWhereRideEquals(ride));
+		}
 	}
 
 	public Page<Ride> findAll(Long driverId, Pageable page, Date from, Date to){
