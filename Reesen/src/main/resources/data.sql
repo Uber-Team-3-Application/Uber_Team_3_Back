@@ -71,8 +71,8 @@ insert into Vehicle
 values
 (true, true, 'Mecedes Benz C class', 4, 'SM077CF', 3, 2);
 
-insert into Drivers(id, vehicle_id) values(1, 2);
-insert into Drivers(id, vehicle_id) values(2, 1);
+insert into Drivers(id, vehicle_id) values(1, 1);
+insert into Drivers(id, vehicle_id) values(2, 2);
 insert into Drivers(id, vehicle_id) values(5, 3);
 insert into Document(document_image, name, driver_id)
 values ('U3dhZ2dlciByb2Nrcw==', 'Saobracajna Dozvola', 1);

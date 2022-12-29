@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.util.*;
 
@@ -44,6 +43,8 @@ public class UserController {
     private final IDriverService driverService;
     private final IPassengerService passengerService;
     private final JavaMailSender mailSender;
+    private final JwtTokenUtil tokens;
+
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -52,13 +53,14 @@ public class UserController {
 
     @Autowired
     public UserController(IUserService userService, IMessageService messageService, IRemarkService remarkService,
-                          IDriverService driverService, IPassengerService passengerService, JavaMailSender mailSender) {
+                          IDriverService driverService, IPassengerService passengerService, JavaMailSender mailSender, JwtTokenUtil tokens) {
         this.userService = userService;
         this.messageService = messageService;
         this.remarkService = remarkService;
         this.driverService = driverService;
         this.passengerService = passengerService;
         this.mailSender = mailSender;
+        this.tokens = tokens;
     }
 
     @GetMapping("/{id}/ride")
@@ -189,6 +191,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> blockUser(@PathVariable Long id) {
         User user = this.userService.findOne(id);
+        System.out.println(id);
         user.setBlocked(true);
         userService.save(user);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -217,7 +220,7 @@ public class UserController {
 
     @PutMapping("/{id}/changePassword")
     @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
-    public ResponseEntity changePassword(
+    public ResponseEntity<String> changePassword(
             @RequestBody ChangePasswordDTO changePasswordDTO,
             @PathVariable Long id) {
         User user = this.userService.findOne(id);
@@ -265,7 +268,7 @@ public class UserController {
         return new ResponseEntity<>(new Paginated<>(remarksDto.size(), remarksDto), HttpStatus.OK);
     }
 
-    @PostMapping
+    @PostMapping("/mail")
     public ResponseEntity<?> sendEmail(@RequestBody EmailDTO email) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -274,6 +277,21 @@ public class UserController {
         helper.setText(email.getMessage(),true);
         mailSender.send(message);
         return new ResponseEntity<>("Email sent successfuly", HttpStatus.OK);
+    }
+    @GetMapping("/{id}/resetPassword")
+    public ResponseEntity<String> resetPassword(@PathVariable Long id){
+        return new ResponseEntity<>(tokens.generateResetPasswordEmailToken(id), HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}/resetPassword")
+    public ResponseEntity resetPassword(@RequestBody ResetPasswordDTO resetPasswordDTO, @PathVariable Long id) {
+        this.userService.resetPassword(resetPasswordDTO.getPassword(), id);
+        return new ResponseEntity<>("Password successfully changed", HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/email")
+    public ResponseEntity<User> getUserByEmail(@RequestBody String email) {
+        return new ResponseEntity<>( this.userService.findByEmail(email).get(), HttpStatus.OK);
     }
 
 }

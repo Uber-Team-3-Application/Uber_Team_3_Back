@@ -85,8 +85,11 @@ public class UserService implements IUserService {
 
         this.userRepository.changePassword(passwordEncoder.encode(new_password), id);
         return true;
-
     }
 
+    @Override
+    public void resetPassword(String password, Long id) {
+        this.userRepository.changePassword(passwordEncoder.encode(password), id);
+    }
 
 }

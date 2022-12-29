@@ -40,6 +40,17 @@ public class DriverEditBasicInformation  implements Serializable {
     @Column
     private String address;
 
+
+    public DriverEditBasicInformation(Driver driver, Long driverId){
+
+        this.driverId = driverId;
+        this.name = driver.getName();
+        this.surname = driver.getSurname();
+        this.profilePicture = driver.getProfilePicture();
+        this.telephoneNumber = driver.getTelephoneNumber();
+        this.email = driver.getEmail();
+        this.address = driver.getAddress();
+    }
     public DriverEditBasicInformation(Long id, Long driverId, String name, String surname, String profilePicture, String telephoneNumber, String email, String address) {
         this.id = id;
         this.driverId = driverId;

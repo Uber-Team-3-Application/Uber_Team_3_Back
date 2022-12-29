@@ -46,13 +46,11 @@ public class PassengerController {
     }
 
     @GetMapping(value = "/activate/{activationId}")
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<String> activatePassenger(@PathVariable Long activationId){
         return new ResponseEntity<>(tokens.generateActivationEmailToken(activationId), HttpStatus.OK);
     }
 
     @GetMapping(value = "/activate/account/{passengerId}")
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<String> activatePassengerAccount(@PathVariable Long passengerId){
         passengerService.activateAccount(passengerId);
         return new ResponseEntity<>("Successful account activation", HttpStatus.OK);
@@ -100,7 +98,7 @@ public class PassengerController {
     }
 
     @PutMapping(value = "/{id}")
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PASSENGER')")
     public ResponseEntity<PassengerDTO> updatePassenger(@RequestBody PassengerDTO passengerDTO, @PathVariable Long id){
         if(this.passengerService.findOne(id).isEmpty())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
