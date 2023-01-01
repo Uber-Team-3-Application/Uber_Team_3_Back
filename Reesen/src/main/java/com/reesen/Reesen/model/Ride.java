@@ -57,7 +57,7 @@ public class Ride implements Serializable {
     @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.EAGER)
     private VehicleType vehicleType;
 
-    @OneToMany(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     private Set<Route> locations;
 
     public Ride() {
@@ -204,5 +204,26 @@ public class Ride implements Serializable {
 
     public void setLocations(Set<Route> locations) {
         this.locations = locations;
+    }
+
+    @Override
+    public String toString() {
+        return "Ride{" +
+                "id=" + id +
+                ", timeOfStart=" + timeOfStart +
+                ", timeOfEnd=" + timeOfEnd +
+                ", totalPrice=" + totalPrice +
+                ", driver=" + driver +
+                ", passengers=" + passengers +
+                ", estimatedTime=" + estimatedTime +
+                ", review=" + review +
+                ", status=" + status +
+                ", deduction=" + deduction +
+                ", isPanicPressed=" + isPanicPressed +
+                ", isBabyAccessible=" + isBabyAccessible +
+                ", isPetAccessible=" + isPetAccessible +
+                ", vehicleType=" + vehicleType +
+                ", locations=" + locations +
+                '}';
     }
 }
