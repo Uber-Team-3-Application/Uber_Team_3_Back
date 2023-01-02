@@ -174,7 +174,14 @@ public class RideService implements IRideService {
 		for(Ride ride: userRides){
 
 			ride.setPassengers(passengerRepository.findPassengersByRidesContaining(ride));
-			ride.setReview(this.reviewRepository.findAllByRideId(ride.getId()));
+
+			// TODO: get reviews and then set users to each review
+			Set<Review> reviews = this.reviewRepository.findAllByRideId(ride.getId());
+			for(Review review:reviews){
+				review.setPassenger(this.passengerRepository.findbyReviewId(review.getId()));
+			}
+
+			ride.setReview(reviews);
 			ride.setDeduction(deductionRepository.findDeductionByRide(ride).orElse(new Deduction()));
 			Set<Route> locations;
 			locations = this.getLocationsByRide(ride.getId());

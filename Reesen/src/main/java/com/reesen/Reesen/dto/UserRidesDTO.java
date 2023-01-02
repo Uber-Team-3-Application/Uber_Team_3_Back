@@ -50,10 +50,17 @@ public class UserRidesDTO {
     public void setReviews(Ride ride) {
         this.reviews = new HashSet<>();
         for(Review review: ride.getReview()){
-//            ReviewWithPassengerDTO vehicleReview = new ReviewWithPassengerDTO();
-//            ReviewWithPassengerDTO driverReview = new ReviewWithPassengerDTO();
-//
-//            reviews.add(new RideReviewDTO(vehicleReview, driverReview));
+            ReviewWithPassengerDTO vehicleReview = new ReviewWithPassengerDTO();
+            vehicleReview.setComment(review.getVehicleComment());
+            vehicleReview.setRating(review.getVehicleRating());
+            vehicleReview.setPassenger(new UserDTO(review.getPassenger()));
+
+            ReviewWithPassengerDTO driverReview = new ReviewWithPassengerDTO();
+            driverReview.setComment(review.getDriverComment());
+            driverReview.setRating(review.getDriverRating());
+            driverReview.setPassenger(new UserDTO(review.getPassenger()));
+
+            reviews.add(new RideReviewDTO(vehicleReview, driverReview));
         }
     }
     public void setReviews(Set<RideReviewDTO> reviews) {

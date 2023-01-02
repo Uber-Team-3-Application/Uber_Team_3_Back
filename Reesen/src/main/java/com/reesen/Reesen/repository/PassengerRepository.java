@@ -68,4 +68,6 @@ public interface PassengerRepository extends JpaRepository<Passenger, Long> {
             Date timeOfEnd,
             Pageable page);
 
+    @Query("select p from Passenger p inner join Review r on p.id=r.passenger.id where r.id=:reviewId")
+    Passenger findbyReviewId(Long reviewId);
 }
