@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.Set;
 
 @Repository
@@ -30,4 +31,41 @@ public interface PassengerRepository extends JpaRepository<Passenger, Long> {
     void activateAccount(Long passengerId);
 
     Set<Passenger> findPassengersByRidesContaining(Ride ride);
+
+
+    @Query("select p.rides from Passenger p where p.id=:passengerId")
+    Page<Ride> findAllRidesByPassengerId(Long passengerId, Pageable page);
+
+    @Query("select p.rides from Passenger p, Ride r  " +
+            "where p.id=:passengerId " +
+            "and " +
+            "p member of r.passengers " +
+            "and r.timeOfEnd<=:timeOfEnd and r.timeOfStart>=:timeOfStart")
+    Page<Ride> findAllRidesByPassengerIdAndTimeOfStartAfterAndTimeOfEndBefore(
+            Long passengerId,
+            Date timeOfStart,
+            Date timeOfEnd,
+            Pageable page);
+
+    @Query("select p.rides from Passenger p, Ride r  " +
+            "where p.id=:passengerId " +
+            "and " +
+            "p member of r.passengers " +
+            "and r.timeOfStart>=:timeOfStart")
+    Page<Ride> findAllRidesByPassengerIdAndTimeOfStartAfter(
+            Long passengerId,
+            Date timeOfStart,
+            Pageable page);
+
+
+    @Query("select p.rides from Passenger p, Ride r  " +
+            "where p.id=:passengerId " +
+            "and " +
+            "p member of r.passengers " +
+            "and r.timeOfEnd<=:timeOfEnd")
+    Page<Ride> findAllRidesByPassengerIdAndTimeOfEndBefore(
+            Long passengerId,
+            Date timeOfEnd,
+            Pageable page);
+
 }

@@ -5,7 +5,6 @@ import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.dto.RideDTO;
 import com.reesen.Reesen.exceptions.BadRequestException;
 import com.reesen.Reesen.model.*;
-import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.security.SecurityUser;
 import com.reesen.Reesen.security.jwt.JwtTokenUtil;
@@ -13,7 +12,6 @@ import com.reesen.Reesen.service.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.relational.core.sql.In;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -31,6 +29,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @CrossOrigin
@@ -45,6 +45,8 @@ public class UserController {
     private final JavaMailSender mailSender;
     private final JwtTokenUtil tokens;
 
+    private final IRideService rideService;
+
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -53,7 +55,7 @@ public class UserController {
 
     @Autowired
     public UserController(IUserService userService, IMessageService messageService, IRemarkService remarkService,
-                          IDriverService driverService, IPassengerService passengerService, JavaMailSender mailSender, JwtTokenUtil tokens) {
+                          IDriverService driverService, IPassengerService passengerService, JavaMailSender mailSender, JwtTokenUtil tokens, IRideService rideService) {
         this.userService = userService;
         this.messageService = messageService;
         this.remarkService = remarkService;
@@ -61,36 +63,42 @@ public class UserController {
         this.passengerService = passengerService;
         this.mailSender = mailSender;
         this.tokens = tokens;
+        this.rideService = rideService;
     }
 
     @GetMapping("/{id}/ride")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Paginated<RideDTO>> getRide(
-            @PathVariable("id") int id,
-            @RequestParam("page") int page,
-            @RequestParam("size") int size,
-            @RequestParam("sort") String sort,
+    public ResponseEntity<Paginated<RideDTO>> getRides(
+            @PathVariable("id") Long id,
+            Pageable page,
             @RequestParam("from") String from,
             @RequestParam("to") String to
     ) {
-        User user = userService.findOne((long) id);
-        Set<RideDTO> rides = new HashSet<>();
-        if (driverService.findOne((long)id) != null) {
-            for (Ride ride : ((Driver)user).getRides()) {
-                RideDTO rideDTO = new RideDTO(ride);
-                rides.add(rideDTO);
-            }
-        }
-        else {
-            if (passengerService.findOne((long)id) != null) {
-                for (Ride ride : ((Passenger)user).getRides()) {
-                    RideDTO rideDTO = new RideDTO(ride);
-                    rides.add(rideDTO);
-                }
-            }
-        }
+        User user = userService.findOne(id);
+        Set<RideDTO> rides = new LinkedHashSet<>();
+        // -1 none, 0 driver, 1 passengeer
+        int userIndicator = -1;
+        if (driverService.findOne(id).isPresent()) userIndicator = 0;
+        else if(passengerService.findOne(id).isPresent()) userIndicator = 1;
+        else return new ResponseEntity("No user with given id.", HttpStatus.NOT_FOUND);
 
-        Paginated<RideDTO> ridePaginated = new Paginated<>(rides.size(), rides);
+        Date dateFrom = null;
+        Date dateTo = null;
+
+        if (from != null || to != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            if  (from != null)
+                dateFrom = java.sql.Timestamp.valueOf(LocalDateTime.parse(from, formatter));
+            if (to != null)
+                dateTo = java.sql.Timestamp.valueOf(LocalDateTime.parse(to, formatter));
+        }
+        Page<Ride> userRides = null;
+        if(userIndicator == 0)
+            userRides = this.rideService.findAllForUserWithRole(id, page, dateFrom, dateTo, Role.DRIVER);
+        else
+            userRides = this.rideService.findAllForUserWithRole(id, page, dateFrom, dateTo, Role.PASSENGER);
+
+        Paginated<RideDTO> ridePaginated = new Paginated<>(userRides.getNumberOfElements(), rides);
         return new ResponseEntity<>(ridePaginated, HttpStatus.OK);
 
     }

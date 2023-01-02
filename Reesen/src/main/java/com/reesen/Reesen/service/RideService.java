@@ -1,6 +1,7 @@
 package com.reesen.Reesen.service;
 
 import com.reesen.Reesen.Enums.RideStatus;
+import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.*;
@@ -120,6 +121,32 @@ public class RideService implements IRideService {
 				page);
 
 	}
+
+	@Override
+	public Page<Ride> findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to) {
+		Optional<Passenger> passenger = this.passengerRepository.findById(passengerId);
+		if(passenger.isEmpty()) return null;
+
+		if(from == null && to == null)
+			return this.passengerRepository.findAllRidesByPassengerId(passengerId, page);
+		if(to != null && from == null)
+			return this.passengerRepository.findAllRidesByPassengerIdAndTimeOfEndBefore(passengerId, to, page);
+		if(to == null)
+			return this.passengerRepository.findAllRidesByPassengerIdAndTimeOfStartAfter(passengerId, from, page);
+
+		return this.passengerRepository.findAllRidesByPassengerIdAndTimeOfStartAfterAndTimeOfEndBefore(passengerId,
+				from,
+				to,
+				page);
+	}
+
+	@Override
+	public Page<Ride> findAllForUserWithRole(Long userId, Pageable page, Date from, Date to, Role role) {
+		if(role == Role.DRIVER) return this.findAll(userId, page, from, to);
+
+		return this.findAllRidesForPassenger(userId, page, from ,to);
+	}
+
 	@Override
 	public Ride findPassengerActiveRide(Long passengerId) {
 		Passenger passenger = this.passengerRepository.findById(passengerId).get();

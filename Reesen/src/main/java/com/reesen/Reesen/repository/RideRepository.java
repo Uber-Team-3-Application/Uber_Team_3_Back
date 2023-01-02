@@ -2,6 +2,7 @@ package com.reesen.Reesen.repository;
 
 import com.reesen.Reesen.Enums.RideStatus;
 import com.reesen.Reesen.model.Location;
+import com.reesen.Reesen.model.Passenger;
 import com.reesen.Reesen.model.Route;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,6 +40,7 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             Long driverId,
             Date timeOfEnd,
             Pageable page);
+
 
 
 }
