@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
+import java.util.Set;
 
 public interface IPassengerService {
 	Passenger save(Passenger passenger);
@@ -20,7 +21,10 @@ public interface IPassengerService {
 
 	Passenger getPassengerFromPassengerDTO(Long id, PassengerDTO passengerDTO);
 
-  void activateAccount(Long passengerId);
+ 	 void activateAccount(Long passengerId);
   
 	boolean getIsEmailConfirmed(String username);
+
+	Set<Passenger> findPassengersByRidesContaining(Ride ride);
+
 }

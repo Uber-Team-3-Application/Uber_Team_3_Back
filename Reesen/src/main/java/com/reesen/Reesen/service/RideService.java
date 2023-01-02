@@ -130,4 +130,9 @@ public class RideService implements IRideService {
 		return null;
 	}
 
+	@Override
+	public Set<Route> getLocationsByRide(Long ride_id) {
+		return this.rideRepository.getLocationsByRide(ride_id);
+	}
+
 }

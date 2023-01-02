@@ -4,6 +4,7 @@ import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.PassengerDTO;
 import com.reesen.Reesen.exceptions.EmailNotConfirmedException;
 import com.reesen.Reesen.model.Passenger;
+import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.repository.PassengerRepository;
 import com.reesen.Reesen.service.interfaces.IPassengerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class PassengerService implements IPassengerService {
@@ -82,6 +85,12 @@ public class PassengerService implements IPassengerService {
         if(exists == null) return true;
         return exists;
         }
+
+    @Override
+    public Set<Passenger> findPassengersByRidesContaining(Ride ride) {
+        return this.passengerRepository.findPassengersByRidesContaining(ride);
+
+    }
 
     @Override
     public void activateAccount(Long passengerId) {

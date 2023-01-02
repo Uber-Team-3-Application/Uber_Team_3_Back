@@ -43,6 +43,7 @@ public class DriverRideDTO {
     }
 
     private void setPassengers(Ride ride) {
+        this.passengers = new HashSet<UserDTO>();
         for (Passenger passenger : ride.getPassengers()) {
             passengers.add(new UserDTO(passenger.getId(), passenger.getEmail()));
         }

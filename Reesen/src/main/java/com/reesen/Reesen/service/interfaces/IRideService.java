@@ -2,6 +2,7 @@ package com.reesen.Reesen.service.interfaces;
 import com.reesen.Reesen.dto.CreateRideDTO;
 import com.reesen.Reesen.dto.RideDTO;
 import com.reesen.Reesen.model.Ride;
+import com.reesen.Reesen.model.Route;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.Date;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Set;
 
 public interface IRideService {
 	Optional<Ride> findOne(Long id);
@@ -34,4 +36,7 @@ public interface IRideService {
 	Page<Ride> findAll(Long driverId, Pageable page, Date from, Date to);
 
 	Ride findPassengerActiveRide(Long passengerId);
+
+	Set<Route> getLocationsByRide (Long ride_id);
+
 }
