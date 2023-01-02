@@ -1,5 +1,8 @@
 package com.reesen.Reesen.dto;
 
+import com.reesen.Reesen.model.Passenger;
+import com.reesen.Reesen.model.Ride;
+import com.reesen.Reesen.model.Route;
 import com.reesen.Reesen.model.User;
 
 import java.util.Date;
@@ -14,7 +17,7 @@ public class PanicRideDTO {
     private double totalCost;
     private UserDTO driver;
     private Set<UserDTO> passengers;
-    private int estimatedTimeInMinutes;
+    private double estimatedTimeInMinutes;
     private String vehicleType;
     private boolean babyTransport;
     private boolean petTransport;
@@ -24,6 +27,27 @@ public class PanicRideDTO {
     public PanicRideDTO(){
         this.passengers = new HashSet<>();
         this.locations = new HashSet<>();
+    }
+    public PanicRideDTO(Ride ride){
+        this.id = ride.getId();
+        this.startTime = ride.getTimeOfStart();
+        this.endTime = ride.getTimeOfEnd();
+        this.totalCost = ride.getTotalPrice();
+        this.driver = new UserDTO(ride.getDriver());
+        this.passengers = new HashSet<>();
+        for(Passenger pass:ride.getPassengers()){
+            this.passengers.add(new UserDTO(pass));
+        }
+        this.estimatedTimeInMinutes = ride.getEstimatedTime();
+        this.vehicleType = ride.getVehicleType().toString();
+        this.babyTransport = ride.isBabyAccessible();
+        this.petTransport = ride.isPetAccessible();
+        this.locations = new HashSet<>();
+        for(Route route:ride.getLocations()){
+            this.locations.add(
+                    new RouteDTO(new LocationDTO(route.getDeparture()), new LocationDTO(route.getDestination())));
+        }
+        this.rejection = new DeductionDTO(ride.getDeduction());
     }
 
     public void addPassenger(UserDTO passenger){
@@ -115,11 +139,11 @@ public class PanicRideDTO {
         this.passengers = passengers;
     }
 
-    public int getEstimatedTimeInMinutes() {
+    public double getEstimatedTimeInMinutes() {
         return estimatedTimeInMinutes;
     }
 
-    public void setEstimatedTimeInMinutes(int estimatedTimeInMinutes) {
+    public void setEstimatedTimeInMinutes(double estimatedTimeInMinutes) {
         this.estimatedTimeInMinutes = estimatedTimeInMinutes;
     }
 

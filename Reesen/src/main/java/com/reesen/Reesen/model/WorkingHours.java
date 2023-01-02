@@ -1,9 +1,11 @@
 package com.reesen.Reesen.model;
 
-import jakarta.persistence.*;
+import com.reesen.Reesen.model.Driver.Driver;
+
+import javax.persistence.*;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 public class WorkingHours implements Serializable {
@@ -13,10 +15,10 @@ public class WorkingHours implements Serializable {
     private Long id;
 
     @Column
-    private Date startTime;
+    private LocalDateTime startTime;
 
     @Column
-    private Date endTime;
+    private LocalDateTime endTime;
 
     @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinColumn(name = "driverId")
@@ -25,7 +27,7 @@ public class WorkingHours implements Serializable {
     public WorkingHours() {
     }
 
-    public WorkingHours(Date startTime, Date endTime, Driver driver) {
+    public WorkingHours(LocalDateTime startTime, LocalDateTime endTime, Driver driver) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.driver = driver;
@@ -39,19 +41,19 @@ public class WorkingHours implements Serializable {
         this.id = id;
     }
 
-    public Date getStartTime() {
+    public LocalDateTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Date startTime) {
+    public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
 
-    public Date getEndTime() {
+    public LocalDateTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Date endTime) {
+    public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
 

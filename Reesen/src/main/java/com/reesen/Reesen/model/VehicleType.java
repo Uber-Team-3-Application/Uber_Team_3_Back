@@ -2,7 +2,7 @@ package com.reesen.Reesen.model;
 
 
 import com.reesen.Reesen.Enums.VehicleName;
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 import java.io.Serializable;
 
@@ -49,5 +49,10 @@ public class VehicleType implements Serializable {
 
     public void setName(VehicleName name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return this.name.toString();
     }
 }

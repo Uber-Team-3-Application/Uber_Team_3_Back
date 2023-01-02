@@ -1,6 +1,6 @@
 package com.reesen.Reesen.dto;
 
-import com.reesen.Reesen.model.Driver;
+import com.reesen.Reesen.model.Driver.Driver;
 
 public class DriverDTO {
 
@@ -91,5 +91,19 @@ public class DriverDTO {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return "DriverDTO{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", profilePicture='" + profilePicture + '\'' +
+                ", telephoneNumber='" + telephoneNumber + '\'' +
+                ", email='" + email + '\'' +
+                ", address='" + address + '\'' +
+                ", password='" + password + '\'' +
+                '}';
     }
 }

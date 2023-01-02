@@ -1,9 +1,10 @@
 package com.reesen.Reesen.model;
 
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -14,7 +15,7 @@ public class Panic implements Serializable {
     private Long id;
 
     @Column(nullable = false)
-    private Date timeOfPress;
+    private LocalDateTime timeOfPress;
 
     @Column(nullable = false)
     private String reason;
@@ -23,8 +24,6 @@ public class Panic implements Serializable {
     @JoinColumn(name = "rideId")
     private Ride ride;
 
-
-
     @OneToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     private User user;
@@ -32,7 +31,7 @@ public class Panic implements Serializable {
     public Panic() {
     }
 
-    public Panic(Date timeOfPress, String reason, Ride ride, User user) {
+    public Panic(LocalDateTime timeOfPress, String reason, Ride ride, User user) {
         this.timeOfPress = timeOfPress;
         this.reason = reason;
         this.ride = ride;
@@ -47,11 +46,11 @@ public class Panic implements Serializable {
         this.id = id;
     }
 
-    public Date getTimeOfPress() {
+    public LocalDateTime getTimeOfPress() {
         return timeOfPress;
     }
 
-    public void setTimeOfPress(Date timeOfPress) {
+    public void setTimeOfPress(LocalDateTime timeOfPress) {
         this.timeOfPress = timeOfPress;
     }
 

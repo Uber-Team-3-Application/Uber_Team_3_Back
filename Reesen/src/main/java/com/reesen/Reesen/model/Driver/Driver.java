@@ -1,6 +1,12 @@
-package com.reesen.Reesen.model;
+package com.reesen.Reesen.model.Driver;
 
-import jakarta.persistence.*;
+import com.reesen.Reesen.Enums.Role;
+import com.reesen.Reesen.model.Document;
+import com.reesen.Reesen.model.Ride;
+import com.reesen.Reesen.model.User;
+import com.reesen.Reesen.model.Vehicle;
+
+import javax.persistence.*;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -20,9 +26,11 @@ public class Driver extends User implements Serializable {
     @JoinColumn(name="vehicleId")
     private Vehicle vehicle;
 
+
     public Driver(){
 
     }
+
 
 
     public Driver(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, Set<Document> documents, Set<Ride> rides, Vehicle vehicle) {
@@ -30,6 +38,8 @@ public class Driver extends User implements Serializable {
         this.documents = documents;
         this.rides = rides;
         this.vehicle = vehicle;
+        this.setRole(Role.DRIVER);
+
     }
 
     public Driver(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, boolean isBlocked, boolean isActive, String address, Set<Document> documents, Set<Ride> rides, Vehicle vehicle) {
@@ -37,6 +47,8 @@ public class Driver extends User implements Serializable {
         this.documents = documents;
         this.rides = rides;
         this.vehicle = vehicle;
+
+        this.setRole(Role.DRIVER);
     }
 
     public Set<Document> getDocuments() {

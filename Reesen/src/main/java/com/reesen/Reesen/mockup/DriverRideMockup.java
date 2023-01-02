@@ -1,9 +1,9 @@
 package com.reesen.Reesen.mockup;
 
 import com.reesen.Reesen.dto.*;
-import com.reesen.Reesen.model.Location;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -32,12 +32,12 @@ public class DriverRideMockup {
         endTime = Date.from(Instant.now());
         LocationDTO departure = new LocationDTO( "Bulevar Oslobodjenja 74", 45.267136, 19.833549);
         LocationDTO destination = new LocationDTO( "Bulevar Oslobodjenja 74", 45.267136, 19.83354 );
-        locations.add(new RouteDTO(departure, destination));
+        locations.add(new RouteDTO(id, departure, destination));
 
 
         rejection = new DeductionDTO(
                         "Ride is canceled due to previous problems with the passenger",
-                        Date.from(Instant.now()));
+                        LocalDateTime.now());
 
         totalCost = 1235;
         driver = new UserDTO(Long.parseLong("123"), "user@example.com");

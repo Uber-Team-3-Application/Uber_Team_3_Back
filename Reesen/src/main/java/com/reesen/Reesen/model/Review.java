@@ -1,6 +1,6 @@
 package com.reesen.Reesen.model;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 import java.io.Serializable;
 
@@ -18,7 +18,10 @@ public class Review implements Serializable {
     private int vehicleRating;
 
     @Column(nullable = true)
-    private String comment;
+    private String vehicleComment;
+
+    @Column(nullable = true)
+    private String driverComment;
 
     @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     private Passenger passenger;
@@ -30,10 +33,12 @@ public class Review implements Serializable {
 
 
     }
-    public Review(int driverRating, int vehicleRating, String comment, Passenger passenger, Ride ride) {
+
+    public Review(int driverRating, int vehicleRating, String vehicleComment, String driverComment, Passenger passenger, Ride ride) {
         this.driverRating = driverRating;
         this.vehicleRating = vehicleRating;
-        this.comment = comment;
+        this.vehicleComment = vehicleComment;
+        this.driverComment = driverComment;
         this.passenger = passenger;
         this.ride = ride;
     }
@@ -62,12 +67,20 @@ public class Review implements Serializable {
         this.vehicleRating = vehicleRating;
     }
 
-    public String getComment() {
-        return comment;
+    public String getVehicleComment() {
+        return vehicleComment;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setVehicleComment(String vehicleComment) {
+        this.vehicleComment = vehicleComment;
+    }
+
+    public String getDriverComment() {
+        return driverComment;
+    }
+
+    public void setDriverComment(String driverComment) {
+        this.driverComment = driverComment;
     }
 
     public Passenger getPassenger() {

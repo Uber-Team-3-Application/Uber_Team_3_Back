@@ -1,6 +1,8 @@
 package com.reesen.Reesen.model;
 
-import jakarta.persistence.*;
+import com.reesen.Reesen.model.Driver.Driver;
+
+import javax.persistence.*;
 
 import java.io.Serializable;
 
@@ -122,5 +124,20 @@ public class Vehicle implements Serializable {
 
     public void setType(VehicleType type) {
         this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return "Vehicle{" +
+                "id=" + id +
+                ", driver=" + driver +
+                ", model='" + model + '\'' +
+                ", registrationPlate='" + registrationPlate + '\'' +
+                ", numberOfSeats=" + numberOfSeats +
+                ", isBabyAccessible=" + isBabyAccessible +
+                ", isPetAccessible=" + isPetAccessible +
+                ", currentLocation=" + currentLocation +
+                ", type=" + type +
+                '}';
     }
 }

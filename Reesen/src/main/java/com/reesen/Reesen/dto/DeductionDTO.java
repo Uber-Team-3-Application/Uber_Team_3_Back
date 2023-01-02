@@ -1,5 +1,6 @@
 package com.reesen.Reesen.dto;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import com.reesen.Reesen.model.Deduction;
@@ -7,12 +8,12 @@ import com.reesen.Reesen.model.Deduction;
 public class DeductionDTO {
 
 	private String reason;
-	private Date timeOfRejection;
+	private LocalDateTime timeOfRejection;
 
 	public DeductionDTO() {
 
 	}
-	public DeductionDTO(String reason, Date timeOfRejection){
+	public DeductionDTO(String reason, LocalDateTime timeOfRejection){
 		this.reason = reason;
 		this.timeOfRejection = timeOfRejection;
 	}
@@ -30,11 +31,11 @@ public class DeductionDTO {
 		this.reason = reason;
 	}
 
-	public Date getTimeOfRejection() {
+	public LocalDateTime getTimeOfRejection() {
 		return this.timeOfRejection;
 	}
 
-	public void setTimeOfRejection(Date deductionTime) {
+	public void setTimeOfRejection(LocalDateTime deductionTime) {
 		this.timeOfRejection = deductionTime;
 	}
 

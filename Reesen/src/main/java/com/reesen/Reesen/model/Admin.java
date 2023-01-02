@@ -1,87 +1,39 @@
 package com.reesen.Reesen.model;
 
-import jakarta.persistence.*;
+import com.reesen.Reesen.Enums.Role;
+import javax.persistence.*;
 
 import java.io.Serializable;
 
 @Entity
-public class Admin implements Serializable {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    private String username;
-
-    @Column(nullable = false)
-    private String password;
-
-    @Column
-    private String profilePicture;
-
-    @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
-    private String surname;
+@Table(name="Admins")
+public class Admin extends User implements Serializable {
 
     public Admin() {
     }
 
-    public Admin(String username, String password, String profilePicture, String name, String surname) {
-        this.username = username;
-        this.password = password;
-        this.profilePicture = profilePicture;
-        this.name = name;
-        this.surname = surname;
+    @Override
+    public void setBlocked(boolean blocked) {
+        super.setBlocked(false);
     }
 
-    public Long getId() {
-        return id;
+    public Admin(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, boolean isBlocked, boolean isActive, String address, Role role, String jwt) {
+        super(name, surname, profilePicture, telephoneNumber, email, password, isBlocked, isActive, address, role, jwt);
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Admin(String name, String surname, String profilePicture, String telephoneNumber, String email, String password) {
+        super(name, surname, profilePicture, telephoneNumber, email, password);
     }
 
-    public String getUsername() {
-        return username;
+    public Admin(Long id, String name, String surname, String profilePicture, String telephoneNumber, String email, String password, boolean isBlocked, boolean isActive, String address, Role role) {
+        super(id, name, surname, profilePicture, telephoneNumber, email, password, isBlocked, isActive, address, role);
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public Admin(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, boolean isBlocked, boolean isActive, String address, Role role) {
+        super(name, surname, profilePicture, telephoneNumber, email, password, isBlocked, isActive, address, role);
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getProfilePicture() {
-        return profilePicture;
-    }
-
-    public void setProfilePicture(String profilePicture) {
-        this.profilePicture = profilePicture;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getsurname() {
-        return surname;
-    }
-
-    public void setsurname(String surname) {
-        this.surname = surname;
+    public Admin(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, boolean isBlocked, boolean isActive, String address) {
+        super(name, surname, profilePicture, telephoneNumber, email, password, isBlocked, isActive, address);
     }
 }
