@@ -2,6 +2,7 @@ package com.reesen.Reesen.service.interfaces;
 import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.CreateRideDTO;
 import com.reesen.Reesen.dto.RideDTO;
+import com.reesen.Reesen.dto.UserRidesDTO;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.Route;
 import org.springframework.data.domain.Page;
@@ -43,4 +44,5 @@ public interface IRideService {
 
 	Set<Route> getLocationsByRide (Long ride_id);
 
+    Set<UserRidesDTO> getFilteredRides(Page<Ride> userRides, Long driverId);
 }

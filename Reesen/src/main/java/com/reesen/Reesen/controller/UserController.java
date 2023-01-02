@@ -68,14 +68,13 @@ public class UserController {
 
     @GetMapping("/{id}/ride")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Paginated<RideDTO>> getRides(
+    public ResponseEntity<Paginated<UserRidesDTO>> getRides(
             @PathVariable("id") Long id,
             Pageable page,
-            @RequestParam("from") String from,
-            @RequestParam("to") String to
+            @RequestParam(value = "from", required = false) String from,
+            @RequestParam(value = "to", required = false) String to
     ) {
-        User user = userService.findOne(id);
-        Set<RideDTO> rides = new LinkedHashSet<>();
+
         // -1 none, 0 driver, 1 passengeer
         int userIndicator = -1;
         if (driverService.findOne(id).isPresent()) userIndicator = 0;
@@ -98,7 +97,10 @@ public class UserController {
         else
             userRides = this.rideService.findAllForUserWithRole(id, page, dateFrom, dateTo, Role.PASSENGER);
 
-        Paginated<RideDTO> ridePaginated = new Paginated<>(userRides.getNumberOfElements(), rides);
+        Set<UserRidesDTO> rides = new LinkedHashSet<>();
+        rides = this.rideService.getFilteredRides(userRides, id);
+
+        Paginated<UserRidesDTO> ridePaginated = new Paginated<>(userRides.getNumberOfElements(), rides);
         return new ResponseEntity<>(ridePaginated, HttpStatus.OK);
 
     }
