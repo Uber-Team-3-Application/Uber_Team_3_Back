@@ -42,5 +42,41 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             Pageable page);
 
 
+    @Query("select r from Ride r, Passenger p where p.id=:passengerId and p member of r.passengers")
+    Page<Ride> findAllRidesByPassengerId(Long passengerId, Pageable page);
+
+    @Query("select r from Ride r, Passenger p " +
+            "where p.id=:passengerId " +
+            "and " +
+            "p member of r.passengers " +
+            "and r.timeOfEnd<=:timeOfEnd and r.timeOfStart>=:timeOfStart")
+    Page<Ride> findAllRidesByPassengerIdAndTimeOfStartAfterAndTimeOfEndBefore(
+            Long passengerId,
+            Date timeOfStart,
+            Date timeOfEnd,
+            Pageable page);
+
+    @Query("select r from Ride r, Passenger p  " +
+            "where p.id=:passengerId " +
+            "and " +
+            "p member of r.passengers " +
+            "and r.timeOfStart>=:timeOfStart")
+    Page<Ride> findAllRidesByPassengerIdAndTimeOfStartAfter(
+            Long passengerId,
+            Date timeOfStart,
+            Pageable page);
+
+
+    @Query("select r from Ride r, Passenger p  " +
+            "where p.id=:passengerId " +
+            "and " +
+            "p member of r.passengers " +
+            "and r.timeOfEnd<=:timeOfEnd")
+    Page<Ride> findAllRidesByPassengerIdAndTimeOfEndBefore(
+            Long passengerId,
+            Date timeOfEnd,
+            Pageable page);
+
+
 
 }

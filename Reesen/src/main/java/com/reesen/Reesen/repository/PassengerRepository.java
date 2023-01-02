@@ -33,41 +33,6 @@ public interface PassengerRepository extends JpaRepository<Passenger, Long> {
     Set<Passenger> findPassengersByRidesContaining(Ride ride);
 
 
-    @Query("select p.rides from Passenger p where p.id=:passengerId")
-    Page<Ride> findAllRidesByPassengerId(Long passengerId, Pageable page);
-
-    @Query("select p.rides from Passenger p, Ride r  " +
-            "where p.id=:passengerId " +
-            "and " +
-            "p member of r.passengers " +
-            "and r.timeOfEnd<=:timeOfEnd and r.timeOfStart>=:timeOfStart")
-    Page<Ride> findAllRidesByPassengerIdAndTimeOfStartAfterAndTimeOfEndBefore(
-            Long passengerId,
-            Date timeOfStart,
-            Date timeOfEnd,
-            Pageable page);
-
-    @Query("select p.rides from Passenger p, Ride r  " +
-            "where p.id=:passengerId " +
-            "and " +
-            "p member of r.passengers " +
-            "and r.timeOfStart>=:timeOfStart")
-    Page<Ride> findAllRidesByPassengerIdAndTimeOfStartAfter(
-            Long passengerId,
-            Date timeOfStart,
-            Pageable page);
-
-
-    @Query("select p.rides from Passenger p, Ride r  " +
-            "where p.id=:passengerId " +
-            "and " +
-            "p member of r.passengers " +
-            "and r.timeOfEnd<=:timeOfEnd")
-    Page<Ride> findAllRidesByPassengerIdAndTimeOfEndBefore(
-            Long passengerId,
-            Date timeOfEnd,
-            Pageable page);
-
     @Query("select p from Passenger p inner join Review r on p.id=r.passenger.id where r.id=:reviewId")
     Passenger findbyReviewId(Long reviewId);
 }

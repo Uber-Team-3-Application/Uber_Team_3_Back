@@ -134,13 +134,13 @@ public class RideService implements IRideService {
 		if(passenger.isEmpty()) return null;
 
 		if(from == null && to == null)
-			return this.passengerRepository.findAllRidesByPassengerId(passengerId, page);
+			return this.rideRepository.findAllRidesByPassengerId(passengerId, page);
 		if(to != null && from == null)
-			return this.passengerRepository.findAllRidesByPassengerIdAndTimeOfEndBefore(passengerId, to, page);
+			return this.rideRepository.findAllRidesByPassengerIdAndTimeOfEndBefore(passengerId, to, page);
 		if(to == null)
-			return this.passengerRepository.findAllRidesByPassengerIdAndTimeOfStartAfter(passengerId, from, page);
+			return this.rideRepository.findAllRidesByPassengerIdAndTimeOfStartAfter(passengerId, from, page);
 
-		return this.passengerRepository.findAllRidesByPassengerIdAndTimeOfStartAfterAndTimeOfEndBefore(passengerId,
+		return this.rideRepository.findAllRidesByPassengerIdAndTimeOfStartAfterAndTimeOfEndBefore(passengerId,
 				from,
 				to,
 				page);
