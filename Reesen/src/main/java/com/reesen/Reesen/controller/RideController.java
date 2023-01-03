@@ -2,9 +2,10 @@ package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.CreateRideDTO;
 import com.reesen.Reesen.dto.RideDTO;
-import com.reesen.Reesen.mockup.RideMockup;
-import com.reesen.Reesen.mockup.RidePanicMockup;
+import com.reesen.Reesen.dto.UserRidesDTO;
+import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Ride;
+import com.reesen.Reesen.service.interfaces.IDriverService;
 import com.reesen.Reesen.service.interfaces.IRideService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +20,11 @@ import java.util.Optional;
 public class RideController {
 
     private final IRideService rideService;
+    private final IDriverService driverService;
 
-    public RideController(IRideService rideService) {
+    public RideController(IRideService rideService, IDriverService driverService) {
         this.rideService = rideService;
+        this.driverService = driverService;
     }
 
     @PostMapping
@@ -57,13 +60,14 @@ public class RideController {
 
     @GetMapping(value = "/{id}")
     @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
-    public ResponseEntity<RideDTO> getRideDetail(@PathVariable Long id){
+    public ResponseEntity<UserRidesDTO> getRideDetail(@PathVariable Long id){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         Optional<Ride> ride = this.rideService.findOne(id);
         if(ride.isEmpty())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        RideDTO rideDTO = new RideDTO(ride.get());
+        Optional<Driver> driver = this.driverService.findDriverWithRide(ride.get());
+        UserRidesDTO rideDTO = this.rideService.getFilteredRide(ride.get(), driver.get().getId());
         return new ResponseEntity<>(rideDTO, HttpStatus.OK);
     }
 

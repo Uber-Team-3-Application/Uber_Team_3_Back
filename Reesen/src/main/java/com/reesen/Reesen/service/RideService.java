@@ -169,42 +169,46 @@ public class RideService implements IRideService {
 	}
 
 	@Override
+	public UserRidesDTO getFilteredRide(Ride ride, Long driverId){
+
+		ride.setPassengers(passengerRepository.findPassengersByRidesContaining(ride));
+
+		// TODO: get reviews and then set users to each review
+		Set<Review> reviews = this.reviewRepository.findAllByRideId(ride.getId());
+		for(Review review:reviews){
+			review.setPassenger(this.passengerRepository.findbyReviewId(review.getId()));
+		}
+
+		ride.setReview(reviews);
+		ride.setDeduction(deductionRepository.findDeductionByRide(ride).orElse(new Deduction()));
+		Set<Route> locations;
+		locations = this.getLocationsByRide(ride.getId());
+		for (Route location : locations) {
+			location.setDestination(this.routeRepository.getDestinationByRoute(location).get());
+			location.setDeparture(this.routeRepository.getDepartureByRoute(location).get());
+		}
+
+		ride.setLocations(locations);
+		UserRidesDTO rideDTO = new UserRidesDTO(ride);
+		if(driverId != 0L)
+			rideDTO.setDriver(new UserDTO(
+					this.userRepository.findById(driverId).get()
+
+			));
+
+		else
+			rideDTO.setDriver(new UserDTO(
+					this.driverRepository.findDriverByRidesContaining(ride).get()
+			));
+
+		return rideDTO;
+	}
+	@Override
 	public Set<UserRidesDTO> getFilteredRides(Page<Ride> userRides, Long driverId) {
 		Set<UserRidesDTO> rides = new LinkedHashSet<>();
 		for(Ride ride: userRides){
 
-			ride.setPassengers(passengerRepository.findPassengersByRidesContaining(ride));
-
-			// TODO: get reviews and then set users to each review
-			Set<Review> reviews = this.reviewRepository.findAllByRideId(ride.getId());
-			for(Review review:reviews){
-				review.setPassenger(this.passengerRepository.findbyReviewId(review.getId()));
-			}
-
-			ride.setReview(reviews);
-			ride.setDeduction(deductionRepository.findDeductionByRide(ride).orElse(new Deduction()));
-			Set<Route> locations;
-			locations = this.getLocationsByRide(ride.getId());
-			for (Route location : locations) {
-				location.setDestination(this.routeRepository.getDestinationByRoute(location).get());
-				location.setDeparture(this.routeRepository.getDepartureByRoute(location).get());
-			}
-
-			ride.setLocations(locations);
-			UserRidesDTO rideDTO = new UserRidesDTO(ride);
-			if(driverId != 0L)
-				rideDTO.setDriver(new UserDTO(
-						this.userRepository.findById(driverId).get()
-
-				));
-
-			else
-				rideDTO.setDriver(new UserDTO(
-					this.driverRepository.findDriverByRidesContaining(ride).get()
-				));
-
-
-			rides.add(rideDTO);
+			rides.add(this.getFilteredRide(ride, driverId));
 		}
 
 		return rides;

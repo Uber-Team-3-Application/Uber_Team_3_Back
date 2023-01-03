@@ -45,4 +45,6 @@ public interface IRideService {
 	Set<Route> getLocationsByRide (Long ride_id);
 
     Set<UserRidesDTO> getFilteredRides(Page<Ride> userRides, Long driverId);
+
+	UserRidesDTO getFilteredRide(Ride ride, Long driverId);
 }
