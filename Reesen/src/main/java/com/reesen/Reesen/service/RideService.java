@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+
 import java.util.*;
 
 import java.time.LocalDateTime;
@@ -30,6 +31,7 @@ public class RideService implements IRideService {
 	private final DeductionRepository deductionRepository;
 	private final ReviewRepository reviewRepository;
 
+
     @Autowired
     public RideService(RideRepository rideRepository, RouteRepository routeRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, UserRepository userRepository, DriverRepository driverRepository, DeductionRepository deductionRepository, ReviewRepository reviewRepository){
         this.rideRepository = rideRepository;
@@ -42,6 +44,7 @@ public class RideService implements IRideService {
 		this.deductionRepository = deductionRepository;
 		this.reviewRepository = reviewRepository;
 	}
+
 
 	@Override
 	public Optional<Ride> findOne(Long id) {
@@ -203,6 +206,21 @@ public class RideService implements IRideService {
 
 		return rideDTO;
 	}
+
+	@Override
+	public List<ReportDTO> getReport(String typeOfReport) {
+		if(typeOfReport.equalsIgnoreCase("rides-per-day")){
+			return this.rideRepository.getRidesPerDayReport();
+		}else if(typeOfReport.equalsIgnoreCase("kilometers-per-day")){
+			return this.rideRepository.getRidesPerDayReport();
+		}else if(typeOfReport.equalsIgnoreCase("spent-per-day")){
+			return this.rideRepository.getRidesPerDayReport();
+		}else if(typeOfReport.equalsIgnoreCase("earned-per-day")){
+			return this.rideRepository.getRidesPerDayReport();
+		}
+		return null;
+	}
+
 	@Override
 	public Set<UserRidesDTO> getFilteredRides(Page<Ride> userRides, Long driverId) {
 		Set<UserRidesDTO> rides = new LinkedHashSet<>();
