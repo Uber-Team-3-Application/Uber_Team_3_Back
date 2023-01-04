@@ -1,6 +1,8 @@
 package com.reesen.Reesen.service.interfaces;
+import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.CreateRideDTO;
 import com.reesen.Reesen.dto.RideDTO;
+import com.reesen.Reesen.dto.UserRidesDTO;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.Route;
 import org.springframework.data.domain.Page;
@@ -34,9 +36,15 @@ public interface IRideService {
 	Ride acceptRide(Ride ride);
 
 	Page<Ride> findAll(Long driverId, Pageable page, Date from, Date to);
+	Page<Ride> findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to);
+
+	Page<Ride> findAllForUserWithRole(Long userId, Pageable page, Date from, Date to, Role role);
 
 	Ride findPassengerActiveRide(Long passengerId);
 
 	Set<Route> getLocationsByRide (Long ride_id);
 
+    Set<UserRidesDTO> getFilteredRides(Page<Ride> userRides, Long driverId);
+
+	UserRidesDTO getFilteredRide(Ride ride, Long driverId);
 }

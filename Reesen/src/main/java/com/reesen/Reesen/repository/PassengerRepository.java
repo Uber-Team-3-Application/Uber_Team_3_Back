@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.Set;
 
 @Repository
@@ -30,4 +31,11 @@ public interface PassengerRepository extends JpaRepository<Passenger, Long> {
     void activateAccount(Long passengerId);
 
     Set<Passenger> findPassengersByRidesContaining(Ride ride);
+
+
+    @Query("select p from Passenger p inner join Review r on p.id=r.passenger.id where r.id=:reviewId")
+    Passenger findbyReviewId(Long reviewId);
+
+    @Query("select size(p.rides) from Passenger p where p.id=:id")
+    int countTotalNumberOfRides(Long id);
 }

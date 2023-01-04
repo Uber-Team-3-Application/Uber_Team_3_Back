@@ -1,6 +1,7 @@
 package com.reesen.Reesen.service;
 
 import com.reesen.Reesen.Enums.RideStatus;
+import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.*;
@@ -11,10 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import java.time.LocalDateTime;
 
@@ -26,14 +24,23 @@ public class RideService implements IRideService {
 	private final PassengerRepository passengerRepository;
 	private final VehicleTypeRepository vehicleTypeRepository;
 	private final PanicRepository panicRepository;
+	private final UserRepository userRepository;
+	private final DriverRepository driverRepository;
+
+	private final DeductionRepository deductionRepository;
+	private final ReviewRepository reviewRepository;
 
     @Autowired
-    public RideService(RideRepository rideRepository, RouteRepository routeRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository){
+    public RideService(RideRepository rideRepository, RouteRepository routeRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, UserRepository userRepository, DriverRepository driverRepository, DeductionRepository deductionRepository, ReviewRepository reviewRepository){
         this.rideRepository = rideRepository;
 		this.routeRepository = routeRepository;
 		this.passengerRepository = passengerRepository;
 		this.vehicleTypeRepository = vehicleTypeRepository;
 		this.panicRepository = panicRepository;
+		this.userRepository = userRepository;
+		this.driverRepository = driverRepository;
+		this.deductionRepository = deductionRepository;
+		this.reviewRepository = reviewRepository;
 	}
 
 	@Override
@@ -120,6 +127,32 @@ public class RideService implements IRideService {
 				page);
 
 	}
+
+	@Override
+	public Page<Ride> findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to) {
+		Optional<Passenger> passenger = this.passengerRepository.findById(passengerId);
+		if(passenger.isEmpty()) return null;
+
+		if(from == null && to == null)
+			return this.rideRepository.findAllRidesByPassengerId(passengerId, page);
+		if(to != null && from == null)
+			return this.rideRepository.findAllRidesByPassengerIdAndTimeOfEndBefore(passengerId, to, page);
+		if(to == null)
+			return this.rideRepository.findAllRidesByPassengerIdAndTimeOfStartAfter(passengerId, from, page);
+
+		return this.rideRepository.findAllRidesByPassengerIdAndTimeOfStartAfterAndTimeOfEndBefore(passengerId,
+				from,
+				to,
+				page);
+	}
+
+	@Override
+	public Page<Ride> findAllForUserWithRole(Long userId, Pageable page, Date from, Date to, Role role) {
+		if(role == Role.DRIVER) return this.findAll(userId, page, from, to);
+
+		return this.findAllRidesForPassenger(userId, page, from ,to);
+	}
+
 	@Override
 	public Ride findPassengerActiveRide(Long passengerId) {
 		Passenger passenger = this.passengerRepository.findById(passengerId).get();
@@ -133,6 +166,52 @@ public class RideService implements IRideService {
 	@Override
 	public Set<Route> getLocationsByRide(Long ride_id) {
 		return this.rideRepository.getLocationsByRide(ride_id);
+	}
+
+	@Override
+	public UserRidesDTO getFilteredRide(Ride ride, Long driverId){
+
+		ride.setPassengers(passengerRepository.findPassengersByRidesContaining(ride));
+
+		// TODO: get reviews and then set users to each review
+		Set<Review> reviews = this.reviewRepository.findAllByRideId(ride.getId());
+		for(Review review:reviews){
+			review.setPassenger(this.passengerRepository.findbyReviewId(review.getId()));
+		}
+
+		ride.setReview(reviews);
+		ride.setDeduction(deductionRepository.findDeductionByRide(ride).orElse(new Deduction()));
+		Set<Route> locations;
+		locations = this.getLocationsByRide(ride.getId());
+		for (Route location : locations) {
+			location.setDestination(this.routeRepository.getDestinationByRoute(location).get());
+			location.setDeparture(this.routeRepository.getDepartureByRoute(location).get());
+		}
+
+		ride.setLocations(locations);
+		UserRidesDTO rideDTO = new UserRidesDTO(ride);
+		if(driverId != 0L)
+			rideDTO.setDriver(new UserDTO(
+					this.userRepository.findById(driverId).get()
+
+			));
+
+		else
+			rideDTO.setDriver(new UserDTO(
+					this.driverRepository.findDriverByRidesContaining(ride).get()
+			));
+
+		return rideDTO;
+	}
+	@Override
+	public Set<UserRidesDTO> getFilteredRides(Page<Ride> userRides, Long driverId) {
+		Set<UserRidesDTO> rides = new LinkedHashSet<>();
+		for(Ride ride: userRides){
+
+			rides.add(this.getFilteredRide(ride, driverId));
+		}
+
+		return rides;
 	}
 
 }
