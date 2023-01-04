@@ -35,4 +35,7 @@ public interface PassengerRepository extends JpaRepository<Passenger, Long> {
 
     @Query("select p from Passenger p inner join Review r on p.id=r.passenger.id where r.id=:reviewId")
     Passenger findbyReviewId(Long reviewId);
+
+    @Query("select size(p.rides) from Passenger p where p.id=:id")
+    int countTotalNumberOfRides(Long id);
 }

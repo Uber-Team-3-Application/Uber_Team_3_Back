@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.swing.text.html.Option;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -129,7 +130,15 @@ public class UserController {
         Integer totalNumber = this.userService.getTotalNumberOfUsers();
         return new ResponseEntity<>(totalNumber, HttpStatus.OK);
     }
+    @GetMapping("/{id}/number-of-rides")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER', 'PASSENGER')")
+    public ResponseEntity<Integer> getTotalNumberOfRides(@PathVariable("id") Long id){
+        User user = this.userService.findOne(id);
+        if(user == null) return new ResponseEntity("Invalid ID.", HttpStatus.NOT_FOUND);
 
+        int totalNumberOfRides = this.userService.getTotalNumberOfRides(user);
+        return new ResponseEntity<>(totalNumberOfRides, HttpStatus.OK);
+    }
 
     @PostMapping("/login")
     public ResponseEntity<TokenDTO> logIn(@RequestBody LoginDTO login) {
