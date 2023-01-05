@@ -1,8 +1,6 @@
 package com.reesen.Reesen.controller;
 
-import com.reesen.Reesen.dto.CreateRideDTO;
-import com.reesen.Reesen.dto.RideDTO;
-import com.reesen.Reesen.dto.UserRidesDTO;
+import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.service.interfaces.IDriverService;
@@ -12,6 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @CrossOrigin
@@ -142,4 +143,15 @@ public class RideController {
         RideDTO canceledRide = new RideDTO(ride);
         return new ResponseEntity<>(canceledRide, HttpStatus.OK);
     }
+
+    @PostMapping(value = "/rides-report")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ReportSumAverageDTO> getReport(@RequestBody ReportRequestDTO reportRequestDTO){
+
+        ReportSumAverageDTO reportDTO = this.rideService.getReport(reportRequestDTO);
+        if(reportDTO == null) return new ResponseEntity("Bad request!", HttpStatus.BAD_REQUEST);
+
+        return new ResponseEntity<>(reportDTO, HttpStatus.OK);
+    }
+
 }

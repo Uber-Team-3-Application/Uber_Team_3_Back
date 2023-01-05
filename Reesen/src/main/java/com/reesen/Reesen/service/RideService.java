@@ -2,6 +2,7 @@ package com.reesen.Reesen.service;
 
 import com.reesen.Reesen.Enums.RideStatus;
 import com.reesen.Reesen.Enums.Role;
+import com.reesen.Reesen.Enums.TypeOfReport;
 import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.*;
@@ -12,9 +13,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class RideService implements IRideService {
@@ -30,6 +35,7 @@ public class RideService implements IRideService {
 	private final DeductionRepository deductionRepository;
 	private final ReviewRepository reviewRepository;
 
+
     @Autowired
     public RideService(RideRepository rideRepository, RouteRepository routeRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, UserRepository userRepository, DriverRepository driverRepository, DeductionRepository deductionRepository, ReviewRepository reviewRepository){
         this.rideRepository = rideRepository;
@@ -42,6 +48,7 @@ public class RideService implements IRideService {
 		this.deductionRepository = deductionRepository;
 		this.reviewRepository = reviewRepository;
 	}
+
 
 	@Override
 	public Optional<Ride> findOne(Long id) {
@@ -203,6 +210,87 @@ public class RideService implements IRideService {
 
 		return rideDTO;
 	}
+
+	@Override
+	public ReportSumAverageDTO getReport(ReportRequestDTO reportRequestDTO) {
+		long diffInMillies = Math.abs(reportRequestDTO.getTo().getTime() - reportRequestDTO.getFrom().getTime());
+		long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+		if(reportRequestDTO.getTypeOfReport() == TypeOfReport.RIDES_PER_DAY){
+			List<ReportDTO<Long>> reportDTOS = this.rideRepository.getRidesPerDayReport(reportRequestDTO.getFrom(), reportRequestDTO.getTo());
+
+			return this.filterTotalRidesReports(reportDTOS, diff);
+		}else if(reportRequestDTO.getTypeOfReport() == TypeOfReport.KILOMETERS_PER_DAY){
+			//reportDTOS = this.rideRepository.getKilometersPerDay(reportRequestDTO.getFrom(), reportRequestDTO.getTo());
+			return null;
+		}else if(reportRequestDTO.getTypeOfReport() == TypeOfReport.MONEY_SPENT_PER_DAY){
+			List<ReportDTO<Double>> reportDTOS = this.rideRepository.getTotalCostPerDay(reportRequestDTO.getFrom(), reportRequestDTO.getTo());
+			return this.filterTotalCostReports(reportDTOS, diff);
+
+		}else if(reportRequestDTO.getTypeOfReport() == TypeOfReport.MONEY_EARNED_PER_DAY){
+			List<ReportDTO<Double>> reportDTOS = this.rideRepository.getTotalCostPerDay(reportRequestDTO.getFrom(), reportRequestDTO.getTo());
+			return this.filterTotalCostReports(reportDTOS, diff);
+
+		}
+
+		return null;
+
+	}
+
+	@Override
+	public ReportSumAverageDTO filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS, long totalDays){
+		ReportSumAverageDTO reportSumAverageDTO = new ReportSumAverageDTO();
+
+		Map<Date, Double> reports = new LinkedHashMap<>();
+		double sum = 0;
+		for(ReportDTO<Long> report: reportDTOS){
+			Date date = getFormattedDate(report);
+			if(reports.containsKey(date)){
+				reports.computeIfPresent(date, (k, v) -> v + (double)(report.getTotal()));
+			}else{
+				reports.put(date, (double)(report.getTotal()));
+			}
+			sum += report.getTotal();
+
+		}
+		reportSumAverageDTO.setResult(reports);
+		reportSumAverageDTO.setSum(sum);
+		reportSumAverageDTO.setAverage(sum/ totalDays);
+		return reportSumAverageDTO;
+	}
+	@Override
+	public ReportSumAverageDTO filterTotalCostReports(List<ReportDTO<Double>> reportDTOS, long totalDays) {
+
+		ReportSumAverageDTO reportSumAverageDTO = new ReportSumAverageDTO();
+		Map<Date, Double> reports = new LinkedHashMap<>();
+		double sum = 0;
+		for(ReportDTO<Double> report: reportDTOS){
+			Date date = getFormattedDate(report);
+			if(reports.containsKey(date)){
+				reports.computeIfPresent(date, (k, v) -> v + report.getTotal());
+			}else{
+				reports.put(date, report.getTotal());
+			}
+			sum += report.getTotal();
+		}
+		reportSumAverageDTO.setResult(reports);
+		reportSumAverageDTO.setSum(sum);
+		reportSumAverageDTO.setAverage(sum/ totalDays);
+
+		return reportSumAverageDTO;
+	}
+
+	private Date getFormattedDate(ReportDTO report) {
+		Date date = report.getDate();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+		String dateStr = sdf.format(date);
+		try {
+			return sdf.parse(dateStr);
+		} catch (ParseException e) {
+			throw new RuntimeException(e);
+		}
+
+	}
+
 	@Override
 	public Set<UserRidesDTO> getFilteredRides(Page<Ride> userRides, Long driverId) {
 		Set<UserRidesDTO> rides = new LinkedHashSet<>();

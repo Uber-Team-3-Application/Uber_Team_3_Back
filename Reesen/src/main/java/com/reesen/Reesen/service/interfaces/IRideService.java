@@ -1,21 +1,19 @@
 package com.reesen.Reesen.service.interfaces;
 import com.reesen.Reesen.Enums.Role;
-import com.reesen.Reesen.dto.CreateRideDTO;
-import com.reesen.Reesen.dto.RideDTO;
-import com.reesen.Reesen.dto.UserRidesDTO;
+import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.Route;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import java.util.Date;
-import java.util.Optional;
+
+import java.util.*;
+
 import com.reesen.Reesen.model.WorkingHours;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Set;
 
 public interface IRideService {
 	Optional<Ride> findOne(Long id);
@@ -47,4 +45,11 @@ public interface IRideService {
     Set<UserRidesDTO> getFilteredRides(Page<Ride> userRides, Long driverId);
 
 	UserRidesDTO getFilteredRide(Ride ride, Long driverId);
+
+	ReportSumAverageDTO getReport(ReportRequestDTO reportRequestDTO);
+
+	ReportSumAverageDTO filterTotalCostReports(List<ReportDTO<Double>> reportDTOS, long totalDays);
+	ReportSumAverageDTO filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS, long totalDays);
+
+
 }
