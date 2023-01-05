@@ -120,6 +120,12 @@ public class VehicleService implements IVehicleService {
     }
 
     @Override
+    public LocationDTO getCurrentLocation(Long vehicleId) {
+        Location location = this.vehicleRepository.getLocation(vehicleId);
+        return new LocationDTO(location);
+    }
+
+    @Override
     public Vehicle createVehicle(VehicleDTO vehicleDTO, Driver driver){
         Location location = new Location();
         location.setLongitude(vehicleDTO.getCurrentLocation().getLongitude());
