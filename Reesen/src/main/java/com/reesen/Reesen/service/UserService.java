@@ -1,5 +1,7 @@
 package com.reesen.Reesen.service;
-
+import com.reesen.Reesen.model.ResetPasswordToken;
+import com.reesen.Reesen.model.User;
+import com.reesen.Reesen.repository.ResetPasswordTokenRepository;
 import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.model.User;
 import com.reesen.Reesen.repository.DriverRepository;
@@ -25,17 +27,18 @@ public class UserService implements IUserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final ResetPasswordTokenRepository resetPasswordTokenRepository;
     private final DriverRepository driverRepository;
     private final PassengerRepository passengerRepository;
 
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, DriverRepository driverRepository, PassengerRepository passengerRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, DriverRepository driverRepository, PassengerRepository passengerRepository, ResetPasswordTokenRepository resetPasswordTokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.driverRepository = driverRepository;
         this.passengerRepository = passengerRepository;
+        this.resetPasswordTokenRepository = resetPasswordTokenRepository;
     }
 
     @Override
@@ -100,12 +103,21 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public void saveResetPasswordToken(ResetPasswordToken resetPasswordToken) {
+        this.resetPasswordTokenRepository.save(resetPasswordToken);
+    }
+
+    @Override
+    public ResetPasswordToken findByUserIdAndCode(Long userId, String code) {
+        return this.resetPasswordTokenRepository.findByUserIdAndCode(userId, code);
+    }
+    
+    @Override
     public int getTotalNumberOfRides(User user) {
         if(user.getRole() == Role.DRIVER)
             return this.driverRepository.countTotalNumberOfRides(user.getId());
 
         return this.passengerRepository.countTotalNumberOfRides(user.getId());
-
     }
 
 }
