@@ -144,11 +144,11 @@ public class RideController {
         return new ResponseEntity<>(canceledRide, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/rides-report")
+    @PostMapping(value = "/rides-report")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Map<Date, Double>> getReport(@RequestBody ReportRequestDTO reportRequestDTO){
+    public ResponseEntity<ReportSumAverageDTO> getReport(@RequestBody ReportRequestDTO reportRequestDTO){
 
-        Map<Date, Double> reportDTO = this.rideService.getReport(reportRequestDTO);
+        ReportSumAverageDTO reportDTO = this.rideService.getReport(reportRequestDTO);
         if(reportDTO == null) return new ResponseEntity("Bad request!", HttpStatus.BAD_REQUEST);
 
         return new ResponseEntity<>(reportDTO, HttpStatus.OK);

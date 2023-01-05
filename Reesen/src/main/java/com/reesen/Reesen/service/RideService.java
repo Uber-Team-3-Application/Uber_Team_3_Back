@@ -211,7 +211,7 @@ public class RideService implements IRideService {
 	}
 
 	@Override
-	public Map<Date, Double> getReport(ReportRequestDTO reportRequestDTO) {
+	public ReportSumAverageDTO getReport(ReportRequestDTO reportRequestDTO) {
 
 		if(reportRequestDTO.getTypeOfReport() == TypeOfReport.RIDES_PER_DAY){
 			List<ReportDTO<Long>> reportDTOS = this.rideRepository.getRidesPerDayReport(reportRequestDTO.getFrom(), reportRequestDTO.getTo());
@@ -234,9 +234,11 @@ public class RideService implements IRideService {
 	}
 
 	@Override
-	public Map<Date, Double> filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS){
-		Map<Date, Double> reports = new HashMap<>();
+	public ReportSumAverageDTO filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS){
+		ReportSumAverageDTO reportSumAverageDTO = new ReportSumAverageDTO();
 
+		Map<Date, Double> reports = new HashMap<>();
+		double sum = 0;
 		for(ReportDTO<Long> report: reportDTOS){
 			Date date = getFormattedDate(report);
 			if(reports.containsKey(date)){
@@ -244,14 +246,20 @@ public class RideService implements IRideService {
 			}else{
 				reports.put(date, (double)(report.getTotal()));
 			}
+			sum += report.getTotal();
 
 		}
-		return reports;
+		reportSumAverageDTO.setResult(reports);
+		reportSumAverageDTO.setSum(sum);
+		reportSumAverageDTO.setAverage(sum/ reports.size());
+		return reportSumAverageDTO;
 	}
 	@Override
-	public Map<Date, Double> filterTotalCostReports(List<ReportDTO<Double>> reportDTOS) {
-		Map<Date, Double> reports = new HashMap<>();
+	public ReportSumAverageDTO filterTotalCostReports(List<ReportDTO<Double>> reportDTOS) {
 
+		ReportSumAverageDTO reportSumAverageDTO = new ReportSumAverageDTO();
+		Map<Date, Double> reports = new HashMap<>();
+		double sum = 0;
 		for(ReportDTO<Double> report: reportDTOS){
 			Date date = getFormattedDate(report);
 			if(reports.containsKey(date)){
@@ -259,9 +267,13 @@ public class RideService implements IRideService {
 			}else{
 				reports.put(date, report.getTotal());
 			}
-
+			sum += report.getTotal();
 		}
-		return reports;
+		reportSumAverageDTO.setResult(reports);
+		reportSumAverageDTO.setSum(sum);
+		reportSumAverageDTO.setAverage(sum/ reports.size());
+
+		return reportSumAverageDTO;
 	}
 
 	private Date getFormattedDate(ReportDTO report) {

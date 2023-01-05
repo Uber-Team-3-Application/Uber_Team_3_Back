@@ -46,10 +46,10 @@ public interface IRideService {
 
 	UserRidesDTO getFilteredRide(Ride ride, Long driverId);
 
-	Map<Date, Double> getReport(ReportRequestDTO reportRequestDTO);
+	ReportSumAverageDTO getReport(ReportRequestDTO reportRequestDTO);
 
-	Map<Date, Double> filterTotalCostReports(List<ReportDTO<Double>> reportDTOS);
-	Map<Date, Double> filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS);
+	ReportSumAverageDTO filterTotalCostReports(List<ReportDTO<Double>> reportDTOS);
+	ReportSumAverageDTO filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS);
 
 
 }
