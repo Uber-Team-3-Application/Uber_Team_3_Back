@@ -11,12 +11,12 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
-public class ReportDTO {
+public class ReportDTO<T> {
 
     private Date date;
-    private Long total;
+    private T total;
 
-    public ReportDTO(Date date, Long total) {
+    public ReportDTO(Date date, T total) {
         this.date = date;
         this.total = total;
 

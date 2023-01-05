@@ -1,9 +1,6 @@
 package com.reesen.Reesen.controller;
 
-import com.reesen.Reesen.dto.CreateRideDTO;
-import com.reesen.Reesen.dto.ReportDTO;
-import com.reesen.Reesen.dto.RideDTO;
-import com.reesen.Reesen.dto.UserRidesDTO;
+import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.service.interfaces.IDriverService;
@@ -147,11 +144,11 @@ public class RideController {
         return new ResponseEntity<>(canceledRide, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{type-of-report}/rides-report")
+    @GetMapping(value = "/rides-report")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<ReportDTO>> getReport(@PathVariable("type-of-report") String typeOfReport){
+    public ResponseEntity<Map<Date, Double>> getReport(@RequestBody ReportRequestDTO reportRequestDTO){
 
-        List<ReportDTO> reportDTO = this.rideService.getReport(typeOfReport);
+        Map<Date, Double> reportDTO = this.rideService.getReport(reportRequestDTO);
         if(reportDTO == null) return new ResponseEntity("Bad request!", HttpStatus.BAD_REQUEST);
 
         return new ResponseEntity<>(reportDTO, HttpStatus.OK);

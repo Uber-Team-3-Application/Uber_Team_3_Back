@@ -1,9 +1,6 @@
 package com.reesen.Reesen.service.interfaces;
 import com.reesen.Reesen.Enums.Role;
-import com.reesen.Reesen.dto.CreateRideDTO;
-import com.reesen.Reesen.dto.ReportDTO;
-import com.reesen.Reesen.dto.RideDTO;
-import com.reesen.Reesen.dto.UserRidesDTO;
+import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.Route;
 import org.springframework.data.domain.Page;
@@ -49,5 +46,10 @@ public interface IRideService {
 
 	UserRidesDTO getFilteredRide(Ride ride, Long driverId);
 
-	List<ReportDTO> getReport(String typeOfReport);
+	Map<Date, Double> getReport(ReportRequestDTO reportRequestDTO);
+
+	Map<Date, Double> filterTotalCostReports(List<ReportDTO<Double>> reportDTOS);
+	Map<Date, Double> filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS);
+
+
 }

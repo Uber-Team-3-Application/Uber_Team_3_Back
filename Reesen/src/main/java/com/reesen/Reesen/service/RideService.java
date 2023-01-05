@@ -2,6 +2,7 @@ package com.reesen.Reesen.service;
 
 import com.reesen.Reesen.Enums.RideStatus;
 import com.reesen.Reesen.Enums.Role;
+import com.reesen.Reesen.Enums.TypeOfReport;
 import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.*;
@@ -13,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import java.time.LocalDateTime;
@@ -208,17 +211,69 @@ public class RideService implements IRideService {
 	}
 
 	@Override
-	public List<ReportDTO> getReport(String typeOfReport) {
-		if(typeOfReport.equalsIgnoreCase("rides-per-day")){
-			return this.rideRepository.getRidesPerDayReport();
-		}else if(typeOfReport.equalsIgnoreCase("kilometers-per-day")){
-			return this.rideRepository.getRidesPerDayReport();
-		}else if(typeOfReport.equalsIgnoreCase("spent-per-day")){
-			return this.rideRepository.getRidesPerDayReport();
-		}else if(typeOfReport.equalsIgnoreCase("earned-per-day")){
-			return this.rideRepository.getRidesPerDayReport();
+	public Map<Date, Double> getReport(ReportRequestDTO reportRequestDTO) {
+
+		if(reportRequestDTO.getTypeOfReport() == TypeOfReport.RIDES_PER_DAY){
+			List<ReportDTO<Long>> reportDTOS = this.rideRepository.getRidesPerDayReport(reportRequestDTO.getFrom(), reportRequestDTO.getTo());
+			return this.filterTotalRidesReports(reportDTOS);
+		}else if(reportRequestDTO.getTypeOfReport() == TypeOfReport.KILOMETERS_PER_DAY){
+			//reportDTOS = this.rideRepository.getKilometersPerDay(reportRequestDTO.getFrom(), reportRequestDTO.getTo());
+			return null;
+		}else if(reportRequestDTO.getTypeOfReport() == TypeOfReport.MONEY_SPENT_PER_DAY){
+			List<ReportDTO<Double>> reportDTOS = this.rideRepository.getTotalCostPerDay(reportRequestDTO.getFrom(), reportRequestDTO.getTo());
+			return this.filterTotalCostReports(reportDTOS);
+
+		}else if(reportRequestDTO.getTypeOfReport() == TypeOfReport.MONEY_EARNED_PER_DAY){
+			List<ReportDTO<Double>> reportDTOS = this.rideRepository.getTotalCostPerDay(reportRequestDTO.getFrom(), reportRequestDTO.getTo());
+			return this.filterTotalCostReports(reportDTOS);
+
 		}
+
 		return null;
+
+	}
+
+	@Override
+	public Map<Date, Double> filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS){
+		Map<Date, Double> reports = new HashMap<>();
+
+		for(ReportDTO<Long> report: reportDTOS){
+			Date date = getFormattedDate(report);
+			if(reports.containsKey(date)){
+				reports.computeIfPresent(date, (k, v) -> v + (double)(report.getTotal()));
+			}else{
+				reports.put(date, (double)(report.getTotal()));
+			}
+
+		}
+		return reports;
+	}
+	@Override
+	public Map<Date, Double> filterTotalCostReports(List<ReportDTO<Double>> reportDTOS) {
+		Map<Date, Double> reports = new HashMap<>();
+
+		for(ReportDTO<Double> report: reportDTOS){
+			Date date = getFormattedDate(report);
+			if(reports.containsKey(date)){
+				reports.computeIfPresent(date, (k, v) -> v + report.getTotal());
+			}else{
+				reports.put(date, report.getTotal());
+			}
+
+		}
+		return reports;
+	}
+
+	private Date getFormattedDate(ReportDTO report) {
+		Date date = report.getDate();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+		String dateStr = sdf.format(date);
+		try {
+			return sdf.parse(dateStr);
+		} catch (ParseException e) {
+			throw new RuntimeException(e);
+		}
+
 	}
 
 	@Override

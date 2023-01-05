@@ -148,8 +148,8 @@ insert into Ride_Review (ride_id, review_id) values (3, 6);
 -------------------------------------------------RIDE------------------------------------------------------------
 insert into Ride (id, estimated_time, is_baby_accessible, is_panic_pressed, is_pet_accessible,
                   status, time_of_end, time_of_start, total_price, deduction_id, driver_id, vehicle_type_id)
-values (4, 9, true, false, false,'FINISHED',TO_DATE('13/10/2022 13:10', 'dd/MM/yyyy HH:mm'),
-        TO_DATE('13/10/2022 13:00', 'dd/MM/yyyy HH:mm'), 903, null, 1, 1);
+values (4, 9, true, false, false,'FINISHED',TO_DATE('13/10/2022 14:10', 'dd/MM/yyyy HH:mm'),
+        TO_DATE('20/9/2022 14:00', 'dd/MM/yyyy HH:mm'), 903, null, 1, 1);
 
 insert into Drivers_Rides (driver_id, rides_id) values (1, 4);
 insert into Passenger_Rides (passenger_id, rides_id) values (4, 4);
