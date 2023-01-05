@@ -115,7 +115,7 @@ insert into Ride_Passengers(ride_id, passengers_id) values (2, 4);
 insert into Ride_Passengers(ride_id, passengers_id) values (2, 5);
 insert into Ride_Locations (ride_id, locations_id) values (2, 2);
 insert into Review (id, driver_comment, driver_rating, vehicle_comment, vehicle_rating, passenger_id, ride_id)
-values (3, 'Vozač je bio jako ljubazan.', 4, 'Vozilo je jako uredno', 5, 3, 2);
+values (3, 'Vozač je bio jako ljubazan.', 4, 'Vozilo je jako uredno', 5, 5, 2);
 insert into Review (id, driver_comment, driver_rating, vehicle_comment, vehicle_rating, passenger_id, ride_id)
 values (4, 'Vozač je bio jako ljubazan.', 5, 'Vozilo nije bas čisto', 3, 4, 2);
 insert into Ride_Review (ride_id, review_id) values (2, 3);

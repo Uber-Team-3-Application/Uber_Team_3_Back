@@ -5,6 +5,7 @@ import com.reesen.Reesen.dto.DriverDTO;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Driver.DriverEditBasicInformation;
 import com.reesen.Reesen.model.Driver.DriverEditVehicle;
+import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.model.paginated.Paginated;
 import org.springframework.data.domain.Page;
@@ -49,4 +50,6 @@ public interface IDriverService {
     void updateDriverBasedOnEditRequest(Driver driver, DriverEditBasicInformation driverEditBasicInformation);
 
     Vehicle updateVehicleBasedOnEditRequest(Driver driver, DriverEditVehicle driverEditVehicle);
+
+    Optional<Driver> findDriverWithRide(Ride ride);
 }
