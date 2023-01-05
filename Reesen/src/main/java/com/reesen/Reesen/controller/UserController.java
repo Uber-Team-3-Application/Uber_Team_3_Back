@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @CrossOrigin
@@ -280,17 +281,23 @@ public class UserController {
     }
     @GetMapping("/{id}/resetPassword")
     public ResponseEntity<String> resetPassword(@PathVariable Long id){
-        return new ResponseEntity<>(tokens.generateResetPasswordEmailToken(id), HttpStatus.OK);
-    }
+        ResetPasswordToken resetPasswordToken = new ResetPasswordToken(id);
+        this.userService.saveResetPasswordToken(resetPasswordToken);
+        return new ResponseEntity<>(resetPasswordToken.getCode(), HttpStatus.OK);    }
 
     @PutMapping("/{id}/resetPassword")
     public ResponseEntity resetPassword(@RequestBody ResetPasswordDTO resetPasswordDTO, @PathVariable Long id) {
+        ResetPasswordToken resetPasswordToken = this.userService.findByUserIdAndCode(id, resetPasswordDTO.getCode());
+        if(resetPasswordToken == null)
+            return new ResponseEntity<>("Wrong code!", HttpStatus.BAD_REQUEST);
+        if(resetPasswordToken.getExpirationDate().isBefore(LocalDateTime.now()))
+            return new ResponseEntity<>("Reset token expired!", HttpStatus.BAD_REQUEST);
         this.userService.resetPassword(resetPasswordDTO.getPassword(), id);
         return new ResponseEntity<>("Password successfully changed", HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/email")
-    public ResponseEntity<User> getUserByEmail(@RequestBody String email) {
+    public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
         return new ResponseEntity<>( this.userService.findByEmail(email).get(), HttpStatus.OK);
     }
 

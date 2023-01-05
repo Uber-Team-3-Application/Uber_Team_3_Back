@@ -4,6 +4,7 @@ import com.reesen.Reesen.dto.PassengerDTO;
 import com.reesen.Reesen.dto.RideDTO;
 import com.reesen.Reesen.model.Passenger;
 import com.reesen.Reesen.model.Ride;
+import com.reesen.Reesen.model.VerificationToken;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.service.interfaces.IPassengerService;
 import com.reesen.Reesen.service.interfaces.IRideService;
@@ -18,6 +19,7 @@ import com.reesen.Reesen.security.jwt.JwtTokenUtil;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @CrossOrigin
@@ -47,12 +49,17 @@ public class PassengerController {
 
     @GetMapping(value = "/activate/{activationId}")
     public ResponseEntity<String> activatePassenger(@PathVariable Long activationId){
-        return new ResponseEntity<>(tokens.generateActivationEmailToken(activationId), HttpStatus.OK);
+        VerificationToken verificationToken = new VerificationToken(activationId);
+        this.passengerService.saveVerificationToken(verificationToken);
+        return new ResponseEntity<>(verificationToken.getUrl(), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/activate/account/{passengerId}")
-    public ResponseEntity<String> activatePassengerAccount(@PathVariable Long passengerId){
-        passengerService.activateAccount(passengerId);
+    @GetMapping(value = "/activate/account")
+    public ResponseEntity<String> activatePassengerAccount(@RequestParam String url){
+        VerificationToken verificationToken = this.passengerService.findByUrl(url);
+        if(verificationToken.getExpirationDate().isBefore(LocalDateTime.now()))
+            return new ResponseEntity<>("Activation expired!", HttpStatus.BAD_REQUEST);
+        passengerService.activateAccount(verificationToken.getPassengerId());
         return new ResponseEntity<>("Successful account activation", HttpStatus.OK);
     }
 

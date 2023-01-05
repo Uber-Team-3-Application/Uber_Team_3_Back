@@ -1,6 +1,8 @@
 package com.reesen.Reesen.service;
 
+import com.reesen.Reesen.model.ResetPasswordToken;
 import com.reesen.Reesen.model.User;
+import com.reesen.Reesen.repository.ResetPasswordTokenRepository;
 import com.reesen.Reesen.repository.UserRepository;
 import com.reesen.Reesen.security.SecurityUser;
 import com.reesen.Reesen.security.UserFactory;
@@ -22,13 +24,13 @@ public class UserService implements IUserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
-
+    private final ResetPasswordTokenRepository resetPasswordTokenRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, ResetPasswordTokenRepository resetPasswordTokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.resetPasswordTokenRepository = resetPasswordTokenRepository;
     }
 
     @Override
@@ -90,6 +92,16 @@ public class UserService implements IUserService {
     @Override
     public void resetPassword(String password, Long id) {
         this.userRepository.changePassword(passwordEncoder.encode(password), id);
+    }
+
+    @Override
+    public void saveResetPasswordToken(ResetPasswordToken resetPasswordToken) {
+        this.resetPasswordTokenRepository.save(resetPasswordToken);
+    }
+
+    @Override
+    public ResetPasswordToken findByUserIdAndCode(Long userId, String code) {
+        return this.resetPasswordTokenRepository.findByUserIdAndCode(userId, code);
     }
 
 }
