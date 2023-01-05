@@ -48,8 +48,8 @@ public interface IRideService {
 
 	ReportSumAverageDTO getReport(ReportRequestDTO reportRequestDTO);
 
-	ReportSumAverageDTO filterTotalCostReports(List<ReportDTO<Double>> reportDTOS);
-	ReportSumAverageDTO filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS);
+	ReportSumAverageDTO filterTotalCostReports(List<ReportDTO<Double>> reportDTOS, long totalDays);
+	ReportSumAverageDTO filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS, long totalDays);
 
 
 }

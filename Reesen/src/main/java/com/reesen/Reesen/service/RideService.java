@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class RideService implements IRideService {
@@ -212,20 +213,22 @@ public class RideService implements IRideService {
 
 	@Override
 	public ReportSumAverageDTO getReport(ReportRequestDTO reportRequestDTO) {
-
+		long diffInMillies = Math.abs(reportRequestDTO.getTo().getTime() - reportRequestDTO.getFrom().getTime());
+		long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 		if(reportRequestDTO.getTypeOfReport() == TypeOfReport.RIDES_PER_DAY){
 			List<ReportDTO<Long>> reportDTOS = this.rideRepository.getRidesPerDayReport(reportRequestDTO.getFrom(), reportRequestDTO.getTo());
-			return this.filterTotalRidesReports(reportDTOS);
+
+			return this.filterTotalRidesReports(reportDTOS, diff);
 		}else if(reportRequestDTO.getTypeOfReport() == TypeOfReport.KILOMETERS_PER_DAY){
 			//reportDTOS = this.rideRepository.getKilometersPerDay(reportRequestDTO.getFrom(), reportRequestDTO.getTo());
 			return null;
 		}else if(reportRequestDTO.getTypeOfReport() == TypeOfReport.MONEY_SPENT_PER_DAY){
 			List<ReportDTO<Double>> reportDTOS = this.rideRepository.getTotalCostPerDay(reportRequestDTO.getFrom(), reportRequestDTO.getTo());
-			return this.filterTotalCostReports(reportDTOS);
+			return this.filterTotalCostReports(reportDTOS, diff);
 
 		}else if(reportRequestDTO.getTypeOfReport() == TypeOfReport.MONEY_EARNED_PER_DAY){
 			List<ReportDTO<Double>> reportDTOS = this.rideRepository.getTotalCostPerDay(reportRequestDTO.getFrom(), reportRequestDTO.getTo());
-			return this.filterTotalCostReports(reportDTOS);
+			return this.filterTotalCostReports(reportDTOS, diff);
 
 		}
 
@@ -234,7 +237,7 @@ public class RideService implements IRideService {
 	}
 
 	@Override
-	public ReportSumAverageDTO filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS){
+	public ReportSumAverageDTO filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS, long totalDays){
 		ReportSumAverageDTO reportSumAverageDTO = new ReportSumAverageDTO();
 
 		Map<Date, Double> reports = new HashMap<>();
@@ -251,11 +254,11 @@ public class RideService implements IRideService {
 		}
 		reportSumAverageDTO.setResult(reports);
 		reportSumAverageDTO.setSum(sum);
-		reportSumAverageDTO.setAverage(sum/ reports.size());
+		reportSumAverageDTO.setAverage(sum/ totalDays);
 		return reportSumAverageDTO;
 	}
 	@Override
-	public ReportSumAverageDTO filterTotalCostReports(List<ReportDTO<Double>> reportDTOS) {
+	public ReportSumAverageDTO filterTotalCostReports(List<ReportDTO<Double>> reportDTOS, long totalDays) {
 
 		ReportSumAverageDTO reportSumAverageDTO = new ReportSumAverageDTO();
 		Map<Date, Double> reports = new HashMap<>();
@@ -271,7 +274,7 @@ public class RideService implements IRideService {
 		}
 		reportSumAverageDTO.setResult(reports);
 		reportSumAverageDTO.setSum(sum);
-		reportSumAverageDTO.setAverage(sum/ reports.size());
+		reportSumAverageDTO.setAverage(sum/ totalDays);
 
 		return reportSumAverageDTO;
 	}
