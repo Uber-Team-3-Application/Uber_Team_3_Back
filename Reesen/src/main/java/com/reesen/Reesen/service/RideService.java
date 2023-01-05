@@ -240,7 +240,7 @@ public class RideService implements IRideService {
 	public ReportSumAverageDTO filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS, long totalDays){
 		ReportSumAverageDTO reportSumAverageDTO = new ReportSumAverageDTO();
 
-		Map<Date, Double> reports = new HashMap<>();
+		Map<Date, Double> reports = new LinkedHashMap<>();
 		double sum = 0;
 		for(ReportDTO<Long> report: reportDTOS){
 			Date date = getFormattedDate(report);
@@ -261,7 +261,7 @@ public class RideService implements IRideService {
 	public ReportSumAverageDTO filterTotalCostReports(List<ReportDTO<Double>> reportDTOS, long totalDays) {
 
 		ReportSumAverageDTO reportSumAverageDTO = new ReportSumAverageDTO();
-		Map<Date, Double> reports = new HashMap<>();
+		Map<Date, Double> reports = new LinkedHashMap<>();
 		double sum = 0;
 		for(ReportDTO<Double> report: reportDTOS){
 			Date date = getFormattedDate(report);

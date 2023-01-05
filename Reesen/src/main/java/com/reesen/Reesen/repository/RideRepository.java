@@ -78,12 +78,14 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
     @Query("select new com.reesen.Reesen.dto.ReportDTO(r.timeOfStart, count(r)) " +
             "from Ride r " +
             "where r.timeOfStart BETWEEN :from and :to " +
-            "group by r.timeOfStart")
+            "group by r.timeOfStart " +
+            "order by r.timeOfStart asc")
     List<ReportDTO<Long>> getRidesPerDayReport(Date from, Date to);
 
     @Query("select new com.reesen.Reesen.dto.ReportDTO(r.timeOfStart, sum(r.totalPrice))" +
             " from Ride r " +
             "where r.timeOfStart BETWEEN :from and :to " +
-            "group by r.timeOfStart")
+            "group by r.timeOfStart " +
+            "order by r.timeOfStart asc")
     List<ReportDTO<Double>> getTotalCostPerDay(Date from, Date to);
 }
