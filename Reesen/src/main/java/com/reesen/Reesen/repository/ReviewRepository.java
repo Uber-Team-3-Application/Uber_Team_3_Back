@@ -13,4 +13,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("select r from Review r where r.ride.id=:rideId")
     Set<Review> findAllByRideId(Long rideId);
+
 }

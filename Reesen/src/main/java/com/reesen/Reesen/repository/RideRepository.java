@@ -101,4 +101,9 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
     List<RideLocationWithTimeDTO> getAllRidesWithStartTimeBetween(Date from, Date to);
 
 
+    @Query("select r.driver.id from Ride r where r.id=:id")
+    Long getDriverIdFromRide(Long id);
+
+    @Query("select r.vehicleType.id from Ride r where r.id=:id")
+    Long getVehicleTypeId(Long id);
 }

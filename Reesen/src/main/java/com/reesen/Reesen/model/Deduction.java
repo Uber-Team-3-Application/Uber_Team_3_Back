@@ -1,5 +1,7 @@
 package com.reesen.Reesen.model;
 
+import lombok.*;
+
 import javax.persistence.*;
 
 import java.io.Serializable;
@@ -8,6 +10,11 @@ import java.util.Date;
 
 @Table
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
 public class Deduction implements Serializable {
 
     @Id
@@ -28,9 +35,6 @@ public class Deduction implements Serializable {
     @Column
     private LocalDateTime deductionTime;
 
-    public Deduction() {
-    }
-
     public Deduction(Ride ride, User user, String reason, LocalDateTime deductionTime) {
         this.ride = ride;
         this.user = user;
@@ -38,43 +42,4 @@ public class Deduction implements Serializable {
         this.deductionTime = deductionTime;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Ride getRide() {
-        return ride;
-    }
-
-    public void setRide(Ride ride) {
-        this.ride = ride;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
-
-    public LocalDateTime getDeductionTime() {
-        return deductionTime;
-    }
-
-    public void setDeductionTime(LocalDateTime deductionTime) {
-        this.deductionTime = deductionTime;
-    }
 }

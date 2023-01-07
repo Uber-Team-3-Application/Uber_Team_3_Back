@@ -175,3 +175,6 @@ insert into Review (id, driver_comment, driver_rating, vehicle_comment, vehicle_
 values (8, 'Vozač je bio jako neljubazan.', 2, 'Vozilo je jako prljavo', 3, 4, 5);
 insert into Ride_Review (ride_id, review_id) values (5, 8);
 -- ---------------------------------------------------------------------------------------------------------------
+
+insert into Panic(time_of_press, reason, ride_id, user_id)
+        values(TO_DATE('15/11/2022 09:10', 'dd/MM/yyyy HH:mm'), 'Rider went of course', 5, 3);

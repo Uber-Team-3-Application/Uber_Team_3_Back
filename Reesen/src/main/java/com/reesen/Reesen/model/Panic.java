@@ -1,6 +1,8 @@
 package com.reesen.Reesen.model;
 
 
+import lombok.*;
+
 import javax.persistence.*;
 
 import java.io.Serializable;
@@ -8,6 +10,11 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode
+@AllArgsConstructor
 public class Panic implements Serializable {
 
     @Id
@@ -15,7 +22,7 @@ public class Panic implements Serializable {
     private Long id;
 
     @Column(nullable = false)
-    private LocalDateTime timeOfPress;
+    private Date timeOfPress;
 
     @Column(nullable = false)
     private String reason;
@@ -28,53 +35,12 @@ public class Panic implements Serializable {
     @JoinColumn(name = "userId")
     private User user;
 
-    public Panic() {
-    }
 
-    public Panic(LocalDateTime timeOfPress, String reason, Ride ride, User user) {
+    public Panic(Date timeOfPress, String reason, Ride ride, User user) {
         this.timeOfPress = timeOfPress;
         this.reason = reason;
         this.ride = ride;
         this.user = user;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public LocalDateTime getTimeOfPress() {
-        return timeOfPress;
-    }
-
-    public void setTimeOfPress(LocalDateTime timeOfPress) {
-        this.timeOfPress = timeOfPress;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
-
-    public Ride getRide() {
-        return ride;
-    }
-
-    public void setRide(Ride ride) {
-        this.ride = ride;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
 }
