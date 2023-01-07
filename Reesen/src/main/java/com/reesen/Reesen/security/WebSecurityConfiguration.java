@@ -24,6 +24,9 @@ public class WebSecurityConfiguration {
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
 
+    @Autowired
+    private JwtAuthenticationEntryPoint entryPoint;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.headers().frameOptions().disable();
@@ -33,7 +36,9 @@ public class WebSecurityConfiguration {
                          .antMatchers("*/login").permitAll()// statički html i login mogu svi da pozovu
                      // sav pristup API-ju mora da bude autentikovan
                 .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // ne koristimo HttpSession i kukije
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                                 .and()
+                                         .exceptionHandling().authenticationEntryPoint(entryPoint);
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // JWT procesiramo pre autentikacije
 
         return http.build();
