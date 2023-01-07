@@ -1,6 +1,7 @@
 package com.reesen.Reesen.service.interfaces;
 import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.*;
+import com.reesen.Reesen.model.Location;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.Route;
 import org.springframework.data.domain.Page;
@@ -48,8 +49,10 @@ public interface IRideService {
 
 	ReportSumAverageDTO getReport(ReportRequestDTO reportRequestDTO);
 
-	ReportSumAverageDTO filterTotalCostReports(List<ReportDTO<Double>> reportDTOS, long totalDays);
+	ReportSumAverageDTO filterReports(List<ReportDTO<Double>> reportDTOS, long totalDays);
 	ReportSumAverageDTO filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS, long totalDays);
 
+
+    double calculateDistance(Location departure, Location destination);
 
 }

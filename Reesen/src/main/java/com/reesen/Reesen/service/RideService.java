@@ -220,20 +220,40 @@ public class RideService implements IRideService {
 
 			return this.filterTotalRidesReports(reportDTOS, diff);
 		}else if(reportRequestDTO.getTypeOfReport() == TypeOfReport.KILOMETERS_PER_DAY){
-			//reportDTOS = this.rideRepository.getKilometersPerDay(reportRequestDTO.getFrom(), reportRequestDTO.getTo());
-			return null;
+			List<RideLocationWithTimeDTO> rideLocationWithTimeDTO =
+					this.rideRepository.getAllRidesWithStartTimeBetween(reportRequestDTO.getFrom(),
+							reportRequestDTO.getTo());
+			List<ReportDTO<Double>> reportDTOS = new ArrayList<>();
+			FilterRideLocations(rideLocationWithTimeDTO, reportDTOS);
+			return this.filterReports(reportDTOS, diff);
+
 		}else if(reportRequestDTO.getTypeOfReport() == TypeOfReport.MONEY_SPENT_PER_DAY){
 			List<ReportDTO<Double>> reportDTOS = this.rideRepository.getTotalCostPerDay(reportRequestDTO.getFrom(), reportRequestDTO.getTo());
-			return this.filterTotalCostReports(reportDTOS, diff);
+			return this.filterReports(reportDTOS, diff);
 
 		}else if(reportRequestDTO.getTypeOfReport() == TypeOfReport.MONEY_EARNED_PER_DAY){
 			List<ReportDTO<Double>> reportDTOS = this.rideRepository.getTotalCostPerDay(reportRequestDTO.getFrom(), reportRequestDTO.getTo());
-			return this.filterTotalCostReports(reportDTOS, diff);
+			return this.filterReports(reportDTOS, diff);
 
 		}
 
 		return null;
 
+	}
+
+	private void FilterRideLocations(List<RideLocationWithTimeDTO> rideLocationWithTimeDTO, List<ReportDTO<Double>> reportDTOS) {
+		for(RideLocationWithTimeDTO r: rideLocationWithTimeDTO){
+			Set<Route> routes = this.rideRepository.getLocationsByRide(r.getRideId());
+			for(Route route: routes){
+				route.setDeparture(this.routeRepository.getDepartureByRoute(route).get());
+				route.setDestination(this.routeRepository.getDestinationByRoute(route).get());
+			}
+			r.setLocations(routes);
+			List<Route> routesListed = r.getLocations().stream().toList();
+			double distance = this.calculateDistance(routesListed.get(0).getDeparture(),
+													routesListed.get(routesListed.size() - 1).getDestination());
+			reportDTOS.add(new ReportDTO<>(r.getStartTime(), distance));
+		}
 	}
 
 	@Override
@@ -257,8 +277,21 @@ public class RideService implements IRideService {
 		reportSumAverageDTO.setAverage(sum/ totalDays);
 		return reportSumAverageDTO;
 	}
+
 	@Override
-	public ReportSumAverageDTO filterTotalCostReports(List<ReportDTO<Double>> reportDTOS, long totalDays) {
+	public double calculateDistance(Location departure, Location destination) {
+		double theta = departure.getLongitude() - destination.getLongitude();
+		double dist = Math.sin(Math.toRadians(departure.getLatitude())) * Math.sin(Math.toRadians(destination.getLatitude()))
+				+ Math.cos(Math.toRadians(departure.getLatitude())) * Math.cos(Math.toRadians(destination.getLatitude())) * Math.cos(Math.toRadians(theta));
+		dist = Math.acos(dist);
+		dist = Math.toDegrees(dist);
+		dist = dist * 60 * 1.1515;
+		dist = dist * 1.609344;
+		return dist;
+	}
+
+	@Override
+	public ReportSumAverageDTO filterReports(List<ReportDTO<Double>> reportDTOS, long totalDays) {
 
 		ReportSumAverageDTO reportSumAverageDTO = new ReportSumAverageDTO();
 		Map<Date, Double> reports = new LinkedHashMap<>();

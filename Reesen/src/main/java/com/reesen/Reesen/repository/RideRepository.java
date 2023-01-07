@@ -3,6 +3,8 @@ package com.reesen.Reesen.repository;
 import com.reesen.Reesen.Enums.RideStatus;
 
 import com.reesen.Reesen.dto.ReportDTO;
+import com.reesen.Reesen.dto.RideLocationWithTimeDTO;
+import com.reesen.Reesen.model.Location;
 import com.reesen.Reesen.model.Route;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +20,7 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
 
     @Query("select r.locations from Ride r where r.id = :id")
     Set<Route> getLocationsByRide(Long id);
+
 
     Optional<Ride> findRideByDriverIdAndStatus(Long driverId, RideStatus status);
     Page<Ride> findAllByDriverId(Long driverId, Pageable page);
@@ -88,4 +91,14 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "group by r.timeOfStart " +
             "order by r.timeOfStart asc")
     List<ReportDTO<Double>> getTotalCostPerDay(Date from, Date to);
+
+
+    @Query("select new " +
+            "com.reesen.Reesen.dto.RideLocationWithTimeDTO(r.id, r.timeOfStart)" +
+            " from Ride r " +
+            "where r.timeOfStart BETWEEN :from and :to " +
+            "order by r.timeOfStart asc")
+    List<RideLocationWithTimeDTO> getAllRidesWithStartTimeBetween(Date from, Date to);
+
+
 }
