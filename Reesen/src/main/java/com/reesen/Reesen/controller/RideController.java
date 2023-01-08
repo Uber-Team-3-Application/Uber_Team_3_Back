@@ -1,5 +1,6 @@
 package com.reesen.Reesen.controller;
 
+import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Ride;
@@ -145,10 +146,15 @@ public class RideController {
     }
 
     @PostMapping(value = "/rides-report")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
     public ResponseEntity<ReportSumAverageDTO> getReport(@RequestBody ReportRequestDTO reportRequestDTO){
 
-        ReportSumAverageDTO reportDTO = this.rideService.getReport(reportRequestDTO);
+        ReportSumAverageDTO reportDTO = null;
+        if (reportRequestDTO.getRole().equals(Role.ADMIN))
+            reportDTO = this.rideService.getReport(reportRequestDTO);
+        else if (reportRequestDTO.getRole().equals(Role.DRIVER))
+            reportDTO = this.rideService.getReportForDriver(reportRequestDTO);
+
         if(reportDTO == null) return new ResponseEntity("Bad request!", HttpStatus.BAD_REQUEST);
 
         return new ResponseEntity<>(reportDTO, HttpStatus.OK);
