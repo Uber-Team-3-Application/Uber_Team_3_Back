@@ -1,6 +1,7 @@
 package com.reesen.Reesen.dto;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import com.reesen.Reesen.Enums.RideStatus;
@@ -36,13 +37,23 @@ public class RideDTO {
 		this.babyTransport = ride.isBabyAccessible();
 		this.petTransport = ride.isPetAccessible();
 		this.status = ride.getStatus();
+		this.driver = new UserDTO(ride.getDriver().getId(), ride.getDriver().getEmail());
 		setPassengers(ride);
 		setVehicleType(ride);
+		setLocations(ride);
 		this.rejection = new DeductionDTO(ride.getDeduction().getReason(), ride.getDeduction().getDeductionTime());
+	}
+
+	private void setLocations(Ride ride) {
+		locations = new HashSet<>();
+		for (Route route : ride.getLocations()) {
+			locations.add(new RouteDTO(route));
+		}
 	}
 
 
 	private void setPassengers(Ride ride) {
+		passengers = new HashSet<>();
 		for (Passenger passenger : ride.getPassengers()) {
 			passengers.add(new UserDTO(passenger.getId(), passenger.getEmail()));
 		}
