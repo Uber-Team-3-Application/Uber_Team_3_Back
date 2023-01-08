@@ -25,4 +25,5 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
 
     @Query("select size(d.rides) from Driver d where d.id=:id")
     int countTotalNumberOfRides(Long id);
+
 }

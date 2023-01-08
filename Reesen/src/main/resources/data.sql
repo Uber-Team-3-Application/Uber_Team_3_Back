@@ -84,9 +84,10 @@ values ('U3dhZ2dlciByb2Nrcw==', 'Saobracajna Dozvola', 2);
 
 -------------------------------------------------RIDE------------------------------------------------------------
 insert into Ride (id, estimated_time, is_baby_accessible, is_panic_pressed, is_pet_accessible,
-                  status, time_of_end, time_of_start, total_price, deduction_id, driver_id, vehicle_type_id)
-values (1, 48, true, false, false,'FINISHED',TO_DATE('26/7/2022 12:34', 'dd/MM/yyyy HH:mm'),
-        TO_DATE('26/7/2022 11:40', 'dd/MM/yyyy HH:mm'), 4042, null, 1, 1);
+                  status, time_of_start, time_of_end, total_price, deduction_id, driver_id, vehicle_type_id)
+values (1, 48, true, false, false,'FINISHED',TO_DATE('26/7/2022 11:42', 'dd/MM/yyyy HH:mm'),
+        TO_DATE('26/7/2022 12:34', 'dd/MM/yyyy HH:mm'), 4042, null, 1, 1);
+
 
 insert into Drivers_Rides (driver_id, rides_id) values (1, 1);
 insert into Passenger_Rides (passenger_id, rides_id) values (3, 1);
@@ -178,3 +179,99 @@ insert into Ride_Review (ride_id, review_id) values (5, 8);
 
 insert into Panic(time_of_press, reason, ride_id, user_id)
         values(TO_DATE('15/11/2022 09:10', 'dd/MM/yyyy HH:mm'), 'Rider went of course', 5, 3);
+
+--- nove voznje
+-------------------------------------------------RIDE------------------------------------------------------------
+insert into Ride (id, estimated_time, is_baby_accessible, is_panic_pressed, is_pet_accessible,
+                  status, time_of_end, time_of_start, total_price, deduction_id, driver_id, vehicle_type_id)
+values (6, 9, false, false, true,'FINISHED',TO_DATE('15/08/2022 09:10', 'dd/MM/yyyy HH:mm'),
+        TO_DATE('15/08/2022 08:50', 'dd/MM/yyyy HH:mm'), 903, null, 1, 1);
+
+insert into Drivers_Rides (driver_id, rides_id) values (1, 6);
+insert into Passenger_Rides (passenger_id, rides_id) values (5, 6);
+insert into Ride_Passengers(ride_id, passengers_id) values (6, 5);
+insert into Ride_Locations (ride_id, locations_id) values (6, 4); -- ok
+insert into Review (id, driver_comment, driver_rating, vehicle_comment, vehicle_rating, passenger_id, ride_id)
+values (9, 'Vozač je bio jako neljubazan.', 2, 'Vozilo je jako prljavo', 3, 5, 6);
+insert into Ride_Review (ride_id, review_id) values (6, 9);
+-- ---------------------------------------------------------------------------------------------------------------
+
+
+-------------------------------------------------RIDE------------------------------------------------------------
+insert into Ride (id, estimated_time, is_baby_accessible, is_panic_pressed, is_pet_accessible,
+                  status, time_of_start, time_of_end, total_price, deduction_id, driver_id, vehicle_type_id)
+values (7, 9, false, false, true,'FINISHED',TO_DATE('12/08/2022 13:10', 'dd/MM/yyyy HH:mm'),
+        TO_DATE('12/08/2022 13:50', 'dd/MM/yyyy HH:mm'), 903, null, 1, 1);
+
+insert into Drivers_Rides (driver_id, rides_id) values (1, 7);
+insert into Passenger_Rides (passenger_id, rides_id) values (3, 7);
+insert into Ride_Passengers(ride_id, passengers_id) values (7, 3);
+insert into Ride_Locations (ride_id, locations_id) values (7, 4); -- ok
+insert into Review (id, driver_comment, driver_rating, vehicle_comment, vehicle_rating, passenger_id, ride_id)
+values (10, 'Vozač je bio jako neljubazan.', 2, 'Vozilo je jako prljavo', 3, 5, 7);
+insert into Ride_Review (ride_id, review_id) values (7, 10);
+-- ---------------------------------------------------------------------------------------------------------------
+
+
+
+-------------------------------------------------RIDE------------------------------------------------------------
+insert into Ride (id, estimated_time, is_baby_accessible, is_panic_pressed, is_pet_accessible,
+                  status, time_of_start, time_of_end, total_price, deduction_id, driver_id, vehicle_type_id)
+values (8, 16, false , false, false,'FINISHED',TO_DATE('11/11/2022 17:22', 'dd/MM/yyyy HH:mm'),
+        TO_DATE('11/11/2022 18:00', 'dd/MM/yyyy HH:mm'), 1669, null, 1, 1);
+
+insert into Drivers_Rides (driver_id, rides_id) values (1, 8);
+insert into Passenger_Rides (passenger_id, rides_id) values (3, 8);
+insert into Passenger_Rides (passenger_id, rides_id) values (5, 8);
+insert into Ride_Passengers(ride_id, passengers_id) values (8, 3);
+insert into Ride_Passengers(ride_id, passengers_id) values (8, 5);
+insert into Ride_Locations (ride_id, locations_id) values (8, 3);
+insert into Review (id, driver_comment, driver_rating, vehicle_comment, vehicle_rating, passenger_id, ride_id)
+values (11, 'Vozač je bio jako ljubazan.', 5, 'Vozilo je jako uredno', 5, 3, 8);
+insert into Review (id, driver_comment, driver_rating, vehicle_comment, vehicle_rating, passenger_id, ride_id)
+values (12, 'Vozač je bio jako ljubazan.', 5, 'Vozilo nije bas čisto', 3, 5, 8);
+insert into Ride_Review (ride_id, review_id) values (8, 11);
+insert into Ride_Review (ride_id, review_id) values (8, 12);
+---------------------------------------------------------------------------------------------------------------
+
+
+
+-------------------------------------------------RIDE------------------------------------------------------------
+insert into Ride (id, estimated_time, is_baby_accessible, is_panic_pressed, is_pet_accessible,
+                  status, time_of_start, time_of_end, total_price, deduction_id, driver_id, vehicle_type_id)
+values (9, 16, false , false, false,'FINISHED',TO_DATE('06/12/2022 14:22', 'dd/MM/yyyy HH:mm'),
+        TO_DATE('06/12/2022 15:00', 'dd/MM/yyyy HH:mm'), 1669, null, 1, 1);
+
+insert into Drivers_Rides (driver_id, rides_id) values (1, 9);
+insert into Passenger_Rides (passenger_id, rides_id) values (3, 9);
+insert into Passenger_Rides (passenger_id, rides_id) values (5, 9);
+insert into Ride_Passengers(ride_id, passengers_id) values (9, 3);
+insert into Ride_Passengers(ride_id, passengers_id) values (9, 5);
+insert into Ride_Locations (ride_id, locations_id) values (9, 3);
+insert into Review (id, driver_comment, driver_rating, vehicle_comment, vehicle_rating, passenger_id, ride_id)
+values (13, 'Vozač je bio jako ljubazan.', 5, 'Vozilo je jako uredno', 5, 3, 9);
+insert into Review (id, driver_comment, driver_rating, vehicle_comment, vehicle_rating, passenger_id, ride_id)
+values (14, 'Vozač je bio jako ljubazan.', 5, 'Vozilo nije bas čisto', 3, 5, 9);
+insert into Ride_Review (ride_id, review_id) values (9, 13);
+insert into Ride_Review (ride_id, review_id) values (9, 14);
+---------------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------RIDE------------------------------------------------------------
+insert into Ride (id, estimated_time, is_baby_accessible, is_panic_pressed, is_pet_accessible,
+                  status, time_of_end, time_of_start, total_price, deduction_id, driver_id, vehicle_type_id)
+values (10, 16, true, true, false,'FINISHED',TO_DATE('05/06/2022 15:00', 'dd/MM/yyyy HH:mm'),
+        TO_DATE('05/06/2022 14:22', 'dd/MM/yyyy HH:mm'), 1669, null, 1, 1);
+
+insert into Drivers_Rides (driver_id, rides_id) values (1, 10);
+insert into Passenger_Rides (passenger_id, rides_id) values (3, 10);
+insert into Passenger_Rides (passenger_id, rides_id) values (5, 10);
+insert into Ride_Passengers(ride_id, passengers_id) values (10, 3);
+insert into Ride_Passengers(ride_id, passengers_id) values (10, 5);
+insert into Ride_Locations (ride_id, locations_id) values (10, 3);
+insert into Review (id, driver_comment, driver_rating, vehicle_comment, vehicle_rating, passenger_id, ride_id)
+values (15, 'Vozač nije bio ljubazan.', 2, 'Vozilo je  neuredno', 2, 3, 10);
+insert into Review (id, driver_comment, driver_rating, vehicle_comment, vehicle_rating, passenger_id, ride_id)
+values (16, 'Vozač je bio jako neljubazan.', 1, 'Vozilo nije bas čisto', 3, 5, 10);
+insert into Ride_Review (ride_id, review_id) values (10, 15);
+insert into Ride_Review (ride_id, review_id) values (10, 16 );
+---------------------------------------------------------------------------------------------------------------
