@@ -29,6 +29,7 @@ public interface IDriverService {
     Driver getDriverFromDriverDTO(Long id, DriverDTO driverDTO);
 
     Vehicle getVehicle(Long driverId);
+    Driver findDriverByRidesContaining(Ride ride);
 
     int getTotalEditRequests();
 
