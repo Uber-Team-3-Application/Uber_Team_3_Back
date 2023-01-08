@@ -15,7 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -32,6 +34,7 @@ public class DriverController {
     private final IPassengerService passengerService;
     private final IDeductionService deductionService;
     private final IRouteService routeService;
+    private final IReviewService reviewService;
 
     @Autowired
     public DriverController(IDriverService driverService,
@@ -42,7 +45,8 @@ public class DriverController {
                             IRideService rideService,
                             IPassengerService passengerService,
                             IDeductionService deductionService,
-                            IRouteService routeService) {
+                            IRouteService routeService,
+                            IReviewService reviewService) {
         this.driverService = driverService;
         this.documentService = documentService;
         this.vehicleService = vehicleService;
@@ -52,6 +56,7 @@ public class DriverController {
         this.passengerService = passengerService;
         this.deductionService = deductionService;
         this.routeService = routeService;
+        this.reviewService = reviewService;
     }
 
 
@@ -189,7 +194,6 @@ public class DriverController {
             driver.get().setActive(isActive);
             this.driverService.save(driver.get());
         }
-        System.out.println(driverId);
         return new ResponseEntity<>("Driver Activity updated!", HttpStatus.OK);
     }
 
@@ -227,7 +231,6 @@ public class DriverController {
         Optional<Driver> driver = this.driverService.findOne(driverId);
         if (driver.isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
 
-        System.out.println(vehicleDTO.getVehicleType());
         Location location = this.locationService.getLocation(vehicleDTO.getCurrentLocation());
         Vehicle vehicle = this.vehicleService.createVehicle(vehicleDTO, location);
         vehicle.setDriver(driver.get());
@@ -386,7 +389,7 @@ public class DriverController {
      *
      * **/
     @GetMapping(value = "/{id}/ride")
-    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
+//    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
     public ResponseEntity<Paginated<DriverRideDTO>> getRides(
             @PathVariable("id") Long driverId,
             Pageable page,
@@ -403,17 +406,18 @@ public class DriverController {
         Date dateTo = null;
 
         if (from != null || to != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-            if  (from != null)
-                dateFrom = java.sql.Timestamp.valueOf(LocalDateTime.parse(from, formatter));
-            if (to != null)
-                dateTo = java.sql.Timestamp.valueOf(LocalDateTime.parse(to, formatter));
+            if  (from != null) {
+                LocalDate date = LocalDate.parse(from, DateTimeFormatter.ISO_DATE);
+                dateFrom = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            }
+            if (to != null) {
+                LocalDate date = LocalDate.parse(to, DateTimeFormatter.ISO_DATE);
+                dateTo = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            }
         }
 
         Page<Ride> driversRides = this.rideService.findAll(driverId, page, dateFrom, dateTo);
-        for (Ride ri : driversRides) {
-            System.out.println(ri.getId());
-        }
+
         LinkedHashSet<DriverRideDTO> rideDTOs = new LinkedHashSet<>();
 
 
@@ -426,6 +430,7 @@ public class DriverController {
             for (Route location : locations) {
                 location.setDestination(this.routeService.getDestinationByRoute(location).get());
                 location.setDeparture(this.routeService.getDepartureByRoute(location).get());
+
             }
 
             ride.setLocations(locations);
