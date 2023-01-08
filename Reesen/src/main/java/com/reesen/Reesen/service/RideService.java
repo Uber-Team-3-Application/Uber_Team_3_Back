@@ -95,7 +95,7 @@ public class RideService implements IRideService {
 
 	@Override
 	public Ride panicRide(Ride ride, String reason) {
-		this.panicRepository.save(new Panic(LocalDateTime.now(), reason, ride, ride.getDriver()));
+		this.panicRepository.save(new Panic(new Date(), reason, ride, ride.getDriver()));
 		ride.setStatus(RideStatus.FINISHED);
 		return ride;
 	}
@@ -171,8 +171,8 @@ public class RideService implements IRideService {
 	}
 
 	@Override
-	public Set<Route> getLocationsByRide(Long ride_id) {
-		return this.rideRepository.getLocationsByRide(ride_id);
+	public Set<Route> getLocationsByRide(Long rideId) {
+		return this.rideRepository.getLocationsByRide(rideId);
 	}
 
 	@Override
@@ -180,7 +180,6 @@ public class RideService implements IRideService {
 
 		ride.setPassengers(passengerRepository.findPassengersByRidesContaining(ride));
 
-		// TODO: get reviews and then set users to each review
 		Set<Review> reviews = this.reviewRepository.findAllByRideId(ride.getId());
 		for(Review review:reviews){
 			review.setPassenger(this.passengerRepository.findbyReviewId(review.getId()));

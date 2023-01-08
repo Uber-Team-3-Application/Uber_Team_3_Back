@@ -32,7 +32,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         if(request.getRequestURL().toString().contains("/api")){
             String requestTokenHeader = request.getHeader("X-Auth-Token");
-            String username = null;
+            String refreshToken = request.getHeader("refreshToken");
             String jwtToken = null;
             if(requestTokenHeader != null){
                 try {
@@ -42,12 +42,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 }catch (IllegalArgumentException e) {
                     System.out.println("Unable to get JWT Token.");
                 } catch (ExpiredJwtException e) {
+                    try {
+                        authenticateToken(request, refreshToken);
+                    }catch (ExpiredJwtException j){
+                        System.out.println("Refresh token has expired.");
+                    }
                     System.out.println("JWT Token has expired.");
                 } catch (io.jsonwebtoken.MalformedJwtException e) {
                     System.out.println("Bad JWT Token.");
                 }
             }else{
-                String refreshToken = request.getHeader("refreshToken");
                 if(refreshToken != null){
                     allowForRefreshToken(request, refreshToken);
                 }else{

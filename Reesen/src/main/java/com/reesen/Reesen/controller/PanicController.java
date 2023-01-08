@@ -38,7 +38,7 @@ public class PanicController {
         Set<PanicDTO> panicDTOs = new HashSet<>();
         for(Panic panic:panics) panicDTOs.add(new PanicDTO(panic));
 
-        return new ResponseEntity<>(new Paginated<PanicDTO>(panicDTOs.size(), panicDTOs), HttpStatus.OK);
+        return new ResponseEntity<>(new Paginated<>(panicDTOs.size(), panicDTOs), HttpStatus.OK);
 
     }
 
