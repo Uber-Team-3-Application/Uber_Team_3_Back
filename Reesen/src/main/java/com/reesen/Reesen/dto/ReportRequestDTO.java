@@ -14,6 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class ReportRequestDTO {
 
+    private Long driverId;
     private Role role;
     private TypeOfReport typeOfReport;
     private Date from;
@@ -25,5 +26,6 @@ public class ReportRequestDTO {
         this.from = from;
         this.to = to;
     }
+
 
 }

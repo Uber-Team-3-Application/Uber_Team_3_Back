@@ -97,7 +97,8 @@ public class ReviewController {
 
         Ride ride = rideService.findOne(rideId).get();
         HashSet<RideReviewDTO> reviews = new HashSet<>();
-        for (Review review : ride.getReview()) {
+        for (Review review : reviewService.findReviewsByRide(ride)) {
+            review.setPassenger(this.reviewService.findPassengerByReviewId(review.getId()).get());
             ReviewWithPassengerDTO vehicleReview = new ReviewWithPassengerDTO(review, false);
             ReviewWithPassengerDTO driverReview = new ReviewWithPassengerDTO(review, true);
             reviews.add(new RideReviewDTO(vehicleReview, driverReview));

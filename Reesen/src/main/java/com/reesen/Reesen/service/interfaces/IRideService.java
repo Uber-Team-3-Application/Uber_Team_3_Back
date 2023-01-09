@@ -49,6 +49,8 @@ public interface IRideService {
 
 	ReportSumAverageDTO getReport(ReportRequestDTO reportRequestDTO);
 
+	ReportSumAverageDTO getReportForDriver(ReportRequestDTO reportRequestDTO);
+
 	ReportSumAverageDTO filterReports(List<ReportDTO<Double>> reportDTOS, long totalDays);
 	ReportSumAverageDTO filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS, long totalDays);
 
