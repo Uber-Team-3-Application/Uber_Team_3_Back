@@ -153,11 +153,13 @@ public class DriverController {
             @RequestBody ChangeWorkingHoursDTO workingHoursDTO,
             @PathVariable("working-hour-id") Long workingHourId
     ) {
-        if (workingHourId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Optional<WorkingHours> workingHours = this.workingHoursService.findOne(workingHourId);
         if (workingHours.isEmpty()) return new ResponseEntity("Working hour does not exist", HttpStatus.NOT_FOUND);
-
+        String workingHoursValid = this.workingHoursService.validateWorkingHours(workingHours.get(), workingHoursDTO);
+        if(!workingHoursValid.equalsIgnoreCase("valid")){
+            return new ResponseEntity(workingHoursValid, HttpStatus.BAD_REQUEST);
+        }
         WorkingHours updatedWH = this.workingHoursService.editWorkingHours(workingHours.get(), workingHoursDTO);
         this.workingHoursService.save(updatedWH);
 
@@ -342,24 +344,20 @@ public class DriverController {
     public ResponseEntity<Paginated<WorkingHoursDTO>> getWorkingHours(
             Pageable page,
             @PathVariable("id") Long driverId,
-            @RequestParam("from") String from,
-            @RequestParam("to") String to
+            @RequestParam("from") LocalDateTime from,
+            @RequestParam("to") LocalDateTime to
     ) {
         Optional<Driver> driver = this.driverService.findOne(driverId);
         if (driver.isEmpty()) return new ResponseEntity("Driver does not exist", HttpStatus.NOT_FOUND);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        LocalDateTime dateFrom = LocalDateTime.parse(from, formatter);
-        LocalDateTime dateTo = LocalDateTime.parse(to, formatter);
-
         Page<WorkingHours> workingHours;
-        workingHours = this.workingHoursService.findAll(driverId, page, dateFrom, dateTo);
+        workingHours = this.workingHoursService.findAll(driverId, page, from, to);
 
         Set<WorkingHoursDTO> workingHoursDTOS = new HashSet<>();
         for (WorkingHours workingHour : workingHours) {
             workingHoursDTOS.add(new WorkingHoursDTO(workingHour));
         }
-        return new ResponseEntity<>(new Paginated<WorkingHoursDTO>
+        return new ResponseEntity<>(new Paginated<>
                 (workingHours.getNumberOfElements(), workingHoursDTOS),
                 HttpStatus.OK);
     }

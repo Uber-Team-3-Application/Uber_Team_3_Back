@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
@@ -63,6 +64,26 @@ public class WorkingHoursService implements IWorkingHoursService {
                                                                                                             to,
                                                                                                             page);
 
+    }
+
+    @Override
+    public String validateWorkingHours(WorkingHours workingHours, ChangeWorkingHoursDTO workingHoursDTO) {
+        if(workingHoursDTO.getEnd().isAfter(LocalDateTime.now())){
+            return "Working hour end is in future";
+        }
+        if(workingHoursDTO.getEnd().isBefore(workingHours.getStartTime())){
+            return "End time is before start time.";
+        }
+        if(workingHours.getStartTime().equals(workingHoursDTO.getEnd())){
+            return "End time is the same as start time."
+        }
+        return "VALID";
+
+    }
+
+    @Override
+    public Duration getTotalHoursWorkedInLastDay(Long driverId) {
+        return null;
     }
 
 }
