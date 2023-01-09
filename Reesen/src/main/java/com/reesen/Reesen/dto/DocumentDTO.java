@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -19,6 +20,8 @@ public class DocumentDTO {
     @Length(max = 30, message = "{maxLength}")
     @NotBlank(message = "{format}")
     private String name;
+
+    @NotBlank(message = "{format}")
     private String documentImage;
     private Long driverId;
 

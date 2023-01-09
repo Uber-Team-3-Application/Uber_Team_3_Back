@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +34,17 @@ public class JwtTokenUtil {
         return getClaim(token, Claims::getSubject);
     }
 
+    public ArrayList<HashMap<String, String>> getRole(String token){
+        Map<String, Object> claims;
+        claims = getAllClaims(token);
+        return (ArrayList<HashMap<String, String>>) claims.get("role");
+    }
+
+    public Integer getId(String token){
+        Map<String, Object> claims;
+        claims = getAllClaims(token);
+        return (Integer) claims.get("id");
+    }
     public Date getExpirationDate(String token){
         return getClaim(token, Claims::getExpiration);
     }
