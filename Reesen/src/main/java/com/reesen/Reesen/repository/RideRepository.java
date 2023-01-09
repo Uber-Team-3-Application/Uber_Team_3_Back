@@ -4,6 +4,7 @@ import com.reesen.Reesen.Enums.RideStatus;
 
 import com.reesen.Reesen.dto.ReportDTO;
 import com.reesen.Reesen.dto.RideLocationWithTimeDTO;
+import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Location;
 import com.reesen.Reesen.model.Route;
 import org.springframework.data.domain.Page;
@@ -85,12 +86,39 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "order by r.timeOfStart asc")
     List<ReportDTO<Long>> getRidesPerDayReport(Date from, Date to);
 
+    @Query("select new com.reesen.Reesen.dto.ReportDTO(r.timeOfStart, count(r)) " +
+            "from Ride r " +
+            "where r.driver.id=:driverId and " +
+            "r.timeOfStart BETWEEN :from and :to " +
+            "group by r.timeOfStart " +
+            "order by r.timeOfStart asc")
+    List<ReportDTO<Long>> getRidesPerDayForSpecificDriver(Date from, Date to, Long driverId);
+
+
+
     @Query("select new com.reesen.Reesen.dto.ReportDTO(r.timeOfStart, sum(r.totalPrice))" +
             " from Ride r " +
             "where r.timeOfStart BETWEEN :from and :to " +
             "group by r.timeOfStart " +
             "order by r.timeOfStart asc")
     List<ReportDTO<Double>> getTotalCostPerDay(Date from, Date to);
+
+    @Query("select new com.reesen.Reesen.dto.ReportDTO(r.timeOfStart, sum(r.totalPrice))" +
+            " from Ride r " +
+            " where r.driver.id=:driverId and " +
+            "r.timeOfStart BETWEEN :from and :to " +
+            "group by r.timeOfStart " +
+            "order by r.timeOfStart asc")
+    List<ReportDTO<Double>> getTotalCostPerDayForDriver(Date from, Date to, Long driverId);
+
+
+    @Query("select new com.reesen.Reesen.dto.ReportDTO(r.timeOfStart, sum(r.totalPrice))" +
+            " from Ride r " +
+            "where r.driver.id=:driverId and " +
+            "r.timeOfStart BETWEEN :from and :to " +
+            "group by r.timeOfStart " +
+            "order by r.timeOfStart asc")
+    List<ReportDTO<Double>> getTotalCostPerDayForSpecificDriver(Date from, Date to, Long driverId);
 
 
     @Query("select new " +
@@ -99,6 +127,14 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "where r.timeOfStart BETWEEN :from and :to " +
             "order by r.timeOfStart asc")
     List<RideLocationWithTimeDTO> getAllRidesWithStartTimeBetween(Date from, Date to);
+
+    @Query("select new " +
+            "com.reesen.Reesen.dto.RideLocationWithTimeDTO(r.id, r.timeOfStart)" +
+            " from Ride r " +
+            "where r.driver.id=:driverId and " +
+            "r.timeOfStart BETWEEN :from and :to " +
+            "order by r.timeOfStart asc")
+    List<RideLocationWithTimeDTO> getRidesWithStartTimeBetweenForSpecificDriver(Date from, Date to, Long driverId);
 
 
     @Query("select r.driver.id from Ride r where r.id=:id")

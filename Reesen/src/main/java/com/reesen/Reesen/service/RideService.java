@@ -240,6 +240,43 @@ public class RideService implements IRideService {
 
 	}
 
+	@Override
+	public ReportSumAverageDTO getReportForDriver(ReportRequestDTO reportRequestDTO) {
+		long diffInMillies = Math.abs(reportRequestDTO.getTo().getTime() - reportRequestDTO.getFrom().getTime());
+		long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+		long driverId = reportRequestDTO.getDriverId();
+
+		if(reportRequestDTO.getTypeOfReport() == TypeOfReport.RIDES_PER_DAY){
+			List<ReportDTO<Long>> reportDTOS = this.rideRepository.getRidesPerDayForSpecificDriver(reportRequestDTO.getFrom(),
+					reportRequestDTO.getTo(), driverId);
+
+			return this.filterTotalRidesReports(reportDTOS, diff);
+		}else if(reportRequestDTO.getTypeOfReport() == TypeOfReport.KILOMETERS_PER_DAY){
+
+			List<RideLocationWithTimeDTO> rideLocationWithTimeDTO =
+					this.rideRepository.getRidesWithStartTimeBetweenForSpecificDriver(reportRequestDTO.getFrom(),
+							reportRequestDTO.getTo(), driverId);
+
+			List<ReportDTO<Double>> reportDTOS = new ArrayList<>();
+			FilterRideLocations(rideLocationWithTimeDTO, reportDTOS);
+			return this.filterReports(reportDTOS, diff);
+
+		}else if(reportRequestDTO.getTypeOfReport() == TypeOfReport.MONEY_SPENT_PER_DAY){
+
+			List<ReportDTO<Double>> reportDTOS = this.rideRepository.getTotalCostPerDayForSpecificDriver(
+					reportRequestDTO.getFrom(), reportRequestDTO.getTo(), driverId);
+			return this.filterReports(reportDTOS, diff);
+
+		}else if(reportRequestDTO.getTypeOfReport() == TypeOfReport.MONEY_EARNED_PER_DAY){
+			List<ReportDTO<Double>> reportDTOS = this.rideRepository.getTotalCostPerDayForDriver(
+					reportRequestDTO.getFrom(), reportRequestDTO.getTo(), driverId);
+			return this.filterReports(reportDTOS, diff);
+
+		}
+
+		return null;
+	}
+
 	private void FilterRideLocations(List<RideLocationWithTimeDTO> rideLocationWithTimeDTO, List<ReportDTO<Double>> reportDTOS) {
 		for(RideLocationWithTimeDTO r: rideLocationWithTimeDTO){
 			Set<Route> routes = this.rideRepository.getLocationsByRide(r.getRideId());
