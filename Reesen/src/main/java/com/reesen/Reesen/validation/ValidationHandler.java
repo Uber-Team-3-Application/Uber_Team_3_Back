@@ -3,6 +3,7 @@ package com.reesen.Reesen.validation;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -35,6 +36,11 @@ public class ValidationHandler {
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
 
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleAccessDeniedException(Exception ex, WebRequest request) {
+        return new ResponseEntity("Access Denied", HttpStatus.FORBIDDEN);
     }
 
 }
