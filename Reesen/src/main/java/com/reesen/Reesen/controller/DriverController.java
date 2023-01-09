@@ -6,7 +6,9 @@ import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Driver.DriverEditBasicInformation;
 import com.reesen.Reesen.model.Driver.DriverEditVehicle;
 import com.reesen.Reesen.model.paginated.Paginated;
+import com.reesen.Reesen.security.jwt.JwtTokenUtil;
 import com.reesen.Reesen.service.interfaces.*;
+import com.reesen.Reesen.validation.UserRequestValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +37,6 @@ public class DriverController {
     private final IPassengerService passengerService;
     private final IDeductionService deductionService;
     private final IRouteService routeService;
-    private final IReviewService reviewService;
 
     @Autowired
     public DriverController(IDriverService driverService,
@@ -46,8 +47,7 @@ public class DriverController {
                             IRideService rideService,
                             IPassengerService passengerService,
                             IDeductionService deductionService,
-                            IRouteService routeService,
-                            IReviewService reviewService) {
+                            IRouteService routeService) {
         this.driverService = driverService;
         this.documentService = documentService;
         this.vehicleService = vehicleService;
@@ -57,7 +57,6 @@ public class DriverController {
         this.passengerService = passengerService;
         this.deductionService = deductionService;
         this.routeService = routeService;
-        this.reviewService = reviewService;
     }
 
 
@@ -206,9 +205,18 @@ public class DriverController {
 
     @PostMapping(value = "/{id}/documents")
     @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN')")
-    public ResponseEntity<DocumentDTO> addDocument(@Valid @RequestBody DocumentDTO documentDTO, @PathVariable("id") Long driverId) {
+    public ResponseEntity<DocumentDTO> addDocument(
+            @Valid @RequestBody DocumentDTO documentDTO,
+            @PathVariable("id") Long driverId,
+            @RequestHeader Map<String, String> headers
 
-        if (driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    ) {
+
+        String role = UserRequestValidation.getRoleFromToken(headers);
+        if(role.equalsIgnoreCase("driver")){
+            boolean areIdsEqual = UserRequestValidation.areIdsEqual(headers, driverId);
+            if(!areIdsEqual) return new ResponseEntity("Driver does not exist.", HttpStatus.NOT_FOUND);
+        }
 
         Optional<Driver> driver = this.driverService.findOne(driverId);
         if (driver.isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
