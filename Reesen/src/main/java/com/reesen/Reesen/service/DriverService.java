@@ -119,6 +119,11 @@ public class DriverService implements IDriverService {
     }
 
     @Override
+    public Driver findDriverByRidesContaining(Ride ride) {
+        return  this.driverRepository.findDriverByRidesContaining(ride).get();
+    }
+
+    @Override
     public int getTotalEditRequests() {
         return this.driverEditBasicInfoRepository.countTotal() + this.driverEditVehicleInfoRepository.countTotal();
     }
