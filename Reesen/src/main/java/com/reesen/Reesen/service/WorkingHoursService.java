@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class WorkingHoursService implements IWorkingHoursService {
@@ -75,7 +76,7 @@ public class WorkingHoursService implements IWorkingHoursService {
             return "End time is before start time.";
         }
         if(workingHours.getStartTime().equals(workingHoursDTO.getEnd())){
-            return "End time is the same as start time."
+            return "End time is the same as start time.";
         }
         return "VALID";
 
@@ -83,7 +84,28 @@ public class WorkingHoursService implements IWorkingHoursService {
 
     @Override
     public Duration getTotalHoursWorkedInLastDay(Long driverId) {
-        return null;
+        LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
+        Set<WorkingHours> workingHours = workingHoursRepository.findAllByDriverIdAndEndTimeAfter(driverId, yesterday);
+        if(workingHours.size() == 0) return Duration.ZERO;
+
+        Duration totalDurationWorked = Duration.ZERO;
+        // yesterday = 9:00
+        // created working hours 10:30 - 10:30
+        // existing 9:30 - 10:00
+        // 8:50 -
+        for(WorkingHours workingHour: workingHours){
+            if(workingHour.getStartTime().equals(workingHour.getEndTime())){
+                totalDurationWorked = totalDurationWorked.plus(Duration.between(workingHour.getStartTime(), LocalDateTime.now()));
+                continue;
+            }
+            if(workingHour.getStartTime().isAfter(yesterday)){
+                totalDurationWorked = totalDurationWorked.plus(Duration.between(workingHour.getStartTime(), workingHour.getEndTime()));
+            }else{
+                totalDurationWorked = totalDurationWorked.plus(Duration.between(yesterday, workingHour.getEndTime()));
+            }
+        }
+        return totalDurationWorked;
+
     }
 
 }
