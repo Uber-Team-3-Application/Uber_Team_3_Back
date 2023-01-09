@@ -8,24 +8,29 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface WorkingHoursRepository extends JpaRepository<WorkingHours, Long> {
 
-    public Page<WorkingHours> findAllByDriverId(Long driverId, Pageable page);
-    public Page<WorkingHours> findAllByDriverIdAndStartTimeAfterAndEndTimeBefore(
+    Page<WorkingHours> findAllByDriverId(Long driverId, Pageable page);
+    Page<WorkingHours> findAllByDriverIdAndStartTimeAfterAndEndTimeBefore(
                                                                                  Long driverId,
                                                                                  LocalDateTime startTime,
                                                                                  LocalDateTime endTime,
                                                                                  Pageable page);
 
-    public Page<WorkingHours> findAllByDriverIdAndStartTimeAfter(
+    Page<WorkingHours> findAllByDriverIdAndStartTimeAfter(
                                                                  Long driverId,
                                                                  LocalDateTime startTime,
                                                                  Pageable page);
 
-    public Page<WorkingHours> findAllByDriverIdAndEndTimeBefore(
+    Page<WorkingHours> findAllByDriverIdAndEndTimeBefore(
                                                                  Long driverId,
                                                                  LocalDateTime endTime,
                                                                  Pageable page);
+
+    Set<WorkingHours> findAllByDriverIdAndEndTimeAfter(
+            Long driverId,
+            LocalDateTime endTime);
 }

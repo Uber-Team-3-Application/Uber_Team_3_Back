@@ -3,16 +3,16 @@ package com.reesen.Reesen.dto;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@EqualsAndHashCode
 @NoArgsConstructor
-@ToString
 @AllArgsConstructor
-public class DriverActivityDTO {
+@EqualsAndHashCode
+@ToString
+public class CreateWorkingHoursDTO {
 
     @NotNull
-    private boolean active;
-
+    private LocalDateTime start;
 }
