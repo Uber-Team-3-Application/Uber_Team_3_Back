@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -60,7 +61,7 @@ public class DriverController {
      **/
     @PutMapping(value = "/{id}")
     @PreAuthorize("hasRole('DRIVER')")
-    public ResponseEntity<CreatedDriverDTO> updateDriver(@RequestBody DriverDTO driverDTO, @PathVariable Long id) {
+    public ResponseEntity<CreatedDriverDTO> updateDriver(@Valid @RequestBody DriverDTO driverDTO, @PathVariable Long id) {
 
         if (this.driverService.findOne(id).isEmpty())
             return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
@@ -81,7 +82,7 @@ public class DriverController {
 
     @PutMapping(value = "/{id}/admin")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CreatedDriverDTO> updateDriverAsAdmin(@RequestBody DriverDTO driverDTO, @PathVariable Long id) {
+    public ResponseEntity<CreatedDriverDTO> updateDriverAsAdmin(@Valid @RequestBody DriverDTO driverDTO, @PathVariable Long id) {
 
         if (this.driverService.findOne(id).isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -102,7 +103,7 @@ public class DriverController {
      **/
     @PutMapping(value = "/{id}/vehicle")
     @PreAuthorize("hasRole('DRIVER')")
-    public ResponseEntity<VehicleDTO> updateVehicle(@RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId) {
+    public ResponseEntity<VehicleDTO> updateVehicle(@Valid @RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId) {
 
         if (driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
@@ -121,7 +122,7 @@ public class DriverController {
 
     @PutMapping(value = "/{id}/vehicle-admin")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<VehicleDTO> updateVehicleAsAdmin(@RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId) {
+    public ResponseEntity<VehicleDTO> updateVehicleAsAdmin(@Valid @RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId) {
 
         if (driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
@@ -150,7 +151,7 @@ public class DriverController {
     @PutMapping(value = "/working-hour/{working-hour-id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
     public ResponseEntity<WorkingHoursDTO> changeWorkingHours(
-            @RequestBody ChangeWorkingHoursDTO workingHoursDTO,
+            @Valid @RequestBody ChangeWorkingHoursDTO workingHoursDTO,
             @PathVariable("working-hour-id") Long workingHourId
     ) {
 
@@ -171,7 +172,7 @@ public class DriverController {
      **/
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CreatedDriverDTO> createDriver(@RequestBody DriverDTO driverDTO) {
+    public ResponseEntity<CreatedDriverDTO> createDriver(@Valid @RequestBody DriverDTO driverDTO) {
 
         if (this.driverService.findByEmail(driverDTO.getEmail()) != null)
             return new ResponseEntity("User with that email already exists!", HttpStatus.BAD_REQUEST);
@@ -183,7 +184,7 @@ public class DriverController {
     @PostMapping(value = "/{id}/activity")
     @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<String> changeDriverActivity(@PathVariable("id") Long driverId,
-                                                       @RequestBody DriverActivityDTO driverActivityDTO) {
+                                                       @Valid @RequestBody DriverActivityDTO driverActivityDTO) {
 
         boolean isActive = driverActivityDTO.isActive();
         Optional<Driver> driver = this.driverService.findOne(driverId);
@@ -201,7 +202,7 @@ public class DriverController {
 
     @PostMapping(value = "/{id}/documents")
     @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN')")
-    public ResponseEntity<DocumentDTO> addDocument(@RequestBody DocumentDTO documentDTO, @PathVariable("id") Long driverId) {
+    public ResponseEntity<DocumentDTO> addDocument(@Valid @RequestBody DocumentDTO documentDTO, @PathVariable("id") Long driverId) {
 
         if (driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 

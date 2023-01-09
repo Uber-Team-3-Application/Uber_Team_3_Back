@@ -1,21 +1,18 @@
 package com.reesen.Reesen.dto;
 
+import lombok.*;
+
+import javax.validation.constraints.NotNull;
+
+@Getter
+@Setter
+@EqualsAndHashCode
+@NoArgsConstructor
+@ToString
+@AllArgsConstructor
 public class DriverActivityDTO {
 
+    @NotNull
     private boolean active;
 
-
-    public DriverActivityDTO(boolean active) {
-        this.active = active;
-    }
-    public DriverActivityDTO() {
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
 }

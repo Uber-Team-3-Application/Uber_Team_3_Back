@@ -2,6 +2,9 @@ package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.model.Document;
 import lombok.*;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
@@ -12,6 +15,9 @@ import lombok.*;
 public class DocumentDTO {
 
     private Long id;
+
+    @Length(max = 30, message = "{maxLength}")
+    @NotBlank
     private String name;
     private String documentImage;
     private Long driverId;
