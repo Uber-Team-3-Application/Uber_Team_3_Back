@@ -3,17 +3,24 @@ package com.reesen.Reesen.validation;
 import com.reesen.Reesen.security.jwt.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Service
 public class UserRequestValidation {
 
 
-    private JwtTokenUtil jwtTokenUtil;
-   
+    private final JwtTokenUtil jwtTokenUtil;
+
+
+    @Autowired
+    public UserRequestValidation(JwtTokenUtil jwtTokenUtil){
+        this.jwtTokenUtil = jwtTokenUtil;
+    }
 
     public  String getRoleFromToken(Map<String, String> headers){
         String token = headers.get("x-auth-token");

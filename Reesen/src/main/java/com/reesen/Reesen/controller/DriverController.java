@@ -6,7 +6,6 @@ import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Driver.DriverEditBasicInformation;
 import com.reesen.Reesen.model.Driver.DriverEditVehicle;
 import com.reesen.Reesen.model.paginated.Paginated;
-import com.reesen.Reesen.security.jwt.JwtTokenUtil;
 import com.reesen.Reesen.service.interfaces.*;
 import com.reesen.Reesen.validation.UserRequestValidation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +36,7 @@ public class DriverController {
     private final IPassengerService passengerService;
     private final IDeductionService deductionService;
     private final IRouteService routeService;
+    private final UserRequestValidation userRequestValidation;
 
     @Autowired
     public DriverController(IDriverService driverService,
@@ -47,7 +47,7 @@ public class DriverController {
                             IRideService rideService,
                             IPassengerService passengerService,
                             IDeductionService deductionService,
-                            IRouteService routeService) {
+                            IRouteService routeService, UserRequestValidation userRequestValidation) {
         this.driverService = driverService;
         this.documentService = documentService;
         this.vehicleService = vehicleService;
@@ -57,6 +57,7 @@ public class DriverController {
         this.passengerService = passengerService;
         this.deductionService = deductionService;
         this.routeService = routeService;
+        this.userRequestValidation = userRequestValidation;
     }
 
 
@@ -212,9 +213,9 @@ public class DriverController {
 
     ) {
 
-        String role = UserRequestValidation.getRoleFromToken(headers);
+        String role = this.userRequestValidation.getRoleFromToken(headers);
         if(role.equalsIgnoreCase("driver")){
-            boolean areIdsEqual = UserRequestValidation.areIdsEqual(headers, driverId);
+            boolean areIdsEqual = this.userRequestValidation.areIdsEqual(headers, driverId);
             if(!areIdsEqual) return new ResponseEntity("Driver does not exist.", HttpStatus.NOT_FOUND);
         }
 
