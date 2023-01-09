@@ -150,7 +150,7 @@ public class DriverController {
     @PutMapping(value = "/working-hour/{working-hour-id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
     public ResponseEntity<WorkingHoursDTO> changeWorkingHours(
-            @RequestBody WorkingHoursDTO workingHoursDTO,
+            @RequestBody ChangeWorkingHoursDTO workingHoursDTO,
             @PathVariable("working-hour-id") Long workingHourId
     ) {
         if (workingHourId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -227,7 +227,6 @@ public class DriverController {
         Optional<Driver> driver = this.driverService.findOne(driverId);
         if (driver.isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
 
-        System.out.println(vehicleDTO.getVehicleType());
         Location location = this.locationService.getLocation(vehicleDTO.getCurrentLocation());
         Vehicle vehicle = this.vehicleService.createVehicle(vehicleDTO, location);
         vehicle.setDriver(driver.get());
@@ -245,7 +244,7 @@ public class DriverController {
      **/
     @PostMapping(value = "/{id}/working-hour")
     @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN')")
-    public ResponseEntity<WorkingHoursDTO> createWorkingHours(@RequestBody WorkingHoursDTO workingHoursDTO, @PathVariable("id") Long driverId) {
+    public ResponseEntity<WorkingHoursDTO> createWorkingHours(@RequestBody CreateWorkingHoursDTO workingHoursDTO, @PathVariable("id") Long driverId) {
 
         if (driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
@@ -280,8 +279,6 @@ public class DriverController {
     @GetMapping(value = "/{id}")
     @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER', 'ADMIN')")
     public ResponseEntity<CreatedDriverDTO> getDriver(@PathVariable Long id) {
-
-        if (id < 1) return new ResponseEntity("Invalid ID format!", HttpStatus.BAD_REQUEST);
 
         Optional<Driver> driver = this.driverService.findOne(id);
         if (driver.isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);

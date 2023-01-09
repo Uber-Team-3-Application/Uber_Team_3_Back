@@ -1,7 +1,14 @@
 package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.model.Driver.Driver;
+import lombok.*;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
 public class CreatedDriverDTO {
 
     private Long id;
@@ -13,8 +20,6 @@ public class CreatedDriverDTO {
     private String address;
 
 
-    public CreatedDriverDTO(){}
-
     public CreatedDriverDTO(Driver driver){
         this.id = driver.getId();
         this.name = driver.getName();
@@ -24,62 +29,6 @@ public class CreatedDriverDTO {
         this.email = driver.getEmail();
         this.address = driver.getAddress();
 
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public String getProfilePicture() {
-        return profilePicture;
-    }
-
-    public void setProfilePicture(String profilePicture) {
-        this.profilePicture = profilePicture;
-    }
-
-    public String getTelephoneNumber() {
-        return telephoneNumber;
-    }
-
-    public void setTelephoneNumber(String telephoneNumber) {
-        this.telephoneNumber = telephoneNumber;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
 }

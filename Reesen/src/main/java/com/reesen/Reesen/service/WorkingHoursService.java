@@ -1,5 +1,7 @@
 package com.reesen.Reesen.service;
 
+import com.reesen.Reesen.dto.ChangeWorkingHoursDTO;
+import com.reesen.Reesen.dto.CreateWorkingHoursDTO;
 import com.reesen.Reesen.dto.WorkingHoursDTO;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.WorkingHours;
@@ -10,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -26,11 +29,11 @@ public class WorkingHoursService implements IWorkingHoursService {
     }
 
     @Override
-    public WorkingHours createWorkingHours(WorkingHoursDTO workingHoursDTO, Driver driver){
+    public WorkingHours createWorkingHours(CreateWorkingHoursDTO workingHoursDTO, Driver driver){
         WorkingHours workingHours = new WorkingHours();
         workingHours.setDriver(driver);
         workingHours.setStartTime(workingHoursDTO.getStart());
-        workingHours.setEndTime(workingHoursDTO.getEnd());
+        workingHours.setEndTime(workingHoursDTO.getStart());
         return workingHours;
     }
 
@@ -40,9 +43,9 @@ public class WorkingHoursService implements IWorkingHoursService {
     }
 
     @Override
-    public WorkingHours editWorkingHours(WorkingHours workingHours, WorkingHoursDTO workingHoursDTO){
+    public WorkingHours editWorkingHours(WorkingHours workingHours, ChangeWorkingHoursDTO workingHoursDTO){
         workingHours.setId(workingHours.getId());
-        workingHours.setStartTime(workingHoursDTO.getStart());
+        workingHours.setStartTime(workingHours.getStartTime());
         workingHours.setEndTime(workingHoursDTO.getEnd());
         return workingHours;
     }
