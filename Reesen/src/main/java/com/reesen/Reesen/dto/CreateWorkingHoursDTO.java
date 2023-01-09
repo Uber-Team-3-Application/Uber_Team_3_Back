@@ -2,6 +2,7 @@ package com.reesen.Reesen.dto;
 
 import lombok.*;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter
@@ -11,5 +12,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 @ToString
 public class CreateWorkingHoursDTO {
+
+    @NotNull
     private LocalDateTime start;
 }

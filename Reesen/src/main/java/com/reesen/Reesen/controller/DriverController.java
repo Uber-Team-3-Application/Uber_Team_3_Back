@@ -223,7 +223,7 @@ public class DriverController {
 
     @PostMapping(value = "/{id}/vehicle")
     @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
-    public ResponseEntity<VehicleDTO> addVehicle(@RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId) {
+    public ResponseEntity<VehicleDTO> addVehicle(@Valid @RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId) {
 
         if (driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
@@ -247,7 +247,7 @@ public class DriverController {
      **/
     @PostMapping(value = "/{id}/working-hour")
     @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN')")
-    public ResponseEntity<WorkingHoursDTO> createWorkingHours(@RequestBody CreateWorkingHoursDTO workingHoursDTO, @PathVariable("id") Long driverId) {
+    public ResponseEntity<WorkingHoursDTO> createWorkingHours(@Valid @RequestBody CreateWorkingHoursDTO workingHoursDTO, @PathVariable("id") Long driverId) {
 
         if (driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 

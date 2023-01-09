@@ -17,7 +17,7 @@ public class DocumentDTO {
     private Long id;
 
     @Length(max = 30, message = "{maxLength}")
-    @NotBlank
+    @NotBlank(message = "{format}")
     private String name;
     private String documentImage;
     private Long driverId;
