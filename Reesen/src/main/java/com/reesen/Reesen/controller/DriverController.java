@@ -10,6 +10,7 @@ import com.reesen.Reesen.service.interfaces.*;
 import com.reesen.Reesen.validation.UserRequestValidation;
 import com.reesen.Reesen.validation.interfaces.IImageValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -39,6 +41,7 @@ public class DriverController {
     private final IRouteService routeService;
     private final UserRequestValidation userRequestValidation;
     private final IImageValidationService imageValidationService;
+    private final MessageSource messageSource;
 
     @Autowired
     public DriverController(IDriverService driverService,
@@ -49,7 +52,7 @@ public class DriverController {
                             IRideService rideService,
                             IPassengerService passengerService,
                             IDeductionService deductionService,
-                            IRouteService routeService, UserRequestValidation userRequestValidation, IImageValidationService imageValidationService) {
+                            IRouteService routeService, UserRequestValidation userRequestValidation, IImageValidationService imageValidationService, MessageSource messageSource) {
         this.driverService = driverService;
         this.documentService = documentService;
         this.vehicleService = vehicleService;
@@ -61,6 +64,7 @@ public class DriverController {
         this.routeService = routeService;
         this.userRequestValidation = userRequestValidation;
         this.imageValidationService = imageValidationService;
+        this.messageSource = messageSource;
     }
 
 
@@ -182,13 +186,29 @@ public class DriverController {
             @PathVariable("working-hour-id") Long workingHourId,
             @RequestHeader Map<String, String> headers
     ) {
-        // TODO get driver id from working hours, and compare to headers
+
 
         Optional<WorkingHours> workingHours = this.workingHoursService.findOne(workingHourId);
         if (workingHours.isEmpty()) return new ResponseEntity("Working hour does not exist", HttpStatus.NOT_FOUND);
         String workingHoursValid = this.workingHoursService.validateWorkingHours(workingHours.get(), workingHoursDTO);
         if(!workingHoursValid.equalsIgnoreCase("valid")){
             return new ResponseEntity(workingHoursValid, HttpStatus.BAD_REQUEST);
+        }
+        Optional<Driver> driver = this.workingHoursService.getDriverFromWorkingHours(workingHourId);
+        if(driver.isEmpty()){
+            return new ResponseEntity(new ErrorResponseMessage(
+                    this.messageSource.getMessage("workingHours.noEndVehicleUndefined", null, Locale.getDefault())
+            ), HttpStatus.BAD_REQUEST);
+        }
+        if(this.driverService.getVehicle(driver.get().getId()) == null ){
+            return new ResponseEntity(new ErrorResponseMessage(
+                    this.messageSource.getMessage("workingHours.noEndVehicleUndefined", null, Locale.getDefault())
+            ), HttpStatus.BAD_REQUEST);
+        }
+        if(!this.workingHoursService.isShiftOngoing(driver.get().getId())){
+            return new ResponseEntity(new ErrorResponseMessage(
+                    this.messageSource.getMessage("workingHours.noEndNoShiftOngoing", null, Locale.getDefault())
+            ), HttpStatus.BAD_REQUEST);
         }
         WorkingHours updatedWH = this.workingHoursService.editWorkingHours(workingHours.get(), workingHoursDTO);
         this.workingHoursService.save(updatedWH);
@@ -302,22 +322,38 @@ public class DriverController {
      * POST Working Hours
      **/
     @PostMapping(value = "/{id}/working-hour")
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN')")
+    @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<WorkingHoursDTO> createWorkingHours(
             @Valid @RequestBody CreateWorkingHoursDTO workingHoursDTO,
             @PathVariable("id") Long driverId,
             @RequestHeader Map<String, String> headers) {
 
-        if (driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        String role = this.userRequestValidation.getRoleFromToken(headers);
-        if(role.equalsIgnoreCase("driver")){
-            boolean areIdsEqual = this.userRequestValidation.areIdsEqual(headers, driverId);
-            if(!areIdsEqual) return new ResponseEntity("Driver does not exist.", HttpStatus.NOT_FOUND);
-        }
+        boolean areIdsEqual = this.userRequestValidation.areIdsEqual(headers, driverId);
+        if(!areIdsEqual) return new ResponseEntity("Driver does not exist.", HttpStatus.NOT_FOUND);
+
 
         Optional<Driver> driver = this.driverService.findOne(driverId);
         if (driver.isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
+
+        Vehicle vehicle =  this.driverService.getVehicle(driverId);
+        if(vehicle == null) {
+            return new ResponseEntity(new ErrorResponseMessage(
+                    this.messageSource.getMessage("workingHours.cannotStartShiftVehicleUndefined", null, Locale.getDefault())
+            ),HttpStatus.BAD_REQUEST);
+        }
+
+        if(this.workingHoursService.isShiftOngoing(driverId)){
+            return new ResponseEntity(new ErrorResponseMessage(
+                    this.messageSource.getMessage("workingHours.cannotStartShiftAlreadyOngoing", null, Locale.getDefault())
+            ), HttpStatus.BAD_REQUEST);
+        }
+        System.out.println(this.workingHoursService.getTotalHoursWorkedInLastDay(driverId).toHours());
+        if(this.workingHoursService.getTotalHoursWorkedInLastDay(driverId).toHours() >= 8){
+            return new ResponseEntity(new ErrorResponseMessage(
+                    this.messageSource.getMessage("workingHours.cannotStartShiftHourLimit", null, Locale.getDefault())
+            ), HttpStatus.BAD_REQUEST);
+        }
 
         WorkingHours workingHours = this.workingHoursService.createWorkingHours(workingHoursDTO, driver.get());
         workingHours = this.workingHoursService.save(workingHours);

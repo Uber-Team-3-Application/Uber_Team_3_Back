@@ -89,10 +89,6 @@ public class WorkingHoursService implements IWorkingHoursService {
         if(workingHours.size() == 0) return Duration.ZERO;
 
         Duration totalDurationWorked = Duration.ZERO;
-        // yesterday = 9:00
-        // created working hours 10:30 - 10:30
-        // existing 9:30 - 10:00
-        // 8:50 -
         for(WorkingHours workingHour: workingHours){
             if(workingHour.getStartTime().equals(workingHour.getEndTime())){
                 totalDurationWorked = totalDurationWorked.plus(Duration.between(workingHour.getStartTime(), LocalDateTime.now()));
@@ -106,6 +102,19 @@ public class WorkingHoursService implements IWorkingHoursService {
         }
         return totalDurationWorked;
 
+    }
+
+    @Override
+    public boolean isShiftOngoing(Long driverId) {
+        Optional<WorkingHours> currentShift =
+                this.workingHoursRepository.findOngoingShift(driverId);
+
+        return currentShift.isPresent();
+    }
+
+    @Override
+    public Optional<Driver> getDriverFromWorkingHours(Long workingHourId) {
+        return this.workingHoursRepository.getDriverWithWorkingHourId(workingHourId);
     }
 
 }

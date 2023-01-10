@@ -27,4 +27,8 @@ public interface IWorkingHoursService {
     String validateWorkingHours(WorkingHours workingHours, ChangeWorkingHoursDTO workingHoursDTO);
 
     Duration getTotalHoursWorkedInLastDay(Long driverId);
+
+    boolean isShiftOngoing(Long driverId);
+
+    Optional<Driver> getDriverFromWorkingHours(Long workingHourId);
 }
