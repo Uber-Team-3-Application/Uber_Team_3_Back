@@ -32,7 +32,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         if(request.getRequestURL().toString().contains("/api")){
             String requestTokenHeader = request.getHeader("X-Auth-Token");
             String refreshToken = request.getHeader("refreshToken");
-            String jwtToken;
+            String jwtToken = null;
             if(requestTokenHeader != null){
                 try {
                     jwtToken = requestTokenHeader;
