@@ -11,6 +11,7 @@ import com.reesen.Reesen.validation.UserRequestValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -66,7 +67,13 @@ public class DriverController {
      **/
     @PutMapping(value = "/{id}")
     @PreAuthorize("hasRole('DRIVER')")
-    public ResponseEntity<CreatedDriverDTO> updateDriver(@Valid @RequestBody DriverDTO driverDTO, @PathVariable Long id) {
+    public ResponseEntity<CreatedDriverDTO> updateDriver(
+            @Valid @RequestBody DriverDTO driverDTO,
+            @PathVariable Long id,
+            @RequestHeader Map<String, String> headers) {
+
+        boolean areIdsEqual = this.userRequestValidation.areIdsEqual(headers, id);
+        if(!areIdsEqual) return new ResponseEntity("Driver does not exist.", HttpStatus.NOT_FOUND);
 
         if (this.driverService.findOne(id).isEmpty())
             return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
@@ -74,7 +81,7 @@ public class DriverController {
         Driver driver = this.driverService.findByEmail(driverDTO.getEmail());
 
         if (driver != null && !driver.getId().toString().equals(id.toString())) {
-            return new ResponseEntity("Invalid data. For example bad email format.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("Invalid data. Bad email format.", HttpStatus.BAD_REQUEST);
         }
         driver = this.driverService.getDriverFromDriverDTO(id, driverDTO);
 
@@ -87,13 +94,15 @@ public class DriverController {
 
     @PutMapping(value = "/{id}/admin")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CreatedDriverDTO> updateDriverAsAdmin(@Valid @RequestBody DriverDTO driverDTO, @PathVariable Long id) {
+    public ResponseEntity<CreatedDriverDTO> updateDriverAsAdmin(
+            @Valid @RequestBody DriverDTO driverDTO,
+            @PathVariable Long id) {
 
         if (this.driverService.findOne(id).isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Driver driver = this.driverService.findByEmail(driverDTO.getEmail());
         if (driver != null && !driver.getId().toString().equals(id.toString())) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("Invalid Data. Bad email format.", HttpStatus.BAD_REQUEST);
         }
         driver = this.driverService.getDriverFromDriverDTO(id, driverDTO);
         this.driverService.save(driver);
@@ -108,7 +117,16 @@ public class DriverController {
      **/
     @PutMapping(value = "/{id}/vehicle")
     @PreAuthorize("hasRole('DRIVER')")
-    public ResponseEntity<VehicleDTO> updateVehicle(@Valid @RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId) {
+    public ResponseEntity<VehicleDTO> updateVehicle(
+            @Valid @RequestBody VehicleDTO vehicleDTO,
+            @PathVariable("id") Long driverId,
+            @RequestHeader Map<String, String> headers) {
+
+        String role = this.userRequestValidation.getRoleFromToken(headers);
+        if(role.equalsIgnoreCase("driver")){
+            boolean areIdsEqual = this.userRequestValidation.areIdsEqual(headers, driverId);
+            if(!areIdsEqual) return new ResponseEntity("Driver does not exist.", HttpStatus.NOT_FOUND);
+        }
 
         if (driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
@@ -117,7 +135,7 @@ public class DriverController {
 
         Vehicle vehicle = this.driverService.getVehicle(driverId);
         if (vehicle == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("Vehicle does not exist!", HttpStatus.BAD_REQUEST);
         }
         vehicle = this.vehicleService.createVehicle(vehicleDTO, driver.get());
         this.driverService.saveEditVehicle(vehicle, driverId);
@@ -127,7 +145,9 @@ public class DriverController {
 
     @PutMapping(value = "/{id}/vehicle-admin")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<VehicleDTO> updateVehicleAsAdmin(@Valid @RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId) {
+    public ResponseEntity<VehicleDTO> updateVehicleAsAdmin(
+            @Valid @RequestBody VehicleDTO vehicleDTO,
+            @PathVariable("id") Long driverId) {
 
         if (driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
@@ -157,8 +177,10 @@ public class DriverController {
     @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
     public ResponseEntity<WorkingHoursDTO> changeWorkingHours(
             @Valid @RequestBody ChangeWorkingHoursDTO workingHoursDTO,
-            @PathVariable("working-hour-id") Long workingHourId
+            @PathVariable("working-hour-id") Long workingHourId,
+            @RequestHeader Map<String, String> headers
     ) {
+        // TODO get driver id from working hours, and compare to headers
 
         Optional<WorkingHours> workingHours = this.workingHoursService.findOne(workingHourId);
         if (workingHours.isEmpty()) return new ResponseEntity("Working hour does not exist", HttpStatus.NOT_FOUND);
@@ -177,7 +199,8 @@ public class DriverController {
      **/
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CreatedDriverDTO> createDriver(@Valid @RequestBody DriverDTO driverDTO) {
+    public ResponseEntity<CreatedDriverDTO> createDriver(
+            @Valid @RequestBody DriverDTO driverDTO) {
 
         if (this.driverService.findByEmail(driverDTO.getEmail()) != null)
             return new ResponseEntity("User with that email already exists!", HttpStatus.BAD_REQUEST);
@@ -188,15 +211,22 @@ public class DriverController {
 
     @PostMapping(value = "/{id}/activity")
     @PreAuthorize("hasRole('DRIVER')")
-    public ResponseEntity<String> changeDriverActivity(@PathVariable("id") Long driverId,
-                                                       @Valid @RequestBody DriverActivityDTO driverActivityDTO) {
+    public ResponseEntity<String> changeDriverActivity(
+            @PathVariable("id") Long driverId,
+            @Valid @RequestBody DriverActivityDTO driverActivityDTO,
+            @RequestHeader Map<String, String> headers) {
 
+        String role = this.userRequestValidation.getRoleFromToken(headers);
+        if(role.equalsIgnoreCase("driver")){
+            boolean areIdsEqual = this.userRequestValidation.areIdsEqual(headers, driverId);
+            if(!areIdsEqual) return new ResponseEntity("Driver does not exist.", HttpStatus.NOT_FOUND);
+        }
         boolean isActive = driverActivityDTO.isActive();
         Optional<Driver> driver = this.driverService.findOne(driverId);
         if (driver.isPresent()) {
             driver.get().setActive(isActive);
             this.driverService.save(driver.get());
-        }
+        }else return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
         return new ResponseEntity<>("Driver Activity updated!", HttpStatus.OK);
     }
 
@@ -236,9 +266,18 @@ public class DriverController {
 
     @PostMapping(value = "/{id}/vehicle")
     @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
-    public ResponseEntity<VehicleDTO> addVehicle(@Valid @RequestBody VehicleDTO vehicleDTO, @PathVariable("id") Long driverId) {
+    public ResponseEntity<VehicleDTO> addVehicle(
+            @Valid @RequestBody VehicleDTO vehicleDTO,
+            @PathVariable("id") Long driverId,
+            @RequestHeader Map<String, String> headers) {
 
         if (driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        String role = this.userRequestValidation.getRoleFromToken(headers);
+        if(role.equalsIgnoreCase("driver")){
+            boolean areIdsEqual = this.userRequestValidation.areIdsEqual(headers, driverId);
+            if(!areIdsEqual) return new ResponseEntity("Driver does not exist.", HttpStatus.NOT_FOUND);
+        }
 
         Optional<Driver> driver = this.driverService.findOne(driverId);
         if (driver.isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
@@ -260,9 +299,18 @@ public class DriverController {
      **/
     @PostMapping(value = "/{id}/working-hour")
     @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN')")
-    public ResponseEntity<WorkingHoursDTO> createWorkingHours(@Valid @RequestBody CreateWorkingHoursDTO workingHoursDTO, @PathVariable("id") Long driverId) {
+    public ResponseEntity<WorkingHoursDTO> createWorkingHours(
+            @Valid @RequestBody CreateWorkingHoursDTO workingHoursDTO,
+            @PathVariable("id") Long driverId,
+            @RequestHeader Map<String, String> headers) {
 
         if (driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        String role = this.userRequestValidation.getRoleFromToken(headers);
+        if(role.equalsIgnoreCase("driver")){
+            boolean areIdsEqual = this.userRequestValidation.areIdsEqual(headers, driverId);
+            if(!areIdsEqual) return new ResponseEntity("Driver does not exist.", HttpStatus.NOT_FOUND);
+        }
 
         Optional<Driver> driver = this.driverService.findOne(driverId);
         if (driver.isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
@@ -294,7 +342,15 @@ public class DriverController {
 
     @GetMapping(value = "/{id}")
     @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER', 'ADMIN')")
-    public ResponseEntity<CreatedDriverDTO> getDriver(@PathVariable Long id) {
+    public ResponseEntity<CreatedDriverDTO> getDriver(
+            @PathVariable Long id,
+            @RequestHeader Map<String, String> headers) {
+
+        String role = this.userRequestValidation.getRoleFromToken(headers);
+        if(role.equalsIgnoreCase("driver")){
+            boolean areIdsEqual = this.userRequestValidation.areIdsEqual(headers, id);
+            if(!areIdsEqual) return new ResponseEntity("Driver does not exist.", HttpStatus.NOT_FOUND);
+        }
 
         Optional<Driver> driver = this.driverService.findOne(id);
         if (driver.isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
@@ -311,9 +367,16 @@ public class DriverController {
 
     @GetMapping(value = "/{id}/documents")
     @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
-    public ResponseEntity<Set<DocumentDTO>> getDocument(@PathVariable("id") Long id) {
+    public ResponseEntity<Set<DocumentDTO>> getDocuments(
+            @PathVariable("id") Long id,
+            @RequestHeader Map<String, String> headers) {
 
         if (id < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        String role = this.userRequestValidation.getRoleFromToken(headers);
+        if(role.equalsIgnoreCase("driver")){
+            boolean areIdsEqual = this.userRequestValidation.areIdsEqual(headers, id);
+            if(!areIdsEqual) return new ResponseEntity("Driver does not exist.", HttpStatus.NOT_FOUND);
+        }
 
         Optional<Driver> driver = this.driverService.findOne(id);
         if (driver.isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
@@ -331,8 +394,17 @@ public class DriverController {
      * **/
     @GetMapping(value = "/{id}/vehicle")
     @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
-    public ResponseEntity<VehicleDTO> getVehicle(@PathVariable("id") Long id) {
+    public ResponseEntity<VehicleDTO> getVehicle(
+            @PathVariable("id") Long id,
+            @RequestHeader Map<String, String> headers) {
+
         if (id < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        String role = this.userRequestValidation.getRoleFromToken(headers);
+        if(role.equalsIgnoreCase("driver")){
+            boolean areIdsEqual = this.userRequestValidation.areIdsEqual(headers, id);
+            if(!areIdsEqual) return new ResponseEntity("Driver does not exist.", HttpStatus.NOT_FOUND);
+        }
 
         if (this.driverService.findOne(id).isEmpty())
             return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
@@ -358,9 +430,16 @@ public class DriverController {
     public ResponseEntity<Paginated<WorkingHoursDTO>> getWorkingHours(
             Pageable page,
             @PathVariable("id") Long driverId,
-            @RequestParam("from") LocalDateTime from,
-            @RequestParam("to") LocalDateTime to
+            @RequestParam(value = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+            @RequestParam(value = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
+            @RequestHeader Map<String, String> headers
     ) {
+        String role = this.userRequestValidation.getRoleFromToken(headers);
+        if(role.equalsIgnoreCase("driver")){
+            boolean areIdsEqual = this.userRequestValidation.areIdsEqual(headers, driverId);
+            if(!areIdsEqual) return new ResponseEntity("Driver does not exist.", HttpStatus.NOT_FOUND);
+        }
+
         Optional<Driver> driver = this.driverService.findOne(driverId);
         if (driver.isEmpty()) return new ResponseEntity("Driver does not exist", HttpStatus.NOT_FOUND);
 
@@ -379,8 +458,10 @@ public class DriverController {
     @GetMapping(value = "/working-hour/{working-hour-id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
     public ResponseEntity<WorkingHoursDTO> getDetailsAboutWorkingHours(
-            @PathVariable("working-hour-id") Long workingHourId) {
+            @PathVariable("working-hour-id") Long workingHourId,
+            @RequestHeader Map<String, String> headers) {
 
+        // TODO GET DRIVER ID FROM WORKING HOUR
         if (workingHourId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Optional<WorkingHours> workingHours = this.workingHoursService.findOne(workingHourId);
@@ -395,15 +476,22 @@ public class DriverController {
      *
      * **/
     @GetMapping(value = "/{id}/ride")
-//    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
     public ResponseEntity<Paginated<DriverRideDTO>> getRides(
             @PathVariable("id") Long driverId,
             Pageable page,
-            @RequestParam(value = "from", required = false) String from,
-            @RequestParam(value = "to", required = false) String to)
+            @RequestParam(value = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate from,
+            @RequestParam(value = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate to,
+            @RequestHeader Map<String, String> headers)
 
 
     {
+        String role = this.userRequestValidation.getRoleFromToken(headers);
+        if(role.equalsIgnoreCase("driver")){
+            boolean areIdsEqual = this.userRequestValidation.areIdsEqual(headers, driverId);
+            if(!areIdsEqual) return new ResponseEntity("Driver does not exist.", HttpStatus.NOT_FOUND);
+        }
+
         Optional<Driver> driver = this.driverService.findOne(driverId);
 
         if (driver.isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
@@ -413,12 +501,10 @@ public class DriverController {
 
         if (from != null || to != null) {
             if  (from != null) {
-                LocalDate date = LocalDate.parse(from, DateTimeFormatter.ISO_DATE);
-                dateFrom = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                dateFrom = Date.from(from.atStartOfDay(ZoneId.systemDefault()).toInstant());
             }
             if (to != null) {
-                LocalDate date = LocalDate.parse(to, DateTimeFormatter.ISO_DATE);
-                dateTo = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                dateTo = Date.from(to.atStartOfDay(ZoneId.systemDefault()).toInstant());
             }
         }
 
@@ -451,14 +537,18 @@ public class DriverController {
      **/
     @DeleteMapping(value = "/document/{document-id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
-    public ResponseEntity<String> deleteDocuments(@PathVariable("document-id") Long id) {
+    public ResponseEntity<String> deleteDocuments(
+            @PathVariable("document-id") Long id,
+            @RequestHeader Map<String, String> headers) {
 
+
+        // TODO GET DRIVER ID FROM DOCUMENT
         if (id < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if (this.documentService.findOne(id).isEmpty())
             return new ResponseEntity<>("Document does not exist!", HttpStatus.NOT_FOUND);
 
         this.documentService.delete(id);
-        return new ResponseEntity<>("Driver document deleted successfully", HttpStatus.NO_CONTENT);
+        return new ResponseEntity("Driver document deleted successfully", HttpStatus.NO_CONTENT);
     }
 
     @GetMapping(value = "/total-edit-requests")
