@@ -8,6 +8,7 @@ import com.reesen.Reesen.model.Driver.DriverEditVehicle;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.service.interfaces.*;
 import com.reesen.Reesen.validation.UserRequestValidation;
+import com.reesen.Reesen.validation.interfaces.IImageValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +22,6 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @CrossOrigin
@@ -38,6 +38,7 @@ public class DriverController {
     private final IDeductionService deductionService;
     private final IRouteService routeService;
     private final UserRequestValidation userRequestValidation;
+    private final IImageValidationService imageValidationService;
 
     @Autowired
     public DriverController(IDriverService driverService,
@@ -48,7 +49,7 @@ public class DriverController {
                             IRideService rideService,
                             IPassengerService passengerService,
                             IDeductionService deductionService,
-                            IRouteService routeService, UserRequestValidation userRequestValidation) {
+                            IRouteService routeService, UserRequestValidation userRequestValidation, IImageValidationService imageValidationService) {
         this.driverService = driverService;
         this.documentService = documentService;
         this.vehicleService = vehicleService;
@@ -59,6 +60,7 @@ public class DriverController {
         this.deductionService = deductionService;
         this.routeService = routeService;
         this.userRequestValidation = userRequestValidation;
+        this.imageValidationService = imageValidationService;
     }
 
 
@@ -252,6 +254,8 @@ public class DriverController {
         Optional<Driver> driver = this.driverService.findOne(driverId);
         if (driver.isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
 
+        String imageMessage = imageValidationService.validateImage(documentDTO.getDocumentImage());
+        if(imageMessage != null) return new ResponseEntity(imageMessage, HttpStatus.BAD_REQUEST);
         Document document = new Document(documentDTO.getName(), documentDTO.getDocumentImage(), driver.get());
         document = this.documentService.save(document);
 

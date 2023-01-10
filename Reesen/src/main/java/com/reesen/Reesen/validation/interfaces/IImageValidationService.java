@@ -4,6 +4,6 @@ import org.springframework.http.ResponseEntity;
 
 public interface IImageValidationService {
 
-    ResponseEntity<String> validateImage(String image);
+    String validateImage(String image);
 
 }

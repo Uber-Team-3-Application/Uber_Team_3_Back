@@ -15,28 +15,28 @@ import java.util.Base64;
 @Service
 public class ImageValidationService implements IImageValidationService {
     @Override
-    public ResponseEntity<String> validateImage(String image) {
+    public String validateImage(String image) {
 
         byte[] imageBytes;
         // is an image
         try {
             imageBytes = Base64.getDecoder().decode(image);
         }catch (IllegalArgumentException e){
-            return new ResponseEntity<>("{image.notAnImage}", HttpStatus.BAD_REQUEST);
+            return "{image.notAnImage}";
 
         }
         // valid image
-        BufferedImage bufferedImage = null;
+        BufferedImage bufferedImage;
         try {
             bufferedImage = ImageIO.read(new ByteArrayInputStream(imageBytes));
-            if(bufferedImage==null) return new ResponseEntity<>("{image.notAnImage}", HttpStatus.BAD_REQUEST);
+            if(bufferedImage==null) return "{image.notAnImage}";
         } catch (IOException e) {
-            return new ResponseEntity<>("{image.notAnImage}", HttpStatus.BAD_REQUEST);
+            return "{image.notAnImage}";
         }
 
         final long MAX_SIZE = 5 * 1024 * 1024;
         if(imageBytes.length > MAX_SIZE)
-            return new ResponseEntity<>("{image.biggerThanFiveM}", HttpStatus.BAD_REQUEST);
+            return "{image.biggerThanFiveM}";
 
         return null;
     }
