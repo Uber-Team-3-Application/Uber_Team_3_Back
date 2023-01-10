@@ -72,11 +72,9 @@ public class DriverController {
             @PathVariable Long id,
             @RequestHeader Map<String, String> headers) {
 
-        String role = this.userRequestValidation.getRoleFromToken(headers);
-        if(role.equalsIgnoreCase("driver")){
-            boolean areIdsEqual = this.userRequestValidation.areIdsEqual(headers, id);
-            if(!areIdsEqual) return new ResponseEntity("Driver does not exist.", HttpStatus.NOT_FOUND);
-        }
+        boolean areIdsEqual = this.userRequestValidation.areIdsEqual(headers, id);
+        if(!areIdsEqual) return new ResponseEntity("Driver does not exist.", HttpStatus.NOT_FOUND);
+
         if (this.driverService.findOne(id).isEmpty())
             return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
 

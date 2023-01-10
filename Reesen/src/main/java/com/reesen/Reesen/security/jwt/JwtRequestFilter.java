@@ -29,11 +29,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException
     {
-
         if(request.getRequestURL().toString().contains("/api")){
             String requestTokenHeader = request.getHeader("X-Auth-Token");
             String refreshToken = request.getHeader("refreshToken");
-            String jwtToken = null;
+            String jwtToken;
             if(requestTokenHeader != null){
                 try {
                     jwtToken = requestTokenHeader;
