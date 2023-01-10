@@ -24,10 +24,11 @@ public class UserRequestValidation {
         String token = headers.get("x-auth-token");
         String refreshToken = headers.get("refreshtoken");
         List<HashMap<String, String>> role;
-        if(isTokenNotExpired(token)){
-            role = jwtTokenUtil.getRole(token);
+        if(isTokenExpired(token)){
+            role = jwtTokenUtil.getRole(refreshToken);
 
-        }else role = jwtTokenUtil.getRole(refreshToken);
+
+        }else  role = jwtTokenUtil.getRole(token);;
 
         for (String values: role.get(0).values()){
             return values;
@@ -38,17 +39,17 @@ public class UserRequestValidation {
     public  boolean areIdsEqual(Map<String, String> headers, Long givenId){
         String token = headers.get("x-auth-token");
         String refreshToken = headers.get("refreshtoken");
-        if(isTokenNotExpired(token)){
-            Integer id = jwtTokenUtil.getId(token);
-            return givenId.intValue() == id;
-
-        }else{
+        if(isTokenExpired(token)){
             Integer id = jwtTokenUtil.getId(refreshToken);
             return givenId.intValue() == id;
+
+
         }
+        Integer id = jwtTokenUtil.getId(token);
+        return givenId.intValue() == id;
     }
 
-    private  boolean isTokenNotExpired(String token){
-        return !jwtTokenUtil.isExpired(token);
+    private  boolean isTokenExpired(String token){
+        return jwtTokenUtil.isExpired(token);
     }
 }
