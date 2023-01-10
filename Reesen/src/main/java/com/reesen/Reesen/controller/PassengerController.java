@@ -1,13 +1,10 @@
 package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.PassengerDTO;
-import com.reesen.Reesen.dto.RideDTO;
-import com.reesen.Reesen.model.Passenger;
-import com.reesen.Reesen.model.Ride;
-import com.reesen.Reesen.model.VerificationToken;
+import com.reesen.Reesen.dto.PassengerRideDTO;
+import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.paginated.Paginated;
-import com.reesen.Reesen.service.interfaces.IPassengerService;
-import com.reesen.Reesen.service.interfaces.IRideService;
+import com.reesen.Reesen.service.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,8 +15,10 @@ import org.springframework.web.bind.annotation.*;
 import com.reesen.Reesen.security.jwt.JwtTokenUtil;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @CrossOrigin
@@ -29,13 +28,19 @@ public class PassengerController {
 
     private final IPassengerService passengerService;
     private final IRideService rideService;
+    private final IDriverService driverService;
+    private final IDeductionService deductionService;
+    private final IRouteService routeService;
 
     private final JwtTokenUtil tokens;
 
     @Autowired
-    public PassengerController(IPassengerService passengerService, IRideService rideService, JwtTokenUtil tokens) {
+    public PassengerController(IPassengerService passengerService, IRideService rideService, IDriverService driverService, IDeductionService deductionService, IRouteService routeService, JwtTokenUtil tokens) {
         this.passengerService = passengerService;
         this.rideService = rideService;
+        this.driverService = driverService;
+        this.deductionService = deductionService;
+        this.routeService = routeService;
         this.tokens = tokens;
     }
 
@@ -87,21 +92,47 @@ public class PassengerController {
     }
 
     @GetMapping(value = "/{id}/ride")
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
-    public ResponseEntity<Paginated<RideDTO>> getPassengerRides(@PathVariable Long id, Pageable page, @RequestParam(value = "sort", required = false) String sort, @RequestParam(value = "from", required = false) String from, @RequestParam(value = "to", required = false) String to) throws ParseException {
-        Date fromDate =new SimpleDateFormat("dd/MM/yyyy").parse(from);
-        Date toDate = new SimpleDateFormat("dd/MM/yyyy").parse(to);
+    @PreAuthorize("hasAnyRole('ADMIN', 'PASSENGER')")
+    public ResponseEntity<Paginated<PassengerRideDTO>> getPassengerRides(@PathVariable Long id,
+                                                                         Pageable page,
+                                                                         @RequestParam(value = "sort", required = false) String sort,
+                                                                         @RequestParam(value = "from", required = false) String from,
+                                                                         @RequestParam(value = "to", required = false) String to) throws ParseException {
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(this.passengerService.findOne(id).isEmpty())
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        Passenger passenger = this.passengerService.findOne(id).get();
-        Set<Ride> rides = passenger.getRides();
-        Set<RideDTO> rideDTOs = new HashSet<>();
-        for(Ride ride: rides){
-            rideDTOs.add(new RideDTO(ride));
+        Optional<Passenger> passenger = this.passengerService.findOne(id);
+        if (passenger.isEmpty()) return new ResponseEntity("Passenger does not exist!", HttpStatus.NOT_FOUND);
+        Page<Ride> rides = this.rideService.findAllRidesForPassenger(id, page, null, null);
+        Date dateFrom = null;
+        Date dateTo = null;
+        if (from != null || to != null) {
+            if  (from != null) {
+                LocalDate date = LocalDate.parse(from, DateTimeFormatter.ISO_DATE);
+                dateFrom = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            }
+            if (to != null) {
+                LocalDate date = LocalDate.parse(to, DateTimeFormatter.ISO_DATE);
+                dateTo = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            }
         }
-        return new ResponseEntity<>(new Paginated<RideDTO>(page.getPageNumber(), rideDTOs), HttpStatus.OK);
+        Page<Ride> passengerRides = this.rideService.findAllRidesForPassenger(id, page, dateFrom, dateTo);
+
+        LinkedHashSet<PassengerRideDTO> rideDTOs = new LinkedHashSet<>();
+
+        for (Ride ride : passengerRides) {
+            ride.setDriver(driverService.findDriverByRidesContaining(ride));
+            ride.setPassengers(passengerService.findPassengersByRidesContaining(ride));
+            ride.setDeduction(deductionService.findDeductionByRide(ride).orElse(new Deduction()));
+            Set<Route> locations;
+            locations = rideService.getLocationsByRide(ride.getId());
+            for (Route location : locations) {
+                location.setDestination(this.routeService.getDestinationByRoute(location).get());
+                location.setDeparture(this.routeService.getDepartureByRoute(location).get());
+            }
+            ride.setLocations(locations);
+            rideDTOs.add(new PassengerRideDTO(ride));
+        }
+        return new ResponseEntity<>(new Paginated<>(passengerRides.getNumberOfElements(), rideDTOs), HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}")

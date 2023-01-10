@@ -37,23 +37,23 @@ insert into Vehicle_Type(price_per_km, name) values(120, 'STANDARD');
 insert into Vehicle_Type(price_per_km, name) values(140, 'LUXURY');
 insert into Vehicle_Type(price_per_km, name) values(130, 'VAN');
 
-insert into location(id, address, latitude, longitude) values(1, 'Radnicka 19, Novi Sad', 45.249101856630546, 19.848034);
-insert into location(id, address, latitude, longitude) values(2, 'Zeleznicka 2, Novi Sad', 45.2493924092008, 19.840783700998372 );
-insert into location(id, address, latitude, longitude) values(3, 'Cerska 34, Lacarak', 44.997668, 19.557723 );
-insert into location(id, address, latitude, longitude) values (4, 'Stevana Pesica, МЗ Коvilj, Коvilj', 45.2205569, 20.0257268);
-insert into location(id, address, latitude, longitude) values (5, 'Jevrejska 2, Novi Sad', 45.254090, 19.841760);
-insert into location(id, address, latitude, longitude) values (6, 'Vladike Platona 2, Novi Sad', 45.252250, 19.848140);
-insert into location(id, address, latitude, longitude) values(7, 'Pionirska 4, Futog', 45.237780, 19.709290 );
-insert into location(id, address, latitude, longitude) values (8, 'Cara Dušana Silnog 64, Veternik', 45.2607023, 19.7611797);
+insert into location(address, latitude, longitude) values('Radnicka 19, Novi Sad', 45.249101856630546, 19.848034);
+insert into location(address, latitude, longitude) values('Zeleznicka 2, Novi Sad', 45.2493924092008, 19.840783700998372 );
+insert into location(address, latitude, longitude) values('Cerska 34, Lacarak', 44.997668, 19.557723 );
+insert into location(address, latitude, longitude) values ('Stevana Pesica, МЗ Коvilj, Коvilj', 45.2205569, 20.0257268);
+insert into location(address, latitude, longitude) values ('Jevrejska 2, Novi Sad', 45.254090, 19.841760);
+insert into location(address, latitude, longitude) values ('Vladike Platona 2, Novi Sad', 45.252250, 19.848140);
+insert into location(address, latitude, longitude) values('Pionirska 4, Futog', 45.237780, 19.709290 );
+insert into location(address, latitude, longitude) values ('Cara Dušana Silnog 64, Veternik', 45.2607023, 19.7611797);
 
-insert into Route (id, mileage, departure_id, destination_id)
-values (1, 59.2, 1, 3);
-insert into Route (id, mileage, departure_id, destination_id)
-values (2, 25.4, 4, 5);
-insert into Route (id, mileage, departure_id, destination_id)
-values (3, 11.4, 7, 6);
-insert into Route (id, mileage, departure_id, destination_id)
-values (4, 9.0, 8, 5);
+insert into Route (mileage, departure_id, destination_id)
+values (59.2, 1, 3);
+insert into Route (mileage, departure_id, destination_id)
+values (25.4, 4, 5);
+insert into Route (mileage, departure_id, destination_id)
+values (11.4, 7, 6);
+insert into Route (mileage, departure_id, destination_id)
+values (9.0, 8, 5);
 
 
 insert into Vehicle

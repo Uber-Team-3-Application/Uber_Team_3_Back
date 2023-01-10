@@ -17,6 +17,7 @@ public class Document implements Serializable {
     private String name;
 
     @Column
+    @Lob
     private String documentImage;
 
     @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
