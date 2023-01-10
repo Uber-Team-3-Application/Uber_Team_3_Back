@@ -98,14 +98,13 @@ public class DriverController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CreatedDriverDTO> updateDriverAsAdmin(
             @Valid @RequestBody DriverDTO driverDTO,
-            @PathVariable Long id,
-            @RequestHeader Map<String, String> headers) {
+            @PathVariable Long id) {
 
         if (this.driverService.findOne(id).isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Driver driver = this.driverService.findByEmail(driverDTO.getEmail());
         if (driver != null && !driver.getId().toString().equals(id.toString())) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("Invalid Data. Bad email format.", HttpStatus.BAD_REQUEST);
         }
         driver = this.driverService.getDriverFromDriverDTO(id, driverDTO);
         this.driverService.save(driver);
@@ -150,8 +149,7 @@ public class DriverController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<VehicleDTO> updateVehicleAsAdmin(
             @Valid @RequestBody VehicleDTO vehicleDTO,
-            @PathVariable("id") Long driverId,
-            @RequestHeader Map<String, String> headers) {
+            @PathVariable("id") Long driverId) {
 
         if (driverId < 1) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
@@ -434,8 +432,8 @@ public class DriverController {
     public ResponseEntity<Paginated<WorkingHoursDTO>> getWorkingHours(
             Pageable page,
             @PathVariable("id") Long driverId,
-            @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
-            @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
+            @RequestParam(value = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+            @RequestParam(value = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
             @RequestHeader Map<String, String> headers
     ) {
         String role = this.userRequestValidation.getRoleFromToken(headers);
@@ -552,7 +550,7 @@ public class DriverController {
             return new ResponseEntity<>("Document does not exist!", HttpStatus.NOT_FOUND);
 
         this.documentService.delete(id);
-        return new ResponseEntity<>("Driver document deleted successfully", HttpStatus.NO_CONTENT);
+        return new ResponseEntity("Driver document deleted successfully", HttpStatus.NO_CONTENT);
     }
 
     @GetMapping(value = "/total-edit-requests")
