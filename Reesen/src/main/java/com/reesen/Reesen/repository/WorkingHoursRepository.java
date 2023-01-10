@@ -1,5 +1,6 @@
 package com.reesen.Reesen.repository;
 
+import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.WorkingHours;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,4 +39,7 @@ public interface WorkingHoursRepository extends JpaRepository<WorkingHours, Long
 
     @Query("select w from WorkingHours w where w.driver.id=:driverId and w.startTime=w.endTime")
     Optional<WorkingHours> findOngoingShift(Long driverId);
+
+    @Query("select w.driver from WorkingHours w where w.id=:workingHourId")
+    Optional<Driver> getDriverWithWorkingHourId(Long workingHourId);
 }

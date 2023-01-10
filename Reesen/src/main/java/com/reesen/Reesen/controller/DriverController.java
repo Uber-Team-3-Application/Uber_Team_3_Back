@@ -186,13 +186,29 @@ public class DriverController {
             @PathVariable("working-hour-id") Long workingHourId,
             @RequestHeader Map<String, String> headers
     ) {
-        // TODO get driver id from working hours, and compare to headers
+
 
         Optional<WorkingHours> workingHours = this.workingHoursService.findOne(workingHourId);
         if (workingHours.isEmpty()) return new ResponseEntity("Working hour does not exist", HttpStatus.NOT_FOUND);
         String workingHoursValid = this.workingHoursService.validateWorkingHours(workingHours.get(), workingHoursDTO);
         if(!workingHoursValid.equalsIgnoreCase("valid")){
             return new ResponseEntity(workingHoursValid, HttpStatus.BAD_REQUEST);
+        }
+        Optional<Driver> driver = this.workingHoursService.getDriverFromWorkingHours(workingHourId);
+        if(driver.isEmpty()){
+            return new ResponseEntity(new ErrorResponseMessage(
+                    this.messageSource.getMessage("workingHours.noEndVehicleUndefined", null, Locale.getDefault())
+            ), HttpStatus.BAD_REQUEST);
+        }
+        if(this.driverService.getVehicle(driver.get().getId()) == null ){
+            return new ResponseEntity(new ErrorResponseMessage(
+                    this.messageSource.getMessage("workingHours.noEndVehicleUndefined", null, Locale.getDefault())
+            ), HttpStatus.BAD_REQUEST);
+        }
+        if(!this.workingHoursService.isShiftOngoing(driver.get().getId())){
+            return new ResponseEntity(new ErrorResponseMessage(
+                    this.messageSource.getMessage("workingHours.noEndNoShiftOngoing", null, Locale.getDefault())
+            ), HttpStatus.BAD_REQUEST);
         }
         WorkingHours updatedWH = this.workingHoursService.editWorkingHours(workingHours.get(), workingHoursDTO);
         this.workingHoursService.save(updatedWH);

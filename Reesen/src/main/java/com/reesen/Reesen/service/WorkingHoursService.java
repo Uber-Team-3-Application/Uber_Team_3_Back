@@ -112,4 +112,9 @@ public class WorkingHoursService implements IWorkingHoursService {
         return currentShift.isPresent();
     }
 
+    @Override
+    public Optional<Driver> getDriverFromWorkingHours(Long workingHourId) {
+        return this.workingHoursRepository.getDriverWithWorkingHourId(workingHourId);
+    }
+
 }
