@@ -4,10 +4,12 @@ import com.reesen.Reesen.model.WorkingHours;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -33,4 +35,7 @@ public interface WorkingHoursRepository extends JpaRepository<WorkingHours, Long
     Set<WorkingHours> findAllByDriverIdAndEndTimeAfter(
             Long driverId,
             LocalDateTime endTime);
+
+    @Query("select w from WorkingHours w where w.driver.id=:driverId and w.startTime=w.endTime")
+    Optional<WorkingHours> findOngoingShift(Long driverId);
 }
