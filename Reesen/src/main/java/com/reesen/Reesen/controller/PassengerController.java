@@ -92,8 +92,12 @@ public class PassengerController {
     }
 
     @GetMapping(value = "/{id}/ride")
-   // @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
-    public ResponseEntity<Paginated<PassengerRideDTO>> getPassengerRides(@PathVariable Long id, Pageable page, @RequestParam(value = "sort", required = false) String sort, @RequestParam(value = "from", required = false) String from, @RequestParam(value = "to", required = false) String to) throws ParseException {
+    @PreAuthorize("hasAnyRole('ADMIN', 'PASSENGER')")
+    public ResponseEntity<Paginated<PassengerRideDTO>> getPassengerRides(@PathVariable Long id,
+                                                                         Pageable page,
+                                                                         @RequestParam(value = "sort", required = false) String sort,
+                                                                         @RequestParam(value = "from", required = false) String from,
+                                                                         @RequestParam(value = "to", required = false) String to) throws ParseException {
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         Optional<Passenger> passenger = this.passengerService.findOne(id);
