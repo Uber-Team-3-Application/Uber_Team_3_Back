@@ -34,7 +34,7 @@ public class DriverEditBasicInformation  implements Serializable {
     @Column
     private String telephoneNumber;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
     @Column
