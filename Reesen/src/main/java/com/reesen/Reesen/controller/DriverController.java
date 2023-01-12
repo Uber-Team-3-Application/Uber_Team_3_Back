@@ -180,26 +180,32 @@ public class DriverController {
      **/
 
     @PutMapping(value = "/working-hour/{working-hour-id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
+    @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<WorkingHoursDTO> changeWorkingHours(
             @Valid @RequestBody ChangeWorkingHoursDTO workingHoursDTO,
             @PathVariable("working-hour-id") Long workingHourId,
             @RequestHeader Map<String, String> headers
     ) {
 
-
+        Optional<Driver> driver = this.workingHoursService.getDriverFromWorkingHours(workingHourId);
+        if(driver.isPresent()) {
+            boolean areIdsEqual = this.userRequestValidation.areIdsEqual(headers, driver.get().getId());
+            if (!areIdsEqual) return new ResponseEntity("Driver does not exist.", HttpStatus.NOT_FOUND);
+        }
         Optional<WorkingHours> workingHours = this.workingHoursService.findOne(workingHourId);
         if (workingHours.isEmpty()) return new ResponseEntity("Working hour does not exist", HttpStatus.NOT_FOUND);
         String workingHoursValid = this.workingHoursService.validateWorkingHours(workingHours.get(), workingHoursDTO);
         if(!workingHoursValid.equalsIgnoreCase("valid")){
-            return new ResponseEntity(workingHoursValid, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(new ErrorResponseMessage(workingHoursValid), HttpStatus.BAD_REQUEST);
         }
-        Optional<Driver> driver = this.workingHoursService.getDriverFromWorkingHours(workingHourId);
+
         if(driver.isEmpty()){
             return new ResponseEntity(new ErrorResponseMessage(
                     this.messageSource.getMessage("workingHours.noEndVehicleUndefined", null, Locale.getDefault())
             ), HttpStatus.BAD_REQUEST);
         }
+
+
         if(this.driverService.getVehicle(driver.get().getId()) == null ){
             return new ResponseEntity(new ErrorResponseMessage(
                     this.messageSource.getMessage("workingHours.noEndVehicleUndefined", null, Locale.getDefault())
@@ -224,9 +230,11 @@ public class DriverController {
     public ResponseEntity<CreatedDriverDTO> createDriver(
             @Valid @RequestBody DriverDTO driverDTO) {
 
-        if (this.driverService.findByEmail(driverDTO.getEmail()) != null)
-            return new ResponseEntity("User with that email already exists!", HttpStatus.BAD_REQUEST);
-
+        if (this.driverService.findByEmail(driverDTO.getEmail()) != null) {
+            return new ResponseEntity(new ErrorResponseMessage(
+                    this.messageSource.getMessage("user.emailExists", null, Locale.getDefault())
+            ), HttpStatus.BAD_REQUEST);
+        }
         CreatedDriverDTO createdDriverDTO = this.driverService.createDriverDTO(driverDTO);
         return new ResponseEntity<>(createdDriverDTO, HttpStatus.OK);
     }
@@ -275,7 +283,9 @@ public class DriverController {
         if (driver.isEmpty()) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
 
         String imageMessage = imageValidationService.validateImage(documentDTO.getDocumentImage());
-        if(imageMessage != null) return new ResponseEntity(imageMessage, HttpStatus.BAD_REQUEST);
+        if(imageMessage != null) {
+            return new ResponseEntity(new ErrorResponseMessage(imageMessage), HttpStatus.BAD_REQUEST);
+        }
         Document document = new Document(documentDTO.getName(), documentDTO.getDocumentImage(), driver.get());
         document = this.documentService.save(document);
 
@@ -450,7 +460,7 @@ public class DriverController {
             return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
 
         Vehicle vehicle = this.driverService.getVehicle(id);
-        if (vehicle == null) return new ResponseEntity("Vehicle is not assigned!", HttpStatus.BAD_REQUEST);
+        if (vehicle == null) return new ResponseEntity(new ErrorResponseMessage("Vehicle is not assigned!"), HttpStatus.BAD_REQUEST);
 
         VehicleType type = this.vehicleService.findType(vehicle.getId());
         Location location = this.vehicleService.findLocation(vehicle.getId());

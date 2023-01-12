@@ -4,9 +4,16 @@ package com.reesen.Reesen.dto;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.reesen.Reesen.Enums.TypeOfMessage;
 import com.reesen.Reesen.model.Message;
+import lombok.*;
 
 import java.util.Date;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
 public class    MessageFullDTO {
 
     private Long id;
@@ -29,7 +36,6 @@ public class    MessageFullDTO {
 
     }
 
-    public MessageFullDTO() {}
 
     public MessageFullDTO(Long receiverId, String message, TypeOfMessage type, Long rideId) {
         this.receiverId = receiverId;
@@ -39,59 +45,4 @@ public class    MessageFullDTO {
 
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Date getTimeOfSending() {
-        return timeOfSending;
-    }
-
-    public void setTimeOfSending(Date timeOfSending) {
-        this.timeOfSending = timeOfSending;
-    }
-
-    public Long getSenderId() {
-        return senderId;
-    }
-
-    public void setSenderId(Long senderId) {
-        this.senderId = senderId;
-    }
-
-    public Long getReceiverId() {
-        return receiverId;
-    }
-
-    public void setReceiverId(Long receiverId) {
-        this.receiverId = receiverId;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public TypeOfMessage getType() {
-        return type;
-    }
-
-    public void setType(TypeOfMessage type) {
-        this.type = type;
-    }
-
-    public Long getRideId() {
-        return rideId;
-    }
-
-    public void setRideId(Long rideId) {
-        this.rideId = rideId;
-    }
 }

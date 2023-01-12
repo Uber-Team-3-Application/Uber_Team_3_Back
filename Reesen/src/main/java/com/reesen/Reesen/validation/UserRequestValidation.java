@@ -28,7 +28,7 @@ public class UserRequestValidation {
             role = jwtTokenUtil.getRole(refreshToken);
 
 
-        }else  role = jwtTokenUtil.getRole(token);;
+        }else  role = jwtTokenUtil.getRole(token);
 
         for (String values: role.get(0).values()){
             return values;
