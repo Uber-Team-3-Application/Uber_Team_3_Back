@@ -9,11 +9,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.*;
 
-import com.reesen.Reesen.model.WorkingHours;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
-import java.time.LocalDateTime;
 import java.util.Date;
 
 public interface IRideService {
@@ -41,7 +36,7 @@ public interface IRideService {
 
 	Ride findPassengerActiveRide(Long passengerId);
 
-	Set<Route> getLocationsByRide (Long rideId);
+	LinkedHashSet<Route> getLocationsByRide (Long rideId);
 
     Set<UserRidesDTO> getFilteredRides(Page<Ride> userRides, Long driverId);
 

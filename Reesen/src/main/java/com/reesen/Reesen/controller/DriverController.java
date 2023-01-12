@@ -567,7 +567,7 @@ public class DriverController {
             ride.setDriver(driver.get());
             ride.setPassengers(passengerService.findPassengersByRidesContaining(ride));
             ride.setDeduction(deductionService.findDeductionByRide(ride).orElse(new Deduction()));
-            Set<Route> locations;
+            LinkedHashSet<Route> locations;
             locations = rideService.getLocationsByRide(ride.getId());
             for (Route location : locations) {
                 location.setDestination(this.routeService.getDestinationByRoute(location).get());

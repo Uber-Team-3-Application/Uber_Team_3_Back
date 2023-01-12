@@ -88,19 +88,28 @@ public class RideService implements IRideService {
 		}
 		ride.setPassengers(passengers);
 		ride.setStatus(RideStatus.ON_HOLD);
-		ride.setTotalPrice(8465);
-		ride.setEstimatedTime(55);
-		ride.setDriver(this.findSutiableDriver(ride));
+		Object[] result = this.findSutiableDriver(ride);
+		if(result[0] == null) {
+			ride.setStatus(RideStatus.REJECTED);
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No active drivers at the moment!");
+		}
+		ride.setDriver((Driver) result[0]);
+		ride.setEstimatedTime((Double) result[1]);
+		ride.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(ride.getLocations()), this.locationService.getLastLocation(ride.getLocations())) * ride.getVehicleType().getPricePerKm());
 		return new RideDTO(this.rideRepository.save(ride));
 	}
 
-	private Driver findSutiableDriver(Ride ride) {
+	private Object[] findSutiableDriver(Ride ride) {
+
+		Object[] result = new Object[2];
+		result[0] = null;
+		result[1] = null;
 
 		Driver bestDriver = new Driver();
 		int minimumMinutes = Integer.MAX_VALUE;
 
 		List<Driver> availableDrivers = this.driverRepository.findAllByIsActive(true);
-		if(availableDrivers.isEmpty())  throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No active drivers at the moment!");
+		if(availableDrivers.isEmpty())  return result;
 
 		List<Driver> suitableDrivers = new ArrayList<>();
 		for (Driver driver: availableDrivers) {
@@ -117,7 +126,7 @@ public class RideService implements IRideService {
 			suitableDrivers.add(driver);
 		}
 
-		if(suitableDrivers.isEmpty())  throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No available drivers at the moment!");
+		if(suitableDrivers.isEmpty()) return result;
 
 		for (Driver driver: suitableDrivers) {
 			int minutes = 0;
@@ -134,7 +143,10 @@ public class RideService implements IRideService {
 			}
 		}
 
-		return bestDriver;
+		result[0] = bestDriver;
+		result[1] = minimumMinutes;
+
+		return result;
 	}
 
 	private boolean getRejectedRidesForDriver(Long driverId, Long passengerId) {
