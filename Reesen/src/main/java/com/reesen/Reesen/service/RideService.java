@@ -71,12 +71,12 @@ public class RideService implements IRideService {
 	@Override
 	public RideDTO createRideDTO(CreateRideDTO rideDTO) {
 		Ride ride = new Ride();
-		ride.setId(Long.parseLong("546"));
 		Set<RouteDTO> locationsDTOs = rideDTO.getLocations();
 		LinkedHashSet<Route> locations = new LinkedHashSet<>();
 		for(RouteDTO routeDTO: locationsDTOs){
 			locations.add(this.routeRepository.findById(routeDTO.getId()).get());
 		}
+		
 		ride.setLocations(locations);
 		ride.setVehicleType(this.vehicleTypeRepository.findByName(VehicleName.valueOf(rideDTO.getVehicleType())));
 		ride.setBabyAccessible(rideDTO.isBabyTransport());

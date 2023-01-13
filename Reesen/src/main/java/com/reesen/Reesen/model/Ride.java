@@ -60,7 +60,7 @@ public class Ride implements Serializable {
     private VehicleType vehicleType;
 
     @ManyToMany(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
-    private LinkedHashSet<Route> locations;
+    private Set<Route> locations;
 
     private LocalDateTime scheduledTime;
 
@@ -69,7 +69,7 @@ public class Ride implements Serializable {
 
     public Ride(Date timeOfStart, Date timeOfEnd, double totalPrice, Driver driver, Set<Passenger> passengers,
                 double estimatedTime, Set<Review> review, RideStatus status, Deduction deduction,
-                boolean isPanicPressed, boolean isBabyAccessible, boolean isPetAccessible, VehicleType vehicleType, LinkedHashSet<Route> locations, LocalDateTime scheduledTime) {
+                boolean isPanicPressed, boolean isBabyAccessible, boolean isPetAccessible, VehicleType vehicleType, Set<Route> locations, LocalDateTime scheduledTime) {
         this.scheduledTime = scheduledTime;
         {
             this.timeOfStart = timeOfStart;
@@ -203,7 +203,7 @@ public class Ride implements Serializable {
         this.vehicleType = vehicleType;
     }
 
-    public LinkedHashSet<Route> getLocations() {
+    public Set<Route> getLocations() {
         return locations;
     }
 

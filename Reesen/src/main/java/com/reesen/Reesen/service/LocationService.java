@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Service
 public class LocationService implements ILocationService {
@@ -40,7 +41,7 @@ public class LocationService implements ILocationService {
     }
 
     @Override
-    public Location getLastLocation(LinkedHashSet<Route> locations){
+    public Location getLastLocation(Set<Route> locations){
         Iterator<Route> iterator = locations.iterator();
         Route lastRoute = null;
         while (iterator.hasNext()) {
@@ -50,7 +51,7 @@ public class LocationService implements ILocationService {
     }
 
     @Override
-    public Location getFirstLocation(LinkedHashSet<Route> locations){
+    public Location getFirstLocation(Set<Route> locations){
         Iterator<Route> iterator = locations.iterator();
         return iterator.next().getDeparture();
     }
