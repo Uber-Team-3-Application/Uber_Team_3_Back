@@ -24,6 +24,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -40,7 +42,7 @@ public class RideService implements IRideService {
 	private final ILocationService locationService;
 	private final DeductionRepository deductionRepository;
 	private final ReviewRepository reviewRepository;
-
+	private final ScheduledExecutorService executor;
 
     @Autowired
     public RideService(RideRepository rideRepository, RouteRepository routeRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, UserRepository userRepository, DriverRepository driverRepository, IWorkingHoursService workingHoursService, ILocationService locationService, DeductionRepository deductionRepository, ReviewRepository reviewRepository){
@@ -55,6 +57,7 @@ public class RideService implements IRideService {
 		this.locationService = locationService;
 		this.deductionRepository = deductionRepository;
 		this.reviewRepository = reviewRepository;
+		this.executor = Executors.newScheduledThreadPool(1);
 	}
 
 
@@ -88,18 +91,44 @@ public class RideService implements IRideService {
 		}
 		ride.setPassengers(passengers);
 		ride.setStatus(RideStatus.ON_HOLD);
-		Object[] result = this.findSutiableDriver(ride);
-		if(result[0] == null) {
-			ride.setStatus(RideStatus.REJECTED);
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No active drivers at the moment!");
+
+		if(ride.getScheduledTime() != null){
+			Runnable task = () -> {
+				Object[] result = this.findSuitableDriver(ride);
+				if (result[0] == null) {
+					ride.setStatus(RideStatus.REJECTED);
+					this.rideRepository.save(ride);
+					throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No active drivers at the moment!");
+				}
+				ride.setDriver((Driver) result[0]);
+				ride.setEstimatedTime((Double) result[1]);
+				ride.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(ride.getLocations()), this.locationService.getLastLocation(ride.getLocations())) * ride.getVehicleType().getPricePerKm());
+				this.rideRepository.save(ride);
+			};
+			Calendar calendar = Calendar.getInstance();
+			LocalDateTime dateTime = ride.getScheduledTime().minusMinutes(15);
+			calendar.set(Calendar.YEAR, dateTime.getYear());
+			calendar.set(Calendar.MONTH, dateTime.getMonth().getValue());
+			calendar.set(Calendar.DAY_OF_MONTH, dateTime.getDayOfMonth());
+			calendar.set(Calendar.HOUR_OF_DAY, dateTime.getHour());
+			calendar.set(Calendar.MINUTE, dateTime.getMinute());
+			calendar.set(Calendar.SECOND, 0);
+		} else {
+
+			Object[] result = this.findSuitableDriver(ride);
+			if (result[0] == null) {
+				ride.setStatus(RideStatus.REJECTED);
+				this.rideRepository.save(ride);
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No active drivers at the moment!");
+			}
+			ride.setDriver((Driver) result[0]);
+			ride.setEstimatedTime((Double) result[1]);
+			ride.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(ride.getLocations()), this.locationService.getLastLocation(ride.getLocations())) * ride.getVehicleType().getPricePerKm());
 		}
-		ride.setDriver((Driver) result[0]);
-		ride.setEstimatedTime((Double) result[1]);
-		ride.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(ride.getLocations()), this.locationService.getLastLocation(ride.getLocations())) * ride.getVehicleType().getPricePerKm());
 		return new RideDTO(this.rideRepository.save(ride));
 	}
 
-	private Object[] findSutiableDriver(Ride ride) {
+	private Object[] findSuitableDriver(Ride ride) {
 
 		Object[] result = new Object[2];
 		result[0] = null;
@@ -116,7 +145,7 @@ public class RideService implements IRideService {
 			if(this.workingHoursService.getTotalHoursWorkedInLastDay(driver.getId()).toHours() >= 8) continue;
 			if(this.getRejectedRidesForDriver(driver.getId(), ride.getPassengers().iterator().next().getId())) continue;
 			if(this.findDriverScheduledRide(driver.getId()).isPresent()) continue;
-			Vehicle vehicle = driver.getVehicle();
+			Vehicle vehicle = driverRepository.getVehicle(driver.getId());
 			if(ride.getVehicleType() != vehicle.getType()) continue;
 			if(ride.isBabyAccessible())
 				if(!vehicle.isBabyAccessible()) continue;
