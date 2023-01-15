@@ -12,12 +12,12 @@ import java.util.*;
 import java.util.Date;
 
 public interface IRideService {
-	Optional<Ride> findOne(Long id);
+	Ride findOne(Long id);
 	Ride save(Ride ride);
 
 	RideDTO createRideDTO(CreateRideDTO rideDTO);
 
-	Optional<Ride> findDriverActiveRide(Long driverId);
+	Ride findDriverActiveRide(Long driverId);
 
 	Ride withdrawRide(Ride ride);
 

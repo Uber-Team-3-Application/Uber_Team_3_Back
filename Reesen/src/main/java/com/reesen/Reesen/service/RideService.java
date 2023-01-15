@@ -43,9 +43,10 @@ public class RideService implements IRideService {
 	private final DeductionRepository deductionRepository;
 	private final ReviewRepository reviewRepository;
 	private final ScheduledExecutorService executor;
+	private PassengerService passengerService;
 
-    @Autowired
-    public RideService(RideRepository rideRepository, RouteRepository routeRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, UserRepository userRepository, DriverRepository driverRepository, IWorkingHoursService workingHoursService, ILocationService locationService, DeductionRepository deductionRepository, ReviewRepository reviewRepository){
+	@Autowired
+    public RideService(RideRepository rideRepository, RouteRepository routeRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, UserRepository userRepository, DriverRepository driverRepository, IWorkingHoursService workingHoursService, ILocationService locationService, DeductionRepository deductionRepository, ReviewRepository reviewRepository, PassengerService passengerService){
         this.rideRepository = rideRepository;
 		this.routeRepository = routeRepository;
 		this.passengerRepository = passengerRepository;
@@ -57,13 +58,21 @@ public class RideService implements IRideService {
 		this.locationService = locationService;
 		this.deductionRepository = deductionRepository;
 		this.reviewRepository = reviewRepository;
+		this.passengerService = passengerService;
 		this.executor = Executors.newScheduledThreadPool(1);
 	}
 
 
 	@Override
-	public Optional<Ride> findOne(Long id) {
-		return this.rideRepository.findById(id);
+	public Ride findOne(Long id) {
+		Ride ride = this.rideRepository.findById(id).get();
+		if(ride != null)
+		{
+			ride.setDriver(this.driverRepository.findDriverByRidesContaining(ride).get());
+			ride.setPassengers(this.passengerService.findPassengersByRidesContaining(ride));
+			ride.setLocations(this.rideRepository.getLocationsByRide(ride.getId()));
+		}
+		return ride;
 	}
 
 	@Override
@@ -159,21 +168,21 @@ public class RideService implements IRideService {
 
 		for (Driver driver: suitableDrivers) {
 			int minutes = 0;
-			Optional<Ride> currentRide = this.findDriverActiveRide(driver.getId());
-			if(currentRide.isPresent()) {
-				minutes += (this.calculateDistance(driver.getVehicle().getCurrentLocation(), locationService.getLastLocation(currentRide.get().getLocations())) / 80) * 60 * 2;
-				minutes += (this.calculateDistance(locationService.getLastLocation(currentRide.get().getLocations()), locationService.getFirstLocation(ride.getLocations())) / 80) * 60 * 2;
+			Ride currentRide = this.findDriverActiveRide(driver.getId());
+			if(currentRide != null) {
+				minutes += (this.calculateDistance(driver.getVehicle().getCurrentLocation(), locationService.getLastLocation(currentRide.getLocations())) / 80) * 60 * 2;
+				minutes += (this.calculateDistance(locationService.getLastLocation(currentRide.getLocations()), locationService.getFirstLocation(ride.getLocations())) / 80) * 60 * 2;
 			} else {
 				minutes += (this.calculateDistance(driver.getVehicle().getCurrentLocation(), locationService.getFirstLocation(ride.getLocations())) / 80) * 60 * 2;
 			}
-			if(minutes < minimumMinutes){
+			if((int)minutes < minimumMinutes){
 				bestDriver = driver;
-				minimumMinutes = minutes;
+				minimumMinutes = (int) minutes;
 			}
 		}
 
 		result[0] = bestDriver;
-		result[1] = minimumMinutes;
+		result[1] = (int) (minimumMinutes + (this.calculateDistance(locationService.getFirstLocation(ride.getLocations()), locationService.getLastLocation(ride.getLocations())) / 80) * 60 * 2);
 
 		return result;
 	}
@@ -189,8 +198,15 @@ public class RideService implements IRideService {
 	}
 
 	@Override
-	public Optional<Ride> findDriverActiveRide(Long driverId) {
-		return this.rideRepository.findRideByDriverIdAndStatus(driverId, RideStatus.ACTIVE);
+	public Ride findDriverActiveRide(Long driverId) {
+		Ride ride = this.rideRepository.findRideByDriverIdAndStatus(driverId, RideStatus.ACTIVE).get();
+		if(ride != null)
+		{
+			ride.setDriver(this.driverRepository.findDriverByRidesContaining(ride).get());
+			ride.setPassengers(this.passengerService.findPassengersByRidesContaining(ride));
+			ride.setLocations(this.rideRepository.getLocationsByRide(ride.getId()));
+		}
+		return ride;
 	}
 
 	@Override
@@ -268,12 +284,14 @@ public class RideService implements IRideService {
 
 	@Override
 	public Ride findPassengerActiveRide(Long passengerId) {
-		Passenger passenger = this.passengerRepository.findById(passengerId).get();
-		for(Ride ride: passenger.getRides()){
-			if(ride.getStatus() == RideStatus.ACTIVE)
-				return ride;
+		Ride ride = this.rideRepository.findPassengerActiveRide(passengerId, RideStatus.ACTIVE);
+		if(ride != null)
+		{
+			ride.setDriver(this.driverRepository.findDriverByRidesContaining(ride).get());
+			ride.setPassengers(this.passengerService.findPassengersByRidesContaining(ride));
+			ride.setLocations(this.rideRepository.getLocationsByRide(ride.getId()));
 		}
-		return null;
+		return ride;
 	}
 
 	@Override

@@ -151,4 +151,11 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "and r.driver.id=:driverId " +
             "and r.status=:rideStatus")
     Set<Ride> findAllRidesByDriverIdAndPassengerIdAndScheduledTimeBeforeAndStatus(Long driverId, Long passengerId, LocalDateTime scheduledTime, RideStatus rideStatus);
+
+    @Query("select r from Ride r, Passenger p  " +
+            "where p.id=:passengerId " +
+            "and " +
+            "p member of r.passengers " +
+            "and r.status=:rideStatus")
+    Ride findPassengerActiveRide(Long passengerId, RideStatus rideStatus);
 }
