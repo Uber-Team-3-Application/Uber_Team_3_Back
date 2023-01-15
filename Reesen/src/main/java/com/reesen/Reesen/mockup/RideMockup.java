@@ -7,11 +7,12 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class RideMockup {
     private  Long id;
-    private Set<RouteDTO> locations;
+    private LinkedHashSet<RouteDTO> locations;
     private  DeductionDTO rejection;
     private Date startTime;
     private  Date endTime;
@@ -26,7 +27,7 @@ public class RideMockup {
 
     public RideMockup(){
         id = Long.parseLong("10");
-        locations = new HashSet<>();
+        locations = new LinkedHashSet<>();
         passengers = new HashSet<>();
         rejection = (
                 new DeductionDTO(
@@ -80,11 +81,11 @@ public class RideMockup {
         this.id = id;
     }
 
-    public Set<RouteDTO> getLocations() {
+    public LinkedHashSet<RouteDTO> getLocations() {
         return locations;
     }
 
-    public void setLocations(Set<RouteDTO> locations) {
+    public void setLocations(LinkedHashSet<RouteDTO> locations) {
         this.locations = locations;
     }
 
