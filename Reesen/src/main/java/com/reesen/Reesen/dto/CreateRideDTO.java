@@ -1,22 +1,25 @@
 package com.reesen.Reesen.dto;
 
+import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class CreateRideDTO {
 
     private Set<UserDTO> passengers;
-    private Set<RouteDTO> locations;
+    private LinkedHashSet<RouteDTO> locations;
     private String vehicleType;
     private boolean babyTransport;
     private boolean petTransport;
+    private LocalDateTime scheduledTime;
 
     public CreateRideDTO() {
         super();
     }
-    public Set<RouteDTO> getLocations() {
+    public LinkedHashSet<RouteDTO> getLocations() {
         return locations;
     }
-    public void setLocations(Set<RouteDTO> locations) {
+    public void setLocations(LinkedHashSet<RouteDTO> locations) {
         this.locations = locations;
     }
     public String getVehicleType() {
@@ -44,6 +47,11 @@ public class CreateRideDTO {
         this.passengers = passengers;
     }
 
+    public LocalDateTime getScheduledTime() {
+        return scheduledTime;
+    }
 
-
+    public void setScheduledTime(LocalDateTime scheduledTime) {
+        this.scheduledTime = scheduledTime;
+    }
 }

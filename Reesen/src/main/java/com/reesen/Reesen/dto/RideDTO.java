@@ -2,6 +2,7 @@ package com.reesen.Reesen.dto;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import com.reesen.Reesen.Enums.RideStatus;
@@ -11,7 +12,7 @@ import com.reesen.Reesen.model.*;
 public class RideDTO {
 
 	private Long id;
-	private Set<RouteDTO> locations;
+	private LinkedHashSet<RouteDTO> locations;
 	private DeductionDTO rejection;
  	private Date startTime;
  	private Date endTime;
@@ -45,7 +46,7 @@ public class RideDTO {
 	}
 
 	private void setLocations(Ride ride) {
-		locations = new HashSet<>();
+		locations = new LinkedHashSet<>();
 		for (Route route : ride.getLocations()) {
 			locations.add(new RouteDTO(route));
 		}
@@ -84,11 +85,11 @@ public class RideDTO {
 		this.id = id;
 	}
 
-	public Set<RouteDTO> getLocations() {
+	public LinkedHashSet<RouteDTO> getLocations() {
 		return locations;
 	}
 
-	public void setLocations(Set<RouteDTO> locations) {
+	public void setLocations(LinkedHashSet<RouteDTO> locations) {
 		this.locations = locations;
 	}
 
