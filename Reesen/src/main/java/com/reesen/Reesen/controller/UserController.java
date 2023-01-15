@@ -318,8 +318,17 @@ public class UserController {
     }
 
     @GetMapping("/email")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
         return new ResponseEntity<>( this.userService.findByEmail(email).get(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/user")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
+    public ResponseEntity<UserFullDTO> getUserById(@PathVariable("id") Long id) {
+        User user = this.userService.findOne(id);
+        UserFullDTO userFullDTO = new UserFullDTO(user);
+        return new ResponseEntity<>( userFullDTO, HttpStatus.OK);
     }
 
     @GetMapping("/admin-user")
