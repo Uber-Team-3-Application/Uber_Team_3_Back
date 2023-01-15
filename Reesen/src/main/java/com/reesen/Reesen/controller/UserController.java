@@ -319,8 +319,8 @@ public class UserController {
 
     @GetMapping("/email")
     @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
-    public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
-        return new ResponseEntity<>( this.userService.findByEmail(email).get(), HttpStatus.OK);
+    public ResponseEntity<UserFullDTO> getUserByEmail(@RequestParam String email) {
+        return new ResponseEntity<>( new UserFullDTO(this.userService.findByEmail(email).get()), HttpStatus.OK);
     }
 
     @GetMapping("/{id}/user")
