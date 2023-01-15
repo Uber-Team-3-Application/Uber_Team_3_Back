@@ -21,7 +21,7 @@ public interface IRideService {
 
 	Ride withdrawRide(Ride ride);
 
-	Ride panicRide(Ride ride, String reason);
+	Ride panicRide(Ride ride, String reason, Long id);
 
 	Ride cancelRide(Ride ride, String reason);
 

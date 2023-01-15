@@ -216,8 +216,8 @@ public class RideService implements IRideService {
 	}
 
 	@Override
-	public Ride panicRide(Ride ride, String reason) {
-		this.panicRepository.save(new Panic(new Date(), reason, ride, ride.getDriver()));
+	public Ride panicRide(Ride ride, String reason, Long id) {
+		this.panicRepository.save(new Panic(new Date(), reason, ride, passengerRepository.findById(id).get()));
 		ride.setStatus(RideStatus.FINISHED);
 		return ride;
 	}
