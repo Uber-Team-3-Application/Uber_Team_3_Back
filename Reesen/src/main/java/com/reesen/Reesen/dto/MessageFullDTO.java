@@ -14,7 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class    MessageFullDTO {
+public class MessageFullDTO {
 
     private Long id;
     private Date timeOfSending;

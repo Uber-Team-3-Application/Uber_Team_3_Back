@@ -2,13 +2,13 @@ package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.*;
-import com.reesen.Reesen.dto.RideDTO;
 import com.reesen.Reesen.exceptions.BadRequestException;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.security.SecurityUser;
 import com.reesen.Reesen.security.jwt.JwtTokenUtil;
 import com.reesen.Reesen.service.interfaces.*;
+import com.reesen.Reesen.validation.UserRequestValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import javax.swing.text.html.Option;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -45,6 +44,7 @@ public class UserController {
     private final IPassengerService passengerService;
     private final JavaMailSender mailSender;
     private final JwtTokenUtil tokens;
+    private final UserRequestValidation userRequestValidation;
 
     private final IRideService rideService;
 
@@ -56,7 +56,7 @@ public class UserController {
 
     @Autowired
     public UserController(IUserService userService, IMessageService messageService, IRemarkService remarkService,
-                          IDriverService driverService, IPassengerService passengerService, JavaMailSender mailSender, JwtTokenUtil tokens, IRideService rideService) {
+                          IDriverService driverService, IPassengerService passengerService, JavaMailSender mailSender, JwtTokenUtil tokens, UserRequestValidation userRequestValidation, IRideService rideService) {
         this.userService = userService;
         this.messageService = messageService;
         this.remarkService = remarkService;
@@ -64,6 +64,7 @@ public class UserController {
         this.passengerService = passengerService;
         this.mailSender = mailSender;
         this.tokens = tokens;
+        this.userRequestValidation = userRequestValidation;
         this.rideService = rideService;
     }
 
@@ -180,9 +181,9 @@ public class UserController {
     public ResponseEntity<Paginated<MessageFullDTO>> getUserMessages(
             @PathVariable int id) {
 
-        User sender = this.userService.findOne((long) id);
-        Set<Message> messages = messageService.getMessagesBySender(sender);
-        Set<MessageFullDTO> retVal = new HashSet<>();
+        User user = this.userService.findOne((long) id);
+        Set<Message> messages = messageService.getAll(user);
+        Set<MessageFullDTO> retVal = new LinkedHashSet<>();
         for (Message message : messages) {
             retVal.add(new MessageFullDTO(message));
         }
@@ -194,13 +195,15 @@ public class UserController {
     @PostMapping("/{id}/message")
     @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER', 'ADMIN')")
     public ResponseEntity<MessageFullDTO> sendMessageToTheUser(
-            @PathVariable int id,
-            @RequestBody MessageDTO messageDto
+            @PathVariable Long id,
+            @RequestBody MessageDTO messageDto,
+            @RequestHeader Map<String, String> headers
     ) {
-        User sender = userService.findOne((long)id);
-        User receiver = userService.findOne(messageDto.getReceiverId());
+        Long senderId = this.userRequestValidation.getIdFromToken(headers);
+        User receiver = userService.findOne(id);
+        User sender = userService.findOne(senderId);
 
-        Message message = new Message(sender, receiver, messageDto.getMessage(), Date.from(Instant.now()), messageDto.getType());
+        Message message = new Message(sender, receiver, messageDto.getMessage(), Date.from(Instant.now()), messageDto.getType(), messageDto.getRideId());
         message = messageService.save(message);
         MessageFullDTO messageFullDTO = new MessageFullDTO(message);
         return new ResponseEntity<>(messageFullDTO, HttpStatus.OK);
