@@ -6,11 +6,16 @@ import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.service.interfaces.IDriverService;
 import com.reesen.Reesen.service.interfaces.IRideService;
+import io.jsonwebtoken.Header;
+import io.jsonwebtoken.JwsHeader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -90,13 +95,14 @@ public class RideController {
     @PutMapping(value = "/{id}/panic")
     @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
     public ResponseEntity<RideDTO> pressedPanic(@PathVariable Long id, @RequestBody String reason){
-        // TODO: get user id from token
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(this.rideService.findOne(id) == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         Ride ride = this.rideService.findOne(id);
-        ride = this.rideService.panicRide(ride, reason);
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        Long userId = Long.valueOf(request.getHeader("Id"));
+        ride = this.rideService.panicRide(ride, reason, userId);
         this.rideService.save(ride);
         RideDTO panicRide = new RideDTO(ride);
         return new ResponseEntity<>(panicRide, HttpStatus.OK);
