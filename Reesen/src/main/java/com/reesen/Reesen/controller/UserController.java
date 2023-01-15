@@ -322,4 +322,13 @@ public class UserController {
         return new ResponseEntity<>( this.userService.findByEmail(email).get(), HttpStatus.OK);
     }
 
+    @GetMapping("/admin-user")
+    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
+    public ResponseEntity<Long> getAdminId(){
+
+        Long id = this.userService.getAdminId();
+        return new ResponseEntity<>(id, HttpStatus.OK);
+    }
+
+
 }

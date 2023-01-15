@@ -120,4 +120,9 @@ public class UserService implements IUserService {
         return this.passengerRepository.countTotalNumberOfRides(user.getId());
     }
 
+    @Override
+    public Long getAdminId() {
+        return this.userRepository.findAdmin(Role.ADMIN);
+    }
+
 }
