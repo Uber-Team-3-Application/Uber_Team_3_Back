@@ -87,6 +87,7 @@ public class DriverController {
         Driver driver = this.driverService.findByEmail(driverDTO.getEmail());
 
         if (driver != null && !driver.getId().toString().equals(id.toString())) {
+
             return new ResponseEntity("Invalid data. Bad email format.", HttpStatus.BAD_REQUEST);
         }
         driver = this.driverService.getDriverFromDriverDTO(id, driverDTO);
