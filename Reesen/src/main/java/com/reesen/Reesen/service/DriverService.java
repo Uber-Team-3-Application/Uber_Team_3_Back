@@ -4,6 +4,7 @@ import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.dto.CreatedDriverDTO;
 import com.reesen.Reesen.dto.DriverDTO;
+import com.reesen.Reesen.dto.UpdateDriverDTO;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Driver.DriverEditBasicInformation;
 import com.reesen.Reesen.model.Driver.DriverEditVehicle;
@@ -92,7 +93,7 @@ public class DriverService implements IDriverService {
         return driverPaginated;
     }
 
-    public Driver getDriverFromDriverDTO(Long id, DriverDTO driverDTO){
+    public Driver getDriverFromDriverDTO(Long id, UpdateDriverDTO driverDTO){
         Optional<Driver> optDriver = this.driverRepository.findById(id);
         Driver driver = new Driver();
         if(optDriver.isPresent()) driver = optDriver.get();
@@ -103,11 +104,7 @@ public class DriverService implements IDriverService {
         driver.setTelephoneNumber(driverDTO.getTelephoneNumber());
         driver.setAddress(driverDTO.getAddress());
         driver.setId(id);
-        if(driverDTO.getPassword() != null) {
-            driver.setPassword(passwordEncoder.encode(driverDTO.getPassword()));
-        }else{
-            driver.setPassword(this.driverRepository.getPasswordWithId(id));
-        }
+
         driver.setRole(Role.DRIVER);
 
         return driver;
