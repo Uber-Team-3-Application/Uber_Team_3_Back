@@ -74,7 +74,7 @@ public class DriverController {
     @PutMapping(value = "/{id}")
     @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<CreatedDriverDTO> updateDriver(
-            @Valid @RequestBody DriverDTO driverDTO,
+            @Valid @RequestBody UpdateDriverDTO driverDTO,
             @PathVariable Long id,
             @RequestHeader Map<String, String> headers) {
 
@@ -102,7 +102,7 @@ public class DriverController {
     @PutMapping(value = "/{id}/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CreatedDriverDTO> updateDriverAsAdmin(
-            @Valid @RequestBody DriverDTO driverDTO,
+            @Valid @RequestBody UpdateDriverDTO driverDTO,
             @PathVariable Long id) {
 
         if (this.driverService.findOne(id).isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -392,7 +392,7 @@ public class DriverController {
 
 
     @GetMapping(value = "/{id}")
-    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN')")
     public ResponseEntity<CreatedDriverDTO> getDriver(
             @PathVariable Long id,
             @RequestHeader Map<String, String> headers) {
