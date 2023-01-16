@@ -32,8 +32,9 @@ public class WebSecurityConfiguration {
         http.headers().frameOptions().disable();
                  http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/*").permitAll()
-                         .antMatchers("*/login").permitAll()
+                         .antMatchers("/api/user/login").permitAll()
+                         .antMatchers("/api/unregisteredUser/**").permitAll()
+                         .antMatchers("/api/**").authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                                  .and()

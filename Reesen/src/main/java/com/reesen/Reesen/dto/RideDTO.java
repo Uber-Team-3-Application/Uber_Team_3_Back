@@ -62,11 +62,11 @@ public class RideDTO {
 
 	private void setVehicleType(Ride ride) {
 		if (ride.getVehicleType().getName() == VehicleName.VAN)
-			this.vehicleType = VehicleTypeDTO.KOMBI;
+			this.vehicleType = VehicleTypeDTO.VAN;
 		else if (ride.getVehicleType().getName() == VehicleName.LUXURY)
-			this.vehicleType = VehicleTypeDTO.LUKSUZNO;
+			this.vehicleType = VehicleTypeDTO.LUXURY;
 		else if (ride.getVehicleType().getName() == VehicleName.STANDARD)
-			this.vehicleType = VehicleTypeDTO.STANDARDNO;
+			this.vehicleType = VehicleTypeDTO.STANDARD;
 	}
 
 	public DeductionDTO getRejection() {
