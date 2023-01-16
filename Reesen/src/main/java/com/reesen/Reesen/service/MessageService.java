@@ -30,5 +30,10 @@ public class MessageService implements IMessageService {
         return this.messageRepository.getMessagesBySender(sender);
     }
 
+    @Override
+    public Set<Message> getAll(User user) {
+        return this.messageRepository.findAll(user);
+    }
+
 
 }

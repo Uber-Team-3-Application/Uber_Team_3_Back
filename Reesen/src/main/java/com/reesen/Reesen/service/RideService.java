@@ -6,12 +6,17 @@ import com.reesen.Reesen.Enums.TypeOfReport;
 import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.*;
+import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.repository.*;
+import com.reesen.Reesen.service.interfaces.ILocationService;
+import com.reesen.Reesen.service.interfaces.IWorkingHoursService;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.reesen.Reesen.service.interfaces.IRideService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 
 import java.text.ParseException;
@@ -19,6 +24,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -31,13 +38,15 @@ public class RideService implements IRideService {
 	private final PanicRepository panicRepository;
 	private final UserRepository userRepository;
 	private final DriverRepository driverRepository;
-
+	private final IWorkingHoursService workingHoursService;
+	private final ILocationService locationService;
 	private final DeductionRepository deductionRepository;
 	private final ReviewRepository reviewRepository;
+	private final ScheduledExecutorService executor;
+	private PassengerService passengerService;
 
-
-    @Autowired
-    public RideService(RideRepository rideRepository, RouteRepository routeRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, UserRepository userRepository, DriverRepository driverRepository, DeductionRepository deductionRepository, ReviewRepository reviewRepository){
+	@Autowired
+    public RideService(RideRepository rideRepository, RouteRepository routeRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, UserRepository userRepository, DriverRepository driverRepository, IWorkingHoursService workingHoursService, ILocationService locationService, DeductionRepository deductionRepository, ReviewRepository reviewRepository, PassengerService passengerService){
         this.rideRepository = rideRepository;
 		this.routeRepository = routeRepository;
 		this.passengerRepository = passengerRepository;
@@ -45,14 +54,25 @@ public class RideService implements IRideService {
 		this.panicRepository = panicRepository;
 		this.userRepository = userRepository;
 		this.driverRepository = driverRepository;
+		this.workingHoursService = workingHoursService;
+		this.locationService = locationService;
 		this.deductionRepository = deductionRepository;
 		this.reviewRepository = reviewRepository;
+		this.passengerService = passengerService;
+		this.executor = Executors.newScheduledThreadPool(1);
 	}
 
 
 	@Override
-	public Optional<Ride> findOne(Long id) {
-		return this.rideRepository.findById(id);
+	public Ride findOne(Long id) {
+		Ride ride = this.rideRepository.findById(id).get();
+		if(ride != null)
+		{
+			ride.setDriver(this.driverRepository.findDriverByRidesContaining(ride).get());
+			ride.setPassengers(this.passengerService.findPassengersByRidesContaining(ride));
+			ride.setLocations(this.rideRepository.getLocationsByRide(ride.getId()));
+		}
+		return ride;
 	}
 
 	@Override
@@ -63,12 +83,12 @@ public class RideService implements IRideService {
 	@Override
 	public RideDTO createRideDTO(CreateRideDTO rideDTO) {
 		Ride ride = new Ride();
-		ride.setId(Long.parseLong("546"));
 		Set<RouteDTO> locationsDTOs = rideDTO.getLocations();
-		Set<Route> locations = new HashSet<>();
+		LinkedHashSet<Route> locations = new LinkedHashSet<>();
 		for(RouteDTO routeDTO: locationsDTOs){
 			locations.add(this.routeRepository.findById(routeDTO.getId()).get());
 		}
+		
 		ride.setLocations(locations);
 		ride.setVehicleType(this.vehicleTypeRepository.findByName(VehicleName.valueOf(rideDTO.getVehicleType())));
 		ride.setBabyAccessible(rideDTO.isBabyTransport());
@@ -79,12 +99,114 @@ public class RideService implements IRideService {
 			passengers.add(this.passengerRepository.findByEmail(userDTO.getEmail()));
 		}
 		ride.setPassengers(passengers);
+		ride.setStatus(RideStatus.ON_HOLD);
+
+		if(ride.getScheduledTime() != null){
+			Runnable task = () -> {
+				Object[] result = this.findSuitableDriver(ride);
+				if (result[0] == null) {
+					ride.setStatus(RideStatus.REJECTED);
+					this.rideRepository.save(ride);
+					throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No active drivers at the moment!");
+				}
+				ride.setDriver((Driver) result[0]);
+				ride.setEstimatedTime((Double) result[1]);
+				ride.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(ride.getLocations()), this.locationService.getLastLocation(ride.getLocations())) * ride.getVehicleType().getPricePerKm());
+				this.rideRepository.save(ride);
+			};
+			Calendar calendar = Calendar.getInstance();
+			LocalDateTime dateTime = ride.getScheduledTime().minusMinutes(15);
+			calendar.set(Calendar.YEAR, dateTime.getYear());
+			calendar.set(Calendar.MONTH, dateTime.getMonth().getValue());
+			calendar.set(Calendar.DAY_OF_MONTH, dateTime.getDayOfMonth());
+			calendar.set(Calendar.HOUR_OF_DAY, dateTime.getHour());
+			calendar.set(Calendar.MINUTE, dateTime.getMinute());
+			calendar.set(Calendar.SECOND, 0);
+		} else {
+
+			Object[] result = this.findSuitableDriver(ride);
+			if (result[0] == null) {
+				ride.setStatus(RideStatus.REJECTED);
+				this.rideRepository.save(ride);
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No active drivers at the moment!");
+			}
+			ride.setDriver((Driver) result[0]);
+			ride.setEstimatedTime((Double) result[1]);
+			ride.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(ride.getLocations()), this.locationService.getLastLocation(ride.getLocations())) * ride.getVehicleType().getPricePerKm());
+		}
 		return new RideDTO(this.rideRepository.save(ride));
 	}
 
+	private Object[] findSuitableDriver(Ride ride) {
+
+		Object[] result = new Object[2];
+		result[0] = null;
+		result[1] = null;
+
+		Driver bestDriver = new Driver();
+		int minimumMinutes = Integer.MAX_VALUE;
+
+		List<Driver> availableDrivers = this.driverRepository.findAllByIsActive(true);
+		if(availableDrivers.isEmpty())  return result;
+
+		List<Driver> suitableDrivers = new ArrayList<>();
+		for (Driver driver: availableDrivers) {
+			if(this.workingHoursService.getTotalHoursWorkedInLastDay(driver.getId()).toHours() >= 8) continue;
+			if(this.getRejectedRidesForDriver(driver.getId(), ride.getPassengers().iterator().next().getId())) continue;
+			if(this.findDriverScheduledRide(driver.getId()).isPresent()) continue;
+			Vehicle vehicle = driverRepository.getVehicle(driver.getId());
+			if(ride.getVehicleType() != vehicle.getType()) continue;
+			if(ride.isBabyAccessible())
+				if(!vehicle.isBabyAccessible()) continue;
+			if(ride.isPetAccessible())
+				if(!vehicle.isPetAccessible()) continue;
+			if(ride.getPassengers().size() > vehicle.getPassengerSeats()) continue;
+			suitableDrivers.add(driver);
+		}
+
+		if(suitableDrivers.isEmpty()) return result;
+
+		for (Driver driver: suitableDrivers) {
+			int minutes = 0;
+			Ride currentRide = this.findDriverActiveRide(driver.getId());
+			if(currentRide != null) {
+				minutes += (this.calculateDistance(driver.getVehicle().getCurrentLocation(), locationService.getLastLocation(currentRide.getLocations())) / 80) * 60 * 2;
+				minutes += (this.calculateDistance(locationService.getLastLocation(currentRide.getLocations()), locationService.getFirstLocation(ride.getLocations())) / 80) * 60 * 2;
+			} else {
+				minutes += (this.calculateDistance(driver.getVehicle().getCurrentLocation(), locationService.getFirstLocation(ride.getLocations())) / 80) * 60 * 2;
+			}
+			if((int)minutes < minimumMinutes){
+				bestDriver = driver;
+				minimumMinutes = (int) minutes;
+			}
+		}
+
+		result[0] = bestDriver;
+		result[1] = (int) (minimumMinutes + (this.calculateDistance(locationService.getFirstLocation(ride.getLocations()), locationService.getLastLocation(ride.getLocations())) / 80) * 60 * 2);
+
+		return result;
+	}
+
+	private boolean getRejectedRidesForDriver(Long driverId, Long passengerId) {
+		Set<Ride> rejectedRides = this.rideRepository.findAllRidesByDriverIdAndPassengerIdAndScheduledTimeBeforeAndStatus(driverId, passengerId, LocalDateTime.now().minusMinutes(15), RideStatus.REJECTED);
+		if(rejectedRides.isEmpty()) return true;
+		return false;
+	}
+
+	private Optional<Ride> findDriverScheduledRide(Long driverId) {
+		return this.rideRepository.findRideByDriverIdAndStatus(driverId, RideStatus.ACCEPTED);
+	}
+
 	@Override
-	public Optional<Ride> findDriverActiveRide(Long driverId) {
-		return this.rideRepository.findRideByDriverIdAndStatus(driverId, RideStatus.ACTIVE);
+	public Ride findDriverActiveRide(Long driverId) {
+		Ride ride = this.rideRepository.findRideByDriverIdAndStatus(driverId, RideStatus.ACTIVE).get();
+		if(ride != null)
+		{
+			ride.setDriver(this.driverRepository.findDriverByRidesContaining(ride).get());
+			ride.setPassengers(this.passengerService.findPassengersByRidesContaining(ride));
+			ride.setLocations(this.rideRepository.getLocationsByRide(ride.getId()));
+		}
+		return ride;
 	}
 
 	@Override
@@ -94,8 +216,8 @@ public class RideService implements IRideService {
 	}
 
 	@Override
-	public Ride panicRide(Ride ride, String reason) {
-		this.panicRepository.save(new Panic(new Date(), reason, ride, ride.getDriver()));
+	public Ride panicRide(Ride ride, String reason, Long id) {
+		this.panicRepository.save(new Panic(new Date(), reason, ride, passengerRepository.findById(id).get()));
 		ride.setStatus(RideStatus.FINISHED);
 		return ride;
 	}
@@ -162,16 +284,18 @@ public class RideService implements IRideService {
 
 	@Override
 	public Ride findPassengerActiveRide(Long passengerId) {
-		Passenger passenger = this.passengerRepository.findById(passengerId).get();
-		for(Ride ride: passenger.getRides()){
-			if(ride.getStatus() == RideStatus.ACTIVE)
-				return ride;
+		Ride ride = this.rideRepository.findPassengerActiveRide(passengerId, RideStatus.ACTIVE);
+		if(ride != null)
+		{
+			ride.setDriver(this.driverRepository.findDriverByRidesContaining(ride).get());
+			ride.setPassengers(this.passengerService.findPassengersByRidesContaining(ride));
+			ride.setLocations(this.rideRepository.getLocationsByRide(ride.getId()));
 		}
-		return null;
+		return ride;
 	}
 
 	@Override
-	public Set<Route> getLocationsByRide(Long rideId) {
+	public LinkedHashSet<Route> getLocationsByRide(Long rideId) {
 		return this.rideRepository.getLocationsByRide(rideId);
 	}
 
@@ -187,7 +311,7 @@ public class RideService implements IRideService {
 
 		ride.setReview(reviews);
 		ride.setDeduction(deductionRepository.findDeductionByRide(ride).orElse(new Deduction()));
-		Set<Route> locations;
+		LinkedHashSet<Route> locations;
 		locations = this.getLocationsByRide(ride.getId());
 		for (Route location : locations) {
 			location.setDestination(this.routeRepository.getDestinationByRoute(location).get());
@@ -363,7 +487,7 @@ public class RideService implements IRideService {
 	@Override
 	public Set<UserRidesDTO> getFilteredRides(Page<Ride> userRides, Long driverId) {
 		Set<UserRidesDTO> rides = new LinkedHashSet<>();
-		for(Ride ride: userRides){
+		for (Ride ride : userRides) {
 
 			rides.add(this.getFilteredRide(ride, driverId));
 		}

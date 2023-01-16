@@ -80,7 +80,7 @@ public class ReviewController {
     @PreAuthorize("hasAnyRole('PASSENGER', 'ADMIN', 'DRIVER')")
     public ResponseEntity<Paginated<ReviewWithPassengerDTO>> getReviewsForTheSpecificDriver(@PathVariable Long id) {
 
-        Ride ride = rideService.findOne(id).get();
+        Ride ride = rideService.findOne(id);
         Set<ReviewWithPassengerDTO> retVal = new HashSet<>();
         for (Review review : reviewService.getReviews()) {
             if (Objects.equals(review.getRide().getId(), ride.getId())) {
@@ -95,7 +95,7 @@ public class ReviewController {
     @PreAuthorize("hasAnyRole('PASSENGER', 'ADMIN', 'DRIVER')")
     public  ResponseEntity<HashSet<RideReviewDTO>> getAllReviewsForTheSpecificRide(@PathVariable Long rideId) {
 
-        Ride ride = rideService.findOne(rideId).get();
+        Ride ride = rideService.findOne(rideId);
         HashSet<RideReviewDTO> reviews = new HashSet<>();
         for (Review review : reviewService.findReviewsByRide(ride)) {
             review.setPassenger(this.reviewService.findPassengerByReviewId(review.getId()).get());

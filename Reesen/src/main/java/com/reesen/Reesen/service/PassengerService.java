@@ -79,6 +79,8 @@ public class PassengerService implements IPassengerService {
         passenger.setConfirmedMail(true);
         passenger.setPassword(this.passengerRepository.getPasswordWithId(id));
         passenger.setRole(Role.PASSENGER);
+        Set<Ride> rides = this.passengerRepository.getPassengerRides(passenger.getId());
+        passenger.setRides(rides);
         return passenger;
     }
     @Override

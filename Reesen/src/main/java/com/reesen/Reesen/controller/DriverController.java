@@ -87,6 +87,7 @@ public class DriverController {
         Driver driver = this.driverService.findByEmail(driverDTO.getEmail());
 
         if (driver != null && !driver.getId().toString().equals(id.toString())) {
+
             return new ResponseEntity("Invalid data. Bad email format.", HttpStatus.BAD_REQUEST);
         }
         driver = this.driverService.getDriverFromDriverDTO(id, driverDTO);
@@ -567,7 +568,7 @@ public class DriverController {
             ride.setDriver(driver.get());
             ride.setPassengers(passengerService.findPassengersByRidesContaining(ride));
             ride.setDeduction(deductionService.findDeductionByRide(ride).orElse(new Deduction()));
-            Set<Route> locations;
+            LinkedHashSet<Route> locations;
             locations = rideService.getLocationsByRide(ride.getId());
             for (Route location : locations) {
                 location.setDestination(this.routeService.getDestinationByRoute(location).get());

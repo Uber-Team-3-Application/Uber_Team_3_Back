@@ -31,4 +31,6 @@ public interface IUserService {
     ResetPasswordToken findByUserIdAndCode(Long id, String code);
     
     int getTotalNumberOfRides(User user);
+
+    Long getAdminId();
 }

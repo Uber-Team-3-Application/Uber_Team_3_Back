@@ -9,4 +9,5 @@ public interface IMessageService {
     Message save(Message message);
     Set<Message> getMessagesBySender(User sender);
 
+    Set<Message> getAll(User user);
 }

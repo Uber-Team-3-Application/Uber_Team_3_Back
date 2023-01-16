@@ -20,6 +20,16 @@ public class UserRequestValidation {
         this.jwtTokenUtil = jwtTokenUtil;
     }
 
+    public Long getIdFromToken(Map<String, String> headers){
+        String token = headers.get("x-auth-token");
+        String refreshToken = headers.get("refreshtoken");
+        Long id;
+        if(isTokenExpired(token)) id = jwtTokenUtil.getId(refreshToken).longValue();
+
+        else id = jwtTokenUtil.getId(token).longValue();
+
+        return id;
+    }
     public  String getRoleFromToken(Map<String, String> headers){
         String token = headers.get("x-auth-token");
         String refreshToken = headers.get("refreshtoken");

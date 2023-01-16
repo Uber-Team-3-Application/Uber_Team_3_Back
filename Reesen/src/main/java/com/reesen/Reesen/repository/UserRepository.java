@@ -1,5 +1,6 @@
 package com.reesen.Reesen.repository;
 
+import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -26,4 +27,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select u.password from User u where u.id=:id")
     String getUserPassword(Long id);
+
+    @Query("select u.id from User u where u.role=:role")
+    Long findAdmin(Role role);
 }

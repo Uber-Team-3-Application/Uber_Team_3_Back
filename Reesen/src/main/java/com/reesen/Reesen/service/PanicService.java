@@ -7,6 +7,7 @@ import com.reesen.Reesen.service.interfaces.IPanicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -90,7 +91,7 @@ public class PanicService implements IPanicService {
     }
 
     private void setLocationsForPanicRide(Ride ride) {
-        Set<Route> locations = this.rideRepository.getLocationsByRide(ride.getId());
+        LinkedHashSet<Route> locations = this.rideRepository.getLocationsByRide(ride.getId());
         for(Route location: locations){
             location.setDestination(this.routeRepository.getDestinationByRoute(location).get());
             location.setDeparture(this.routeRepository.getDepartureByRoute(location).get());

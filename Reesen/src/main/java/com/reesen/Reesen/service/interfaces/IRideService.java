@@ -9,24 +9,19 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.*;
 
-import com.reesen.Reesen.model.WorkingHours;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
-import java.time.LocalDateTime;
 import java.util.Date;
 
 public interface IRideService {
-	Optional<Ride> findOne(Long id);
+	Ride findOne(Long id);
 	Ride save(Ride ride);
 
 	RideDTO createRideDTO(CreateRideDTO rideDTO);
 
-	Optional<Ride> findDriverActiveRide(Long driverId);
+	Ride findDriverActiveRide(Long driverId);
 
 	Ride withdrawRide(Ride ride);
 
-	Ride panicRide(Ride ride, String reason);
+	Ride panicRide(Ride ride, String reason, Long id);
 
 	Ride cancelRide(Ride ride, String reason);
 
@@ -41,7 +36,7 @@ public interface IRideService {
 
 	Ride findPassengerActiveRide(Long passengerId);
 
-	Set<Route> getLocationsByRide (Long rideId);
+	LinkedHashSet<Route> getLocationsByRide (Long rideId);
 
     Set<UserRidesDTO> getFilteredRides(Page<Ride> userRides, Long driverId);
 

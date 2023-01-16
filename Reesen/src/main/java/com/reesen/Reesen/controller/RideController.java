@@ -6,11 +6,16 @@ import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.service.interfaces.IDriverService;
 import com.reesen.Reesen.service.interfaces.IRideService;
+import io.jsonwebtoken.Header;
+import io.jsonwebtoken.JwsHeader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +34,7 @@ public class RideController {
         this.driverService = driverService;
     }
 
-    @PostMapping
+    @PostMapping( produces="application/json")
     @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
     public ResponseEntity<RideDTO> createRide(@RequestBody CreateRideDTO rideDTO){
         RideDTO ride = this.rideService.createRideDTO(rideDTO);
@@ -41,10 +46,10 @@ public class RideController {
     public ResponseEntity<RideDTO> getDriverActiveRide(@PathVariable("driverId") Long driverId){
         if(driverId < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        Optional<Ride> ride = this.rideService.findDriverActiveRide(driverId);
-        if(ride.isEmpty())
+        Ride ride = this.rideService.findDriverActiveRide(driverId);
+        if(ride == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        RideDTO rideDTO = new RideDTO(ride.get());
+        RideDTO rideDTO = new RideDTO(ride);
         return new ResponseEntity<>(rideDTO, HttpStatus.OK);
     }
 
@@ -65,11 +70,11 @@ public class RideController {
     public ResponseEntity<UserRidesDTO> getRideDetail(@PathVariable Long id){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        Optional<Ride> ride = this.rideService.findOne(id);
-        if(ride.isEmpty())
+        Ride ride = this.rideService.findOne(id);
+        if(ride == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        Optional<Driver> driver = this.driverService.findDriverWithRide(ride.get());
-        UserRidesDTO rideDTO = this.rideService.getFilteredRide(ride.get(), driver.get().getId());
+        Optional<Driver> driver = this.driverService.findDriverWithRide(ride);
+        UserRidesDTO rideDTO = this.rideService.getFilteredRide(ride, driver.get().getId());
         return new ResponseEntity<>(rideDTO, HttpStatus.OK);
     }
 
@@ -78,9 +83,9 @@ public class RideController {
     public ResponseEntity<RideDTO> cancelExistingRide(@PathVariable Long id){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(this.rideService.findOne(id).isEmpty())
+        if(this.rideService.findOne(id) == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        Ride ride = this.rideService.findOne(id).get();
+        Ride ride = this.rideService.findOne(id);
         ride = this.rideService.withdrawRide(ride);
         this.rideService.save(ride);
         RideDTO withdrawRide = new RideDTO(ride);
@@ -90,13 +95,14 @@ public class RideController {
     @PutMapping(value = "/{id}/panic")
     @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
     public ResponseEntity<RideDTO> pressedPanic(@PathVariable Long id, @RequestBody String reason){
-        // TODO: get user id from token
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(this.rideService.findOne(id).isEmpty())
+        if(this.rideService.findOne(id) == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        Ride ride = this.rideService.findOne(id).get();
-        ride = this.rideService.panicRide(ride, reason);
+        Ride ride = this.rideService.findOne(id);
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        Long userId = Long.valueOf(request.getHeader("Id"));
+        ride = this.rideService.panicRide(ride, reason, userId);
         this.rideService.save(ride);
         RideDTO panicRide = new RideDTO(ride);
         return new ResponseEntity<>(panicRide, HttpStatus.OK);
@@ -107,9 +113,9 @@ public class RideController {
     public ResponseEntity<RideDTO> acceptRide(@PathVariable Long id){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(this.rideService.findOne(id).isEmpty())
+        if(this.rideService.findOne(id) == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        Ride ride = this.rideService.findOne(id).get();
+        Ride ride = this.rideService.findOne(id);
         ride = this.rideService.acceptRide(ride);
         this.rideService.save(ride);
         RideDTO acceptedRide = new RideDTO(ride);
@@ -121,9 +127,9 @@ public class RideController {
     public ResponseEntity<RideDTO> endRide(@PathVariable Long id){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(this.rideService.findOne(id).isEmpty())
+        if(this.rideService.findOne(id) == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        Ride ride = this.rideService.findOne(id).get();
+        Ride ride = this.rideService.findOne(id);
         ride = this.rideService.endRide(ride);
         this.rideService.save(ride);
         RideDTO endedRide = new RideDTO(ride);
@@ -136,9 +142,9 @@ public class RideController {
 
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(this.rideService.findOne(id).isEmpty())
+        if(this.rideService.findOne(id) == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        Ride ride = this.rideService.findOne(id).get();
+        Ride ride = this.rideService.findOne(id);
         ride = this.rideService.cancelRide(ride, reason);
         this.rideService.save(ride);
         RideDTO canceledRide = new RideDTO(ride);
