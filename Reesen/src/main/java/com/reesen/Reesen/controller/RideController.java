@@ -34,7 +34,7 @@ public class RideController {
         this.driverService = driverService;
     }
 
-    @PostMapping
+    @PostMapping( produces="application/json")
     @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
     public ResponseEntity<RideDTO> createRide(@RequestBody CreateRideDTO rideDTO){
         RideDTO ride = this.rideService.createRideDTO(rideDTO);
