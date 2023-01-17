@@ -63,10 +63,10 @@ public class RideService implements IRideService {
 
 	@Override
 	public Ride findOne(Long id) {
-		Ride ride = this.rideRepository.findById(id).get();
+		Ride ride = this.rideRepository.findById(id).orElse(null);
 		if(ride != null)
 		{
-			ride.setDriver(this.driverRepository.findDriverByRidesContaining(ride).get());
+			ride.setDriver(this.driverRepository.findDriverByRidesContaining(ride).orElse(null));
 			ride.setPassengers(this.passengerService.findPassengersByRidesContaining(ride));
 			ride.setLocations(this.rideRepository.getLocationsByRide(ride.getId()));
 		}

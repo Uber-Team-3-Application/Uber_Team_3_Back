@@ -68,9 +68,10 @@ public class ReviewController {
         Long passengerId = this.userRequestValidation.getIdFromToken(headers);
         Passenger passenger = this.passengerService.findOne(passengerId).get();
 
-        Review oldReview = this.reviewService.findReviewByPassengerAndRide(passenger, ride).orElseGet(null);
+        Review oldReview = this.reviewService.findReviewByPassengerAndRide(passenger, ride).orElse(null);
         if (oldReview != null) {
             oldReview.setVehicleComment(review.getComment());
+            oldReview.setPassenger(passenger);
             oldReview.setVehicleRating(review.getRating());
             this.reviewService.save(oldReview);
             ReviewWithPassengerDTO dto = new ReviewWithPassengerDTO(oldReview, false);
@@ -91,7 +92,7 @@ public class ReviewController {
     @PreAuthorize("hasAnyRole('PASSENGER', 'DRIVER', 'ADMIN')")
     public ResponseEntity<Paginated<ReviewWithPassengerDTO>> getReviewsForVehicle(@PathVariable int id) {
 
-        Vehicle vehicle = vehicleService.findOne((long) id).orElseGet(null);
+        Vehicle vehicle = vehicleService.findOne((long) id).orElse(null);
 
         if (vehicle == null)
             return new ResponseEntity("Vehicle does not exist!", HttpStatus.NOT_FOUND);
@@ -120,10 +121,11 @@ public class ReviewController {
         Long passengerId = this.userRequestValidation.getIdFromToken(headers);
         Passenger passenger = this.passengerService.findOne(passengerId).get();
 
-        Review oldReview = this.reviewService.findReviewByPassengerAndRide(passenger, ride).orElseGet(null);
+        Review oldReview = this.reviewService.findReviewByPassengerAndRide(passenger, ride).orElse(null);
         if (oldReview != null) {
             oldReview.setDriverComment(review.getComment());
             oldReview.setDriverRating(review.getRating());
+            oldReview.setPassenger(passenger);
             this.reviewService.save(oldReview);
             ReviewWithPassengerDTO dto = new ReviewWithPassengerDTO(oldReview, true);
             return new ResponseEntity<>(dto, HttpStatus.OK);
@@ -142,7 +144,7 @@ public class ReviewController {
     @PreAuthorize("hasAnyRole('PASSENGER', 'ADMIN', 'DRIVER')")
     public ResponseEntity<Paginated<ReviewWithPassengerDTO>> getReviewsForTheSpecificDriver(@PathVariable Long id) {
 
-        Driver driver = this.driverService.findOne(id).orElseGet(null);
+        Driver driver = this.driverService.findOne(id).orElse(null);
         if (driver == null)
             return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
 
