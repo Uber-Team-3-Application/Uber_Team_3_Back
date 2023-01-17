@@ -2,6 +2,7 @@ package com.reesen.Reesen.service;
 
 import com.reesen.Reesen.dto.DocumentDTO;
 import com.reesen.Reesen.model.Document;
+import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.repository.DocumentRepository;
 import com.reesen.Reesen.service.interfaces.IDocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,5 +52,10 @@ public class DocumentService implements IDocumentService {
             documentDTOS.add(new DocumentDTO(document));
         }
         return documentDTOS;
+    }
+
+    @Override
+    public Optional<Long> getDriverFromDocumentId(Long id) {
+        return this.documentRepository.findDriverByDocumentId(id);
     }
 }
