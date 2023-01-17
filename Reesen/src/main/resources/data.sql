@@ -81,3 +81,26 @@ values ('U3dhZ2dlciByb2Nrcw==', 'Vozacka Dozvola', 2);
 insert into Document(document_image, name, driver_id)
 values ('U3dhZ2dlciByb2Nrcw==', 'Saobracajna Dozvola', 2);
 
+
+insert into Ride (estimated_time, is_baby_accessible, is_panic_pressed, is_pet_accessible,
+                  status, time_of_start, time_of_end, total_price, deduction_id, driver_id, vehicle_type_id)
+values (48, true, True, false,'FINISHED',TO_DATE('26/7/2022 11:42', 'dd/MM/yyyy HH:mm'),
+        TO_DATE('26/7/2022 12:34', 'dd/MM/yyyy HH:mm'), 4042, null, 1, 1);
+
+
+insert into Drivers_Rides (driver_id, rides_id) values (1, 1);
+insert into Passenger_Rides (passenger_id, rides_id) values (3, 1);
+insert into Passenger_Rides (passenger_id, rides_id) values (4, 1);
+insert into Ride_Passengers(ride_id, passengers_id) values (1, 3);
+insert into Ride_Passengers(ride_id, passengers_id) values (1, 4);
+insert into Ride_Locations (ride_id, locations_id) values (1, 1);
+insert into Review (driver_comment, driver_rating, vehicle_comment, vehicle_rating, passenger_id, ride_id)
+values ('Vozač je bio jako ljubazan.', 4, 'Vozilo je jako uredno', 5, 3, 1);
+insert into Review (driver_comment, driver_rating, vehicle_comment, vehicle_rating, passenger_id, ride_id)
+values ('Vozač je bio jako ljubazan.', 5, 'Vozilo nije bas čisto', 3, 4, 1);
+insert into Ride_Review (ride_id, review_id) values (1, 1);
+insert into Ride_Review (ride_id, review_id) values (1, 2);
+
+insert into Panic(time_of_press, reason, ride_id, user_id)
+values(TO_DATE('15/11/2022 09:10', 'dd/MM/yyyy HH:mm'), 'Rider went of course', 1, 3);
+
