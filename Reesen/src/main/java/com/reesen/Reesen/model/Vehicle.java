@@ -30,12 +30,12 @@ public class Vehicle implements Serializable {
     @Column
     private boolean isPetAccessible;
 
-    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.EAGER)
     @JoinColumn(name = "currentLocationId")
     private Location currentLocation;
 
 
-    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.EAGER)
     @JoinColumn(name = "vehicleTypeId")
     private VehicleType type;
 

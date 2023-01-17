@@ -42,7 +42,8 @@ public class RideDTO {
 		setPassengers(ride);
 		setVehicleType(ride);
 		setLocations(ride);
-		this.rejection = new DeductionDTO(ride.getDeduction().getReason(), ride.getDeduction().getDeductionTime());
+		if(ride.getDeduction() == null) this.rejection = new DeductionDTO();
+		else this.rejection = new DeductionDTO(ride.getDeduction().getReason(), ride.getDeduction().getDeductionTime());
 	}
 
 	private void setLocations(Ride ride) {

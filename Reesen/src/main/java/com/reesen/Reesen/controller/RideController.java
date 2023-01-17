@@ -6,8 +6,7 @@ import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.service.interfaces.IDriverService;
 import com.reesen.Reesen.service.interfaces.IRideService;
-import io.jsonwebtoken.Header;
-import io.jsonwebtoken.JwsHeader;
+import com.reesen.Reesen.validation.UserRequestValidation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,8 +15,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.List;
+import javax.validation.Valid;
 import java.util.Map;
 import java.util.Optional;
 
@@ -28,16 +26,19 @@ public class RideController {
 
     private final IRideService rideService;
     private final IDriverService driverService;
+    private final UserRequestValidation userRequestValidation;
 
-    public RideController(IRideService rideService, IDriverService driverService) {
+    public RideController(IRideService rideService, IDriverService driverService, UserRequestValidation userRequestValidation) {
         this.rideService = rideService;
         this.driverService = driverService;
+        this.userRequestValidation = userRequestValidation;
     }
 
-    @PostMapping( produces="application/json")
-    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
-    public ResponseEntity<RideDTO> createRide(@RequestBody CreateRideDTO rideDTO){
-        RideDTO ride = this.rideService.createRideDTO(rideDTO);
+    @PostMapping
+    @PreAuthorize("hasAnyRole('PASSENGER', 'ADMIN')")
+    public ResponseEntity<RideDTO> createRide(@Valid @RequestBody CreateRideDTO rideDTO, @RequestHeader Map<String, String> headers){
+        if (this.rideService.validateCreateRideDTO(rideDTO)) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        RideDTO ride = this.rideService.createRideDTO(rideDTO, userRequestValidation.getIdFromToken(headers));
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
 
@@ -94,7 +95,7 @@ public class RideController {
 
     @PutMapping(value = "/{id}/panic")
     @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
-    public ResponseEntity<RideDTO> pressedPanic(@PathVariable Long id, @RequestBody String reason){
+    public ResponseEntity<RideDTO> pressedPanic(@PathVariable Long id, @Valid @RequestBody String reason){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(this.rideService.findOne(id) == null)
@@ -138,7 +139,7 @@ public class RideController {
 
     @PutMapping(value = "/{id}/cancel")
     @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
-    public ResponseEntity<RideDTO> cancelRide(@PathVariable Long id, @RequestBody String reason){
+    public ResponseEntity<RideDTO> cancelRide(@PathVariable Long id, @Valid @RequestBody String reason){
 
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -153,7 +154,7 @@ public class RideController {
 
     @PostMapping(value = "/rides-report")
     @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
-    public ResponseEntity<ReportSumAverageDTO> getReport(@RequestBody ReportRequestDTO reportRequestDTO){
+    public ResponseEntity<ReportSumAverageDTO> getReport(@Valid @RequestBody ReportRequestDTO reportRequestDTO){
 
         ReportSumAverageDTO reportDTO = null;
         if (reportRequestDTO.getRole().equals(Role.ADMIN))
