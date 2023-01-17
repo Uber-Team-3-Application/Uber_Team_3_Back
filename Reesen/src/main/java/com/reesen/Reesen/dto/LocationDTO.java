@@ -4,6 +4,11 @@ import com.reesen.Reesen.model.Location;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 
@@ -13,18 +18,20 @@ import javax.validation.constraints.NotEmpty;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
+
 public class LocationDTO {
 
     @NotEmpty(message = "{required}")
     @Length(max=40, message = "{maxLength}")
     private String address;
-
-    @Min(1)
-	private double latitude;
-
-    @Min(1)
-	private double longitude;
-	
+    @NotNull(message = "{required}")
+    @Min(value = -90, message = "{regex}")
+    @Max(value = 90, message = "{regex}")
+    private double latitude;
+    @NotNull(message = "{required}")
+    @Min(value = -180, message = "{regex}")
+    @Max(value = 180, message = "{regex}")
+    private double longitude;
 
     public LocationDTO(Location location) {
 

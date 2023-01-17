@@ -159,11 +159,11 @@ public class DriverController {
         if (driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Vehicle vehicle = this.driverService.getVehicle(driverId);
-        // if ! exists -> create
+        // if ! exists => create
         if (vehicle == null) {
             vehicle = this.vehicleService.createVehicle(vehicleDTO, driver.get());
         } else {
-            // if exists -> edit
+            // if exists => edit
             vehicle = this.vehicleService.editVehicle(vehicle, vehicleDTO);
         }
         this.vehicleService.save(vehicle);

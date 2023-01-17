@@ -13,5 +13,7 @@ public interface IReviewService {
 	Set<Review> findReviewsByRide(Ride ride);
 	Set<Review> getReviews();
 	Optional<Passenger> findPassengerByReviewId(Long reviewID);
+	Optional<Review> findReviewByPassengerAndRide(Passenger passenger, Ride ride);
+
 
 }

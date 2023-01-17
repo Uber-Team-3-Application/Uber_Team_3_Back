@@ -2,12 +2,14 @@ package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.model.Remark;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.Date;
 
 public class RemarkDTO {
 
     private Long id;
     private Date date;
+    @NotEmpty
     private String message;
 
     public RemarkDTO(Remark remark) {

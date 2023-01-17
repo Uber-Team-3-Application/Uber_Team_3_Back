@@ -2,6 +2,8 @@ package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.model.Review;
 
+import java.util.Set;
+
 public class ReviewWithPassengerDTO {
     private Long id;
     private int rating;
@@ -9,6 +11,7 @@ public class ReviewWithPassengerDTO {
     private UserDTO passenger;
 
     public ReviewWithPassengerDTO() {}
+
 
     public ReviewWithPassengerDTO(Long id, int rating, String comment, UserDTO passenger) {
         this.id = id;
@@ -19,7 +22,7 @@ public class ReviewWithPassengerDTO {
 
     public ReviewWithPassengerDTO(Review review, boolean isDriverComment) {
         this.id = review.getId();
-        this.rating = review.getVehicleRating();
+        this.rating = isDriverComment ? review.getDriverRating() : review.getVehicleRating();
         this.comment = isDriverComment ? review.getDriverComment() : review.getVehicleComment();
         this.passenger = new UserDTO(review.getPassenger().getId(), review.getPassenger().getEmail());
     }

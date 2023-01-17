@@ -8,6 +8,7 @@ import com.reesen.Reesen.dto.UpdateDriverDTO;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Driver.DriverEditBasicInformation;
 import com.reesen.Reesen.model.Driver.DriverEditVehicle;
+import com.reesen.Reesen.model.Review;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.model.VehicleType;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class DriverService implements IDriverService {
@@ -199,6 +201,11 @@ public class DriverService implements IDriverService {
     @Override
     public Optional<Driver> findDriverWithRide(Ride ride) {
         return this.driverRepository.findDriverByRidesContaining(ride);
+    }
+
+    @Override
+    public Set<Review> getAllReviews(Long driverId) {
+        return this.driverRepository.getAllReviews(driverId);
     }
 
     public VehicleType findVehicleTypeByName(VehicleName name){
