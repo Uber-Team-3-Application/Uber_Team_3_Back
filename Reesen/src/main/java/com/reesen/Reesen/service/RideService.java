@@ -14,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.reesen.Reesen.service.interfaces.IRideService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 
 import java.text.ParseException;
@@ -81,14 +79,22 @@ public class RideService implements IRideService {
 	}
 
 	@Override
-	public RideDTO createRideDTO(CreateRideDTO rideDTO) {
+	public RideDTO createRideDTO(CreateRideDTO rideDTO, Long passengerId) {
 		Ride ride = new Ride();
 		Set<RouteDTO> locationsDTOs = rideDTO.getLocations();
 		LinkedHashSet<Route> locations = new LinkedHashSet<>();
 		for(RouteDTO routeDTO: locationsDTOs){
-			locations.add(this.routeRepository.findById(routeDTO.getId()).get());
+			Route route = new Route();
+			Location departure = new Location(routeDTO.getDeparture().getLatitude(), routeDTO.getDeparture().getLongitude(), routeDTO.getDeparture().getAddress());
+			this.locationService.save(departure);
+			route.setDeparture(departure);
+			Location destination = new Location(routeDTO.getDestination().getLatitude(), routeDTO.getDestination().getLongitude(), routeDTO.getDestination().getAddress());
+			this.locationService.save(destination);
+			route.setDestination(destination);
+			locations.add(route);
+			this.routeRepository.save(route);
 		}
-		
+
 		ride.setLocations(locations);
 		ride.setVehicleType(this.vehicleTypeRepository.findByName(VehicleName.valueOf(rideDTO.getVehicleType())));
 		ride.setBabyAccessible(rideDTO.isBabyTransport());
@@ -98,42 +104,41 @@ public class RideService implements IRideService {
 		for(UserDTO userDTO: passengersDTOs){
 			passengers.add(this.passengerRepository.findByEmail(userDTO.getEmail()));
 		}
+		passengers.add(this.passengerService.findOne(passengerId).get());
 		ride.setPassengers(passengers);
 		ride.setStatus(RideStatus.ON_HOLD);
 
-		if(ride.getScheduledTime() != null){
-			Runnable task = () -> {
-				Object[] result = this.findSuitableDriver(ride);
-				if (result[0] == null) {
-					ride.setStatus(RideStatus.REJECTED);
-					this.rideRepository.save(ride);
-					throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No active drivers at the moment!");
-				}
-				ride.setDriver((Driver) result[0]);
-				ride.setEstimatedTime((Double) result[1]);
-				ride.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(ride.getLocations()), this.locationService.getLastLocation(ride.getLocations())) * ride.getVehicleType().getPricePerKm());
-				this.rideRepository.save(ride);
-			};
-			Calendar calendar = Calendar.getInstance();
-			LocalDateTime dateTime = ride.getScheduledTime().minusMinutes(15);
-			calendar.set(Calendar.YEAR, dateTime.getYear());
-			calendar.set(Calendar.MONTH, dateTime.getMonth().getValue());
-			calendar.set(Calendar.DAY_OF_MONTH, dateTime.getDayOfMonth());
-			calendar.set(Calendar.HOUR_OF_DAY, dateTime.getHour());
-			calendar.set(Calendar.MINUTE, dateTime.getMinute());
-			calendar.set(Calendar.SECOND, 0);
-		} else {
+//		if(ride.getScheduledTime() != null){
+//			Runnable task = () -> {
+//				Object[] result = this.findSuitableDriver(ride);
+//				if (result[0] == null) {
+//					ride.setStatus(RideStatus.REJECTED);
+//					this.rideRepository.save(ride);
+//					throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No active drivers at the moment!");
+//				}
+//				ride.setDriver((Driver) result[0]);
+//				ride.setEstimatedTime((Double) result[1]);
+//				ride.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(ride.getLocations()), this.locationService.getLastLocation(ride.getLocations())) * ride.getVehicleType().getPricePerKm());
+//				this.rideRepository.save(ride);
+//			};
+//			Calendar calendar = Calendar.getInstance();
+//			LocalDateTime dateTime = ride.getScheduledTime().minusMinutes(15);
+//			calendar.set(Calendar.YEAR, dateTime.getYear());
+//			calendar.set(Calendar.MONTH, dateTime.getMonth().getValue());
+//			calendar.set(Calendar.DAY_OF_MONTH, dateTime.getDayOfMonth());
+//			calendar.set(Calendar.HOUR_OF_DAY, dateTime.getHour());
+//			calendar.set(Calendar.MINUTE, dateTime.getMinute());
+//			calendar.set(Calendar.SECOND, 0);
+//		} else {}
 
 			Object[] result = this.findSuitableDriver(ride);
 			if (result[0] == null) {
 				ride.setStatus(RideStatus.REJECTED);
-				this.rideRepository.save(ride);
-				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No active drivers at the moment!");
+			} else {
+				ride.setDriver((Driver) result[0]);
+				ride.setEstimatedTime((Double) result[1]);
+				ride.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(ride.getLocations()), this.locationService.getLastLocation(ride.getLocations())) * ride.getVehicleType().getPricePerKm());
 			}
-			ride.setDriver((Driver) result[0]);
-			ride.setEstimatedTime((Double) result[1]);
-			ride.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(ride.getLocations()), this.locationService.getLastLocation(ride.getLocations())) * ride.getVehicleType().getPricePerKm());
-		}
 		return new RideDTO(this.rideRepository.save(ride));
 	}
 
@@ -152,10 +157,10 @@ public class RideService implements IRideService {
 		List<Driver> suitableDrivers = new ArrayList<>();
 		for (Driver driver: availableDrivers) {
 			if(this.workingHoursService.getTotalHoursWorkedInLastDay(driver.getId()).toHours() >= 8) continue;
-			if(this.getRejectedRidesForDriver(driver.getId(), ride.getPassengers().iterator().next().getId())) continue;
+			//if(this.getRejectedRidesForDriver(driver.getId(), ride.getPassengers().iterator().next().getId())) continue;
 			if(this.findDriverScheduledRide(driver.getId()).isPresent()) continue;
 			Vehicle vehicle = driverRepository.getVehicle(driver.getId());
-			if(ride.getVehicleType() != vehicle.getType()) continue;
+			//if(ride.getVehicleType().equals(vehicle.getType())) continue;
 			if(ride.isBabyAccessible())
 				if(!vehicle.isBabyAccessible()) continue;
 			if(ride.isPetAccessible())
@@ -167,13 +172,14 @@ public class RideService implements IRideService {
 		if(suitableDrivers.isEmpty()) return result;
 
 		for (Driver driver: suitableDrivers) {
+			Vehicle vehicle = this.driverRepository.getVehicle(driver.getId());
 			int minutes = 0;
 			Ride currentRide = this.findDriverActiveRide(driver.getId());
 			if(currentRide != null) {
-				minutes += (this.calculateDistance(driver.getVehicle().getCurrentLocation(), locationService.getLastLocation(currentRide.getLocations())) / 80) * 60 * 2;
+				minutes += (this.calculateDistance(vehicle.getCurrentLocation(), locationService.getLastLocation(currentRide.getLocations())) / 80) * 60 * 2;
 				minutes += (this.calculateDistance(locationService.getLastLocation(currentRide.getLocations()), locationService.getFirstLocation(ride.getLocations())) / 80) * 60 * 2;
 			} else {
-				minutes += (this.calculateDistance(driver.getVehicle().getCurrentLocation(), locationService.getFirstLocation(ride.getLocations())) / 80) * 60 * 2;
+				minutes += (this.calculateDistance(vehicle.getCurrentLocation(), locationService.getFirstLocation(ride.getLocations())) / 80) * 60 * 2;
 			}
 			if((int)minutes < minimumMinutes){
 				bestDriver = driver;
@@ -182,7 +188,7 @@ public class RideService implements IRideService {
 		}
 
 		result[0] = bestDriver;
-		result[1] = (int) (minimumMinutes + (this.calculateDistance(locationService.getFirstLocation(ride.getLocations()), locationService.getLastLocation(ride.getLocations())) / 80) * 60 * 2);
+		result[1] = (minimumMinutes + (this.calculateDistance(locationService.getFirstLocation(ride.getLocations()), locationService.getLastLocation(ride.getLocations())) / 80) * 60 * 2);
 
 		return result;
 	}
@@ -199,12 +205,13 @@ public class RideService implements IRideService {
 
 	@Override
 	public Ride findDriverActiveRide(Long driverId) {
-		Ride ride = this.rideRepository.findRideByDriverIdAndStatus(driverId, RideStatus.ACTIVE).get();
-		if(ride != null)
+		Ride ride = null;
+		if(this.rideRepository.findRideByDriverIdAndStatus(driverId, RideStatus.ACTIVE).isPresent())
 		{
 			ride.setDriver(this.driverRepository.findDriverByRidesContaining(ride).get());
 			ride.setPassengers(this.passengerService.findPassengersByRidesContaining(ride));
 			ride.setLocations(this.rideRepository.getLocationsByRide(ride.getId()));
+			ride = this.rideRepository.findRideByDriverIdAndStatus(driverId, RideStatus.ACTIVE).get();
 		}
 		return ride;
 	}
@@ -503,6 +510,26 @@ public class RideService implements IRideService {
 		}
 
 		return rides;
+	}
+
+	@Override
+	public boolean validateCreateRideDTO(CreateRideDTO createRideDTO) {
+		if (createRideDTO.getPassengers() == null ||
+				createRideDTO.getLocations() == null ||
+				createRideDTO.getVehicleType() == null) {
+			return true;
+		}
+		for (UserDTO passenger : createRideDTO.getPassengers()) {
+			if (passenger.getEmail() == null) {
+				return true;
+			}
+		}
+		for (RouteDTO location : createRideDTO.getLocations()) {
+			if (location.getDeparture() == null || location.getDestination() == null) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

@@ -16,7 +16,7 @@ public interface IRideService {
 	Ride findOne(Long id);
 	Ride save(Ride ride);
 
-	RideDTO createRideDTO(CreateRideDTO rideDTO);
+	RideDTO createRideDTO(CreateRideDTO rideDTO, Long passengerId);
 
 	Ride findDriverActiveRide(Long driverId);
 
@@ -57,4 +57,5 @@ public interface IRideService {
 
 	double calculateDistance(Location departure, Location destination);
 
+	boolean validateCreateRideDTO(CreateRideDTO createRideDTO);
 }

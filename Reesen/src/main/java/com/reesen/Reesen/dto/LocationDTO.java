@@ -1,14 +1,28 @@
 package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.model.Location;
+import lombok.*;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
+
 public class LocationDTO {
 
+    @NotEmpty(message = "{required}")
+    @Length(max=40, message = "{maxLength}")
     private String address;
     @NotNull(message = "{required}")
     @Min(value = -90, message = "{regex}")
@@ -18,15 +32,6 @@ public class LocationDTO {
     @Min(value = -180, message = "{regex}")
     @Max(value = 180, message = "{regex}")
     private double longitude;
-	
-    public LocationDTO() {
-    }
-
-    public LocationDTO(String address, double latitude, double longitude) {
-        this.address = address;
-        this.latitude = latitude;
-        this.longitude = longitude;
-    }
 
     public LocationDTO(Location location) {
 
@@ -34,27 +39,5 @@ public class LocationDTO {
         this.longitude = location.getLongitude();
         this.address = location.getAddress();
     }
-
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
 
 }
