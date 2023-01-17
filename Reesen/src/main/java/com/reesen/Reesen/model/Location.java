@@ -1,10 +1,13 @@
 package com.reesen.Reesen.model;
 
+import lombok.ToString;
+
 import javax.persistence.*;
 
 import java.io.Serializable;
 
 @Entity
+@ToString
 public class Location implements Serializable {
 
     @Id

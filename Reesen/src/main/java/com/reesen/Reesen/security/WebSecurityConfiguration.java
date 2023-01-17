@@ -24,17 +24,22 @@ public class WebSecurityConfiguration {
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
 
+    @Autowired
+    private JwtAuthenticationEntryPoint entryPoint;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.headers().frameOptions().disable();
                  http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/*").permitAll()
-                         .antMatchers("*/login").permitAll()// statički html i login mogu svi da pozovu
-                     // sav pristup API-ju mora da bude autentikovan
+                         .antMatchers("/api/user/login").permitAll()
+                         .antMatchers("/api/unregisteredUser/**").permitAll()
+                         .antMatchers("/api/**").authenticated()
                 .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // ne koristimo HttpSession i kukije
-        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // JWT procesiramo pre autentikacije
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                                 .and()
+                                         .exceptionHandling().authenticationEntryPoint(entryPoint);
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -44,12 +49,10 @@ public class WebSecurityConfiguration {
 
         return new BCryptPasswordEncoder();
     }
-
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
             throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-
-
+    
 }

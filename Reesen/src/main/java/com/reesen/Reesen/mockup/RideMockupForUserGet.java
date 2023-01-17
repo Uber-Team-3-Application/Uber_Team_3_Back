@@ -7,13 +7,14 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 public class RideMockupForUserGet {
     public static RideDTO getRide()  {
         RideDTO rideDTO = new RideDTO();
         rideDTO.setId(Long.parseLong("10"));
 
-        HashSet<RouteDTO> set = new HashSet<>();
+        LinkedHashSet<RouteDTO> set = new LinkedHashSet<>();
         RouteDTO routeDTO = new RouteDTO();;
         routeDTO.setDeparture(new LocationDTO("Bulevar oslobodjenja 46", 45.267135, 19.833549));
         routeDTO.setDestination(new LocationDTO("Bulevar oslobodjenja 46", 45.267135, 19.833549));
@@ -30,7 +31,7 @@ public class RideMockupForUserGet {
         passengers.add(new UserDTO(Long.parseLong("123"), "user@example.com"));
         rideDTO.setPassengers(passengers);
         rideDTO.setEstimatedTimeInMinutes(5);
-        rideDTO.setVehicleType(VehicleTypeDTO.STANDARDNO);
+        rideDTO.setVehicleType(VehicleTypeDTO.STANDARD);
         rideDTO.setBabyTransport(true);
         rideDTO.setPetTransport(true);
         rideDTO.setRejection(new DeductionDTO("Ride is canceled due to previous problems with the passenger", LocalDateTime.now()));

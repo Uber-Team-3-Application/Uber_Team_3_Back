@@ -1,5 +1,6 @@
 package com.reesen.Reesen.service.interfaces;
 
+import com.reesen.Reesen.model.ResetPasswordToken;
 import com.reesen.Reesen.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,4 +25,12 @@ public interface IUserService {
     boolean changePassword(String old_password, String new_password, Long id);
 
     void resetPassword(String password, Long id);
+
+    void saveResetPasswordToken(ResetPasswordToken resetPasswordToken);
+
+    ResetPasswordToken findByUserIdAndCode(Long id, String code);
+    
+    int getTotalNumberOfRides(User user);
+
+    Long getAdminId();
 }

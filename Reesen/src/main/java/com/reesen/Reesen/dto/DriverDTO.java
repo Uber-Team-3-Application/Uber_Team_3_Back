@@ -1,20 +1,47 @@
 package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.model.Driver.Driver;
+import lombok.*;
+import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
 public class DriverDTO {
 
     private Long id;
+
+    @NotEmpty(message = "{required}")
+    @Length(max=25, message = "{maxLength}")
     private String name;
+
+
+    @NotEmpty(message = "{required}")
+    @Length(max=25, message = "{maxLength}")
     private String surname;
     private String profilePicture;
+
+    @NotEmpty(message = "{required}")
+    @Length(max=20, message = "{maxLength}")
     private String telephoneNumber;
+
+    @Email(message = "{format}")
+    @NotEmpty(message = "{required}")
+    @Length(max=40, message = "{maxLength}")
     private String email;
+
+    @NotEmpty(message = "{required}")
+    @Length(max=50, message = "{maxLength}")
     private String address;
+
     private String password;
-
-
-    public DriverDTO(){}
 
 
     public DriverDTO(Driver driver){
@@ -27,83 +54,5 @@ public class DriverDTO {
         this.address = driver.getAddress();
         this.password = driver.getPassword();
 
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public String getProfilePicture() {
-        return profilePicture;
-    }
-
-    public void setProfilePicture(String profilePicture) {
-        this.profilePicture = profilePicture;
-    }
-
-    public String getTelephoneNumber() {
-        return telephoneNumber;
-    }
-
-    public void setTelephoneNumber(String telephoneNumber) {
-        this.telephoneNumber = telephoneNumber;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    @Override
-    public String toString() {
-        return "DriverDTO{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
-                ", profilePicture='" + profilePicture + '\'' +
-                ", telephoneNumber='" + telephoneNumber + '\'' +
-                ", email='" + email + '\'' +
-                ", address='" + address + '\'' +
-                ", password='" + password + '\'' +
-                '}';
     }
 }

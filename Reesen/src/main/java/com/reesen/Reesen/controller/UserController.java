@@ -2,18 +2,18 @@ package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.*;
-import com.reesen.Reesen.dto.RideDTO;
 import com.reesen.Reesen.exceptions.BadRequestException;
 import com.reesen.Reesen.model.*;
-import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.security.SecurityUser;
 import com.reesen.Reesen.security.jwt.JwtTokenUtil;
 import com.reesen.Reesen.service.interfaces.*;
+import com.reesen.Reesen.validation.UserRequestValidation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.relational.core.sql.In;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -30,8 +30,17 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @CrossOrigin
 @RestController
@@ -44,6 +53,9 @@ public class UserController {
     private final IPassengerService passengerService;
     private final JavaMailSender mailSender;
     private final JwtTokenUtil tokens;
+    private final UserRequestValidation userRequestValidation;
+    private final IRideService rideService;
+    private final MessageSource messageSource;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -53,7 +65,9 @@ public class UserController {
 
     @Autowired
     public UserController(IUserService userService, IMessageService messageService, IRemarkService remarkService,
-                          IDriverService driverService, IPassengerService passengerService, JavaMailSender mailSender, JwtTokenUtil tokens) {
+                          IDriverService driverService, IPassengerService passengerService, JavaMailSender mailSender,
+                          JwtTokenUtil tokens, IRideService rideService,
+                          UserRequestValidation userRequestValidation, MessageSource messageSource) {
         this.userService = userService;
         this.messageService = messageService;
         this.remarkService = remarkService;
@@ -61,36 +75,47 @@ public class UserController {
         this.passengerService = passengerService;
         this.mailSender = mailSender;
         this.tokens = tokens;
+        this.userRequestValidation = userRequestValidation;
+        this.rideService = rideService;
+        this.messageSource = messageSource;
     }
 
     @GetMapping("/{id}/ride")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Paginated<RideDTO>> getRide(
-            @PathVariable("id") int id,
-            @RequestParam("page") int page,
-            @RequestParam("size") int size,
-            @RequestParam("sort") String sort,
-            @RequestParam("from") String from,
-            @RequestParam("to") String to
+    public ResponseEntity<Paginated<UserRidesDTO>> getRides(
+            @PathVariable(value = "id") Long id,
+            Pageable page,
+            @RequestParam(value = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate from,
+            @RequestParam(value = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate to
     ) {
-        User user = userService.findOne((long) id);
-        Set<RideDTO> rides = new HashSet<>();
-        if (driverService.findOne((long)id) != null) {
-            for (Ride ride : ((Driver)user).getRides()) {
-                RideDTO rideDTO = new RideDTO(ride);
-                rides.add(rideDTO);
-            }
-        }
-        else {
-            if (passengerService.findOne((long)id) != null) {
-                for (Ride ride : ((Passenger)user).getRides()) {
-                    RideDTO rideDTO = new RideDTO(ride);
-                    rides.add(rideDTO);
-                }
-            }
-        }
 
-        Paginated<RideDTO> ridePaginated = new Paginated<>(rides.size(), rides);
+        // -1 none, 0 driver, 1 passengeer
+        int userIndicator = -1;
+        if (driverService.findOne(id).isPresent()) userIndicator = 0;
+        else if(passengerService.findOne(id).isPresent()) userIndicator = 1;
+        else return new ResponseEntity("User does not exist!", HttpStatus.NOT_FOUND);
+
+        Date dateFrom = null;
+        Date dateTo = null;
+
+        if (from != null || to != null) {
+            if  (from != null)
+                dateFrom = Date.from(from.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            if (to != null)
+                dateTo = Date.from(to.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        }
+        Page<Ride> userRides = null;
+        if(userIndicator == 0) {
+            userRides = this.rideService.findAllForUserWithRole(id, page, dateFrom, dateTo, Role.DRIVER);
+
+        }
+        else
+            userRides = this.rideService.findAllForUserWithRole(id, page, dateFrom, dateTo, Role.PASSENGER);
+
+        Set<UserRidesDTO> rides = new LinkedHashSet<>();
+        rides = this.rideService.getFilteredRides(userRides, id);
+
+        Paginated<UserRidesDTO> ridePaginated = new Paginated<>(userRides.getNumberOfElements(), rides);
         return new ResponseEntity<>(ridePaginated, HttpStatus.OK);
 
     }
@@ -119,25 +144,25 @@ public class UserController {
         Integer totalNumber = this.userService.getTotalNumberOfUsers();
         return new ResponseEntity<>(totalNumber, HttpStatus.OK);
     }
+    @GetMapping("/{id}/number-of-rides")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER', 'PASSENGER')")
+    public ResponseEntity<Integer> getTotalNumberOfRides(@PathVariable("id") Long id){
+        User user = this.userService.findOne(id);
+        if(user == null) return new ResponseEntity("Invalid ID.", HttpStatus.NOT_FOUND);
 
+        int totalNumberOfRides = this.userService.getTotalNumberOfRides(user);
+        return new ResponseEntity<>(totalNumberOfRides, HttpStatus.OK);
+    }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDTO> logIn(@RequestBody LoginDTO login) {
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (!(auth instanceof AnonymousAuthenticationToken)) {
-            throw new BadRequestException("Unauthorized!");
-        }
-
+    public ResponseEntity<TokenDTO> logIn(@Valid @RequestBody LoginDTO login) {
+        System.out.println("aaaaaaaa");
         try {
             TokenDTO token = new TokenDTO();
             SecurityUser userDetails = (SecurityUser) this.userService.findByUsername(login.getEmail());
 
             boolean isEmailConfirmed = this.passengerService.getIsEmailConfirmed(login.getEmail());
-            if(!isEmailConfirmed){
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
+
             String tokenValue = this.jwtTokenUtil.generateToken(userDetails);
             token.setToken(tokenValue);
             token.setRefreshToken(this.jwtTokenUtil.generateRefreshToken(userDetails));
@@ -149,8 +174,10 @@ public class UserController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             return new ResponseEntity<>(token, HttpStatus.OK);
-        } catch (BadCredentialsException e) {
-            throw new BadRequestException("Wrong password!");
+        } catch (Exception e) {
+            return new ResponseEntity(new ErrorResponseMessage(
+                    this.messageSource.getMessage("user.badCredentials", null, Locale.getDefault())
+            ), HttpStatus.BAD_REQUEST);
         }
 
     }
@@ -161,9 +188,13 @@ public class UserController {
     public ResponseEntity<Paginated<MessageFullDTO>> getUserMessages(
             @PathVariable int id) {
 
-        User sender = this.userService.findOne((long) id);
-        Set<Message> messages = messageService.getMessagesBySender(sender);
-        Set<MessageFullDTO> retVal = new HashSet<>();
+        User user = this.userService.findOne((long) id);
+
+        if (user == null)
+            return new ResponseEntity("User does not exist!", HttpStatus.NOT_FOUND);
+
+        Set<Message> messages = messageService.getAll(user);
+        Set<MessageFullDTO> retVal = new LinkedHashSet<>();
         for (Message message : messages) {
             retVal.add(new MessageFullDTO(message));
         }
@@ -175,13 +206,28 @@ public class UserController {
     @PostMapping("/{id}/message")
     @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER', 'ADMIN')")
     public ResponseEntity<MessageFullDTO> sendMessageToTheUser(
-            @PathVariable int id,
-            @RequestBody MessageDTO messageDto
-    ) {
-        User sender = userService.findOne((long)id);
-        User receiver = userService.findOne(messageDto.getReceiverId());
 
-        Message message = new Message(sender, receiver, messageDto.getMessage(), Date.from(Instant.now()), messageDto.getType());
+            @PathVariable int id,
+            @Valid @RequestBody MessageDTO messageDto,
+            @RequestHeader Map<String, String> headers
+    ) {
+        User receiver = userService.findOne((long)id);
+
+        if (receiver == null)
+            return new ResponseEntity("Receiver does not exist!", HttpStatus.NOT_FOUND);
+
+        Integer idOfSender = this.userRequestValidation.getUserId(headers);
+
+        User sender = userService.findOne((long)idOfSender);
+        if (sender == null)
+            return new ResponseEntity("User does not exist!", HttpStatus.NOT_FOUND);
+
+        if (rideService.findOne((long)messageDto.getRideId()) == null) {
+            return new ResponseEntity("Ride does not exist!", HttpStatus.NOT_FOUND);
+
+        }
+
+        Message message = new Message(sender, receiver, messageDto.getMessage(), Date.from(Instant.now()), messageDto.getType(), (long)messageDto.getRideId());
         message = messageService.save(message);
         MessageFullDTO messageFullDTO = new MessageFullDTO(message);
         return new ResponseEntity<>(messageFullDTO, HttpStatus.OK);
@@ -191,10 +237,16 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> blockUser(@PathVariable Long id) {
         User user = this.userService.findOne(id);
-        System.out.println(id);
+        if (user == null)
+            return new ResponseEntity("User does not exist!", HttpStatus.NOT_FOUND);
+        if (user.isBlocked())
+            return new ResponseEntity(new ErrorResponseMessage(
+                    this.messageSource.getMessage("user.AlreadyBlocked", null, Locale.getDefault())
+            ), HttpStatus.BAD_REQUEST);
+
         user.setBlocked(true);
         userService.save(user);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity("User is successfully blocked",HttpStatus.NO_CONTENT);
 
     }
 
@@ -203,7 +255,6 @@ public class UserController {
     public ResponseEntity<Boolean> isUserBlocked(@PathVariable Long id){
         User user = this.userService.findOne(id);
         if(user == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
         boolean isBlocked = this.userService.getIsUserBlocked(id);
         return new ResponseEntity<>(isBlocked, HttpStatus.OK);
     }
@@ -212,24 +263,33 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> unblockUser(@PathVariable int id) {
         User user = this.userService.findOne((long) id);
+        if (user == null)
+            return new ResponseEntity("User does not exist!", HttpStatus.NOT_FOUND);
+        if (!user.isBlocked())
+            return new ResponseEntity(new ErrorResponseMessage(
+                    this.messageSource.getMessage("user.NotBlocked", null, Locale.getDefault())
+            ), HttpStatus.BAD_REQUEST);
         user.setBlocked(false);
         userService.save(user);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity("User is successfully unblocked", HttpStatus.NO_CONTENT);
 
     }
 
     @PutMapping("/{id}/changePassword")
     @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<String> changePassword(
-            @RequestBody ChangePasswordDTO changePasswordDTO,
+            @Valid @RequestBody ChangePasswordDTO changePasswordDTO,
             @PathVariable Long id) {
+
         User user = this.userService.findOne(id);
-        if(user == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(user == null) return new ResponseEntity("User does not exist!", HttpStatus.NOT_FOUND);
 
-        boolean passwordChanged = this.userService.changePassword(changePasswordDTO.getOld_password(), changePasswordDTO.getNew_password(), id);
-        if(!passwordChanged) return new ResponseEntity<>("Current password is not matching", HttpStatus.BAD_REQUEST);
+        boolean passwordChanged = this.userService.changePassword(changePasswordDTO.getOldPassword(), changePasswordDTO.getNewPassword(), id);
+        if(!passwordChanged) return new ResponseEntity(new ErrorResponseMessage(
+                this.messageSource.getMessage("user.passwordNotMatching", null, Locale.getDefault())
+        ), HttpStatus.BAD_REQUEST);
 
-        return new ResponseEntity<>("Password successfully changed", HttpStatus.NO_CONTENT);
+        return new ResponseEntity("Password successfully changed", HttpStatus.NO_CONTENT);
 
     }
 
@@ -239,9 +299,13 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RemarkDTO> createNote(
             @PathVariable Long id,
-            @RequestBody String message
+            @Valid @RequestBody NoteDTO note
     ) {
         User user = userService.findOne(id);
+        if (user == null)
+            return new ResponseEntity("User does not exist!", HttpStatus.NOT_FOUND);
+
+        String message = note.getMessage();
         Remark remark = new Remark(message,  Date.from(Instant.now()), user);
         System.out.println(remark.getMessage());
         remark = remarkService.save(remark);
@@ -258,6 +322,9 @@ public class UserController {
     ) {
 
         User user = userService.findOne((long) id);
+        if (user == null)
+            return new ResponseEntity("User does not exist!", HttpStatus.NOT_FOUND);
+
         Set<Remark> remarks = remarkService.getRemarksByUser(user);
         Set<RemarkDTO> remarksDto = new HashSet<>();
         for (Remark remark : remarks) {
@@ -278,20 +345,64 @@ public class UserController {
         mailSender.send(message);
         return new ResponseEntity<>("Email sent successfuly", HttpStatus.OK);
     }
+
     @GetMapping("/{id}/resetPassword")
-    public ResponseEntity<String> resetPassword(@PathVariable Long id){
-        return new ResponseEntity<>(tokens.generateResetPasswordEmailToken(id), HttpStatus.OK);
+    public ResponseEntity<String> resetPassword(@PathVariable Long id) {
+
+        User user = this.userService.findOne(id);
+        if (user == null)
+            return new ResponseEntity<>("User does not exist!", HttpStatus.NOT_FOUND);
+
+        ResetPasswordToken resetPasswordToken = new ResetPasswordToken(id);
+        this.userService.saveResetPasswordToken(resetPasswordToken);
+        return new ResponseEntity<>("Email with reset code has been sent!", HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{id}/resetPassword")
-    public ResponseEntity resetPassword(@RequestBody ResetPasswordDTO resetPasswordDTO, @PathVariable Long id) {
-        this.userService.resetPassword(resetPasswordDTO.getPassword(), id);
-        return new ResponseEntity<>("Password successfully changed", HttpStatus.NO_CONTENT);
+    public ResponseEntity resetPassword(@Valid @RequestBody ResetPasswordDTO resetPasswordDTO,
+                                        @PathVariable Long id) {
+
+        User user = this.userService.findOne(id);
+        if (user == null)
+            return new ResponseEntity<>("User does not exist!", HttpStatus.NOT_FOUND);
+
+        ResetPasswordToken resetPasswordToken = this.userService.findByUserIdAndCode(id, resetPasswordDTO.getCode());
+
+        if(resetPasswordToken == null)
+            return new ResponseEntity(new ErrorResponseMessage(
+                    this.messageSource.getMessage("user.codeExpired", null, Locale.getDefault())),
+                    HttpStatus.BAD_REQUEST);
+
+        if(resetPasswordToken.getExpirationDate().isBefore(LocalDateTime.now()))
+            return new ResponseEntity(new ErrorResponseMessage(
+                    this.messageSource.getMessage("user.codeExpired", null, Locale.getDefault())),
+                    HttpStatus.BAD_REQUEST);
+
+        this.userService.resetPassword(resetPasswordDTO.getNewPassword(), id);
+        return new ResponseEntity<>("Password successfully changed!", HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/email")
-    public ResponseEntity<User> getUserByEmail(@RequestBody String email) {
-        return new ResponseEntity<>( this.userService.findByEmail(email).get(), HttpStatus.OK);
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
+    public ResponseEntity<UserFullDTO> getUserByEmail(@RequestParam("email") String email) {
+        return new ResponseEntity<>( new UserFullDTO(this.userService.findByEmail(email).get()), HttpStatus.OK);
     }
+
+    @GetMapping("/{id}/user")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
+    public ResponseEntity<UserFullDTO> getUserById(@PathVariable("id") Long id) {
+        User user = this.userService.findOne(id);
+        UserFullDTO userFullDTO = new UserFullDTO(user);
+        return new ResponseEntity<>( userFullDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/admin-user")
+    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
+    public ResponseEntity<Long> getAdminId(){
+
+        Long id = this.userService.getAdminId();
+        return new ResponseEntity<>(id, HttpStatus.OK);
+    }
+
 
 }

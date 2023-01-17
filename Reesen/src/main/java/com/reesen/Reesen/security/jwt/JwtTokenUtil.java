@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +34,17 @@ public class JwtTokenUtil {
         return getClaim(token, Claims::getSubject);
     }
 
+    public ArrayList<HashMap<String, String>> getRole(String token){
+        Map<String, Object> claims;
+        claims = getAllClaims(token);
+        return (ArrayList<HashMap<String, String>>) claims.get("role");
+    }
+
+    public Integer getId(String token){
+        Map<String, Object> claims;
+        claims = getAllClaims(token);
+        return (Integer) claims.get("id");
+    }
     public Date getExpirationDate(String token){
         return getClaim(token, Claims::getExpiration);
     }
@@ -47,7 +59,7 @@ public class JwtTokenUtil {
                 .parse(token).getBody();
     }
 
-    private Boolean isExpired(String token){
+    public Boolean isExpired(String token){
         final Date expiration = getExpirationDate(token);
         return expiration.before(new Date());
     }
@@ -116,21 +128,6 @@ public class JwtTokenUtil {
     public Boolean validateToken(String token, UserDetails userDetails){
         final String username = getUsername(token);
         return (username.equals(userDetails.getUsername()) && !isExpired(token));
-    }
-
-    public String generateActivationEmailToken(Long passengerId){
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("passengerId", passengerId);
-        claims.put("expirationDate", new Date());
-        return this.generateToken(claims);
-    }
-
-    public String generateResetPasswordEmailToken(Long userId){
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", userId);
-        claims.put("expirationDate", new Date());
-        claims.put("code", (int)(Math.random() * 900000) + 100000 );
-        return this.generateToken(claims);
     }
 
 }

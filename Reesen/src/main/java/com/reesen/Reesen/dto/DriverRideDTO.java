@@ -1,14 +1,18 @@
 package com.reesen.Reesen.dto;
 
-import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.model.Passenger;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.Route;
+import lombok.*;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
 public class DriverRideDTO {
     private  Long id;
     private Date startTime;
@@ -22,9 +26,6 @@ public class DriverRideDTO {
     private  boolean petTransport;
     private  DeductionDTO rejection;
     private  Set<RouteDTO> locations;
-
-    public DriverRideDTO() {
-    }
 
     public DriverRideDTO(Ride ride) {
         this.id = ride.getId();

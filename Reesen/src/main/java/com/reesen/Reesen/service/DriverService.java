@@ -4,9 +4,12 @@ import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.dto.CreatedDriverDTO;
 import com.reesen.Reesen.dto.DriverDTO;
+import com.reesen.Reesen.dto.UpdateDriverDTO;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Driver.DriverEditBasicInformation;
 import com.reesen.Reesen.model.Driver.DriverEditVehicle;
+import com.reesen.Reesen.model.Review;
+import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.model.VehicleType;
 import com.reesen.Reesen.model.paginated.Paginated;
@@ -23,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class DriverService implements IDriverService {
@@ -91,7 +95,7 @@ public class DriverService implements IDriverService {
         return driverPaginated;
     }
 
-    public Driver getDriverFromDriverDTO(Long id, DriverDTO driverDTO){
+    public Driver getDriverFromDriverDTO(Long id, UpdateDriverDTO driverDTO){
         Optional<Driver> optDriver = this.driverRepository.findById(id);
         Driver driver = new Driver();
         if(optDriver.isPresent()) driver = optDriver.get();
@@ -102,11 +106,7 @@ public class DriverService implements IDriverService {
         driver.setTelephoneNumber(driverDTO.getTelephoneNumber());
         driver.setAddress(driverDTO.getAddress());
         driver.setId(id);
-        if(driverDTO.getPassword() != null) {
-            driver.setPassword(passwordEncoder.encode(driverDTO.getPassword()));
-        }else{
-            driver.setPassword(this.driverRepository.getPasswordWithId(id));
-        }
+
         driver.setRole(Role.DRIVER);
 
         return driver;
@@ -115,6 +115,14 @@ public class DriverService implements IDriverService {
     @Override
     public Vehicle getVehicle(Long driverId){
         return this.driverRepository.getVehicle(driverId);
+    }
+
+    @Override
+    public Driver findDriverByRidesContaining(Ride ride) {
+        Optional<Driver> driver =  this.driverRepository.findDriverByRidesContaining(ride);
+        if(driver.isPresent()) return driver.get();
+        return null;
+
     }
 
     @Override
@@ -189,6 +197,17 @@ public class DriverService implements IDriverService {
         vehicle.setPetAccessible(driverEditVehicle.isVIsPetAccessible());
         return vehicle;
     }
+
+    @Override
+    public Optional<Driver> findDriverWithRide(Ride ride) {
+        return this.driverRepository.findDriverByRidesContaining(ride);
+    }
+
+    @Override
+    public Set<Review> getAllReviews(Long driverId) {
+        return this.driverRepository.getAllReviews(driverId);
+    }
+
     public VehicleType findVehicleTypeByName(VehicleName name){
         return this.vehicleTypeRepository.findByName(name);
     }

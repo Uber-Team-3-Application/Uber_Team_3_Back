@@ -32,4 +32,6 @@ public interface IVehicleService {
     List<LocationDTO> getAllLocations();
 
     List<VehicleLocationWithAvailabilityDTO> getAllLocationsWithAvailability();
+
+    LocationDTO getCurrentLocation(Long vehicleId);
 }

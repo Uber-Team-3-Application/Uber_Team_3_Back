@@ -1,20 +1,23 @@
 package com.reesen.Reesen.model;
 
+import lombok.ToString;
+
 import javax.persistence.*;
 
 import java.io.Serializable;
 
 @Entity
+@ToString
 public class Route implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
     private Location departure;
 
-    @ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
     private Location destination;
 
     @Column

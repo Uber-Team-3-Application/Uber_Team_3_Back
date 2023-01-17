@@ -1,6 +1,9 @@
 package com.reesen.Reesen.dto;
 
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import com.reesen.Reesen.Enums.RideStatus;
@@ -10,7 +13,7 @@ import com.reesen.Reesen.model.*;
 public class RideDTO {
 
 	private Long id;
-	private Set<RouteDTO> locations;
+	private LinkedHashSet<RouteDTO> locations;
 	private DeductionDTO rejection;
  	private Date startTime;
  	private Date endTime;
@@ -22,6 +25,8 @@ public class RideDTO {
  	private boolean babyTransport;
  	private boolean petTransport;
 	 private RideStatus status;
+
+	 private LocalDateTime scheduledTime;
 
     public RideDTO(){
 
@@ -36,13 +41,25 @@ public class RideDTO {
 		this.babyTransport = ride.isBabyAccessible();
 		this.petTransport = ride.isPetAccessible();
 		this.status = ride.getStatus();
+		this.driver = new UserDTO(ride.getDriver().getId(), ride.getDriver().getEmail());
 		setPassengers(ride);
 		setVehicleType(ride);
-		this.rejection = new DeductionDTO(ride.getDeduction().getReason(), ride.getDeduction().getDeductionTime());
+		setLocations(ride);
+		if(ride.getDeduction() == null) this.rejection = null;
+		else this.rejection = new DeductionDTO(ride.getDeduction().getReason(), ride.getDeduction().getDeductionTime());
+		this.scheduledTime = ride.getScheduledTime();
+	}
+
+	private void setLocations(Ride ride) {
+		locations = new LinkedHashSet<>();
+		for (Route route : ride.getLocations()) {
+			locations.add(new RouteDTO(route));
+		}
 	}
 
 
 	private void setPassengers(Ride ride) {
+		passengers = new HashSet<>();
 		for (Passenger passenger : ride.getPassengers()) {
 			passengers.add(new UserDTO(passenger.getId(), passenger.getEmail()));
 		}
@@ -50,11 +67,11 @@ public class RideDTO {
 
 	private void setVehicleType(Ride ride) {
 		if (ride.getVehicleType().getName() == VehicleName.VAN)
-			this.vehicleType = VehicleTypeDTO.KOMBI;
+			this.vehicleType = VehicleTypeDTO.VAN;
 		else if (ride.getVehicleType().getName() == VehicleName.LUXURY)
-			this.vehicleType = VehicleTypeDTO.LUKSUZNO;
+			this.vehicleType = VehicleTypeDTO.LUXURY;
 		else if (ride.getVehicleType().getName() == VehicleName.STANDARD)
-			this.vehicleType = VehicleTypeDTO.STANDARDNO;
+			this.vehicleType = VehicleTypeDTO.STANDARD;
 	}
 
 	public DeductionDTO getRejection() {
@@ -73,11 +90,11 @@ public class RideDTO {
 		this.id = id;
 	}
 
-	public Set<RouteDTO> getLocations() {
+	public LinkedHashSet<RouteDTO> getLocations() {
 		return locations;
 	}
 
-	public void setLocations(Set<RouteDTO> locations) {
+	public void setLocations(LinkedHashSet<RouteDTO> locations) {
 		this.locations = locations;
 	}
 
@@ -159,5 +176,13 @@ public class RideDTO {
 
 	public void setStatus(RideStatus status) {
 		this.status = status;
+	}
+
+	public LocalDateTime getScheduledTime() {
+		return scheduledTime;
+	}
+
+	public void setScheduledTime(LocalDateTime scheduledTime) {
+		this.scheduledTime = scheduledTime;
 	}
 }
