@@ -4,6 +4,7 @@ import com.reesen.Reesen.Enums.RideStatus;
 
 import com.reesen.Reesen.dto.ReportDTO;
 import com.reesen.Reesen.dto.RideLocationWithTimeDTO;
+import com.reesen.Reesen.model.Review;
 import com.reesen.Reesen.model.Route;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -158,4 +159,10 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "p member of r.passengers " +
             "and r.status=:rideStatus")
     Ride findPassengerActiveRide(Long passengerId, RideStatus rideStatus);
+
+    @Query("select r.review from Ride r " +
+            "where r.id=:rideId")
+    Set<Review> findAllReviewsBySpecificDriverAndRide(Long rideId);
+
+    List<Ride> findAll();
 }

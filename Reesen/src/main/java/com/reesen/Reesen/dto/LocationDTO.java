@@ -2,11 +2,22 @@ package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.model.Location;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 public class LocationDTO {
 
     private String address;
-	private double latitude;
-	private double longitude;
+    @NotNull(message = "{required}")
+    @Min(value = -90, message = "{regex}")
+    @Max(value = 90, message = "{regex}")
+    private double latitude;
+    @NotNull(message = "{required}")
+    @Min(value = -180, message = "{regex}")
+    @Max(value = 180, message = "{regex}")
+    private double longitude;
 	
     public LocationDTO() {
     }

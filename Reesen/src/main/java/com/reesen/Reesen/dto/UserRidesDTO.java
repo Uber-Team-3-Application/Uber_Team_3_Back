@@ -11,6 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class UserRidesDTO {
+
     private  Long id;
     private Date startTime;
     private  Date endTime;

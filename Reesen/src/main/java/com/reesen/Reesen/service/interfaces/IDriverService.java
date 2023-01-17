@@ -5,6 +5,7 @@ import com.reesen.Reesen.dto.DriverDTO;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Driver.DriverEditBasicInformation;
 import com.reesen.Reesen.model.Driver.DriverEditVehicle;
+import com.reesen.Reesen.model.Review;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.model.paginated.Paginated;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface IDriverService {
     Driver save(Driver driver);
@@ -53,4 +55,6 @@ public interface IDriverService {
     Vehicle updateVehicleBasedOnEditRequest(Driver driver, DriverEditVehicle driverEditVehicle);
 
     Optional<Driver> findDriverWithRide(Ride ride);
+    Set<Review> getAllReviews(Long driverId);
+
 }

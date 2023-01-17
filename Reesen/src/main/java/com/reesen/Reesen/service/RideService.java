@@ -242,6 +242,11 @@ public class RideService implements IRideService {
 		return ride;
 	}
 
+	@Override
+	public List<Ride> findAll() {
+		return rideRepository.findAll();
+	}
+
 	public Page<Ride> findAll(Long driverId, Pageable page, Date from, Date to){
 		if(from == null && to == null)
 			return this.rideRepository.findAllByDriverId(driverId, page);
@@ -436,6 +441,11 @@ public class RideService implements IRideService {
 		reportSumAverageDTO.setSum(sum);
 		reportSumAverageDTO.setAverage(sum/ totalDays);
 		return reportSumAverageDTO;
+	}
+
+	@Override
+	public Set<Review> findAllReviewsBySpecificDriverAndRide(Long rideId) {
+		return this.rideRepository.findAllReviewsBySpecificDriverAndRide(rideId);
 	}
 
 	@Override
