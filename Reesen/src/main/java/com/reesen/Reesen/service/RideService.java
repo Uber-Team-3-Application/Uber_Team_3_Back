@@ -315,7 +315,6 @@ public class RideService implements IRideService {
 	public UserRidesDTO getFilteredRide(Ride ride, Long driverId){
 
 		ride.setPassengers(passengerRepository.findPassengersByRidesContaining(ride));
-
 		Set<Review> reviews = this.reviewRepository.findAllByRideId(ride.getId());
 		for(Review review:reviews){
 			review.setPassenger(this.passengerRepository.findbyReviewId(review.getId()));
@@ -332,6 +331,8 @@ public class RideService implements IRideService {
 
 		ride.setLocations(locations);
 		UserRidesDTO rideDTO = new UserRidesDTO(ride);
+
+
 		if(driverId != 0L)
 			rideDTO.setDriver(new UserDTO(
 					this.userRepository.findById(driverId).get()
@@ -503,9 +504,10 @@ public class RideService implements IRideService {
 
 	@Override
 	public Set<UserRidesDTO> getFilteredRides(Page<Ride> userRides, Long driverId) {
-		Set<UserRidesDTO> rides = new LinkedHashSet<>();
-		for (Ride ride : userRides) {
 
+		Set<UserRidesDTO> rides = new LinkedHashSet<>();
+
+		for (Ride ride :  userRides) {
 			rides.add(this.getFilteredRide(ride, driverId));
 		}
 

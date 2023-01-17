@@ -70,7 +70,7 @@ public class UserService implements IUserService {
 
     @Override
     public User findOne(Long id) {
-        return this.userRepository.findById(id).orElseGet(null);
+        return this.userRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -98,7 +98,6 @@ public class UserService implements IUserService {
 
         String old = this.userRepository.getUserPassword(id);
         System.out.println(old_password);
-        System.out.println(passwordEncoder.encode(old_password));
         System.out.println(old);
         if(!passwordEncoder.matches(old_password, old)) return false;
 
