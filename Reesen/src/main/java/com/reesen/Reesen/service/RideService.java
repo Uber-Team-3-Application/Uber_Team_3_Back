@@ -63,14 +63,14 @@ public class RideService implements IRideService {
 
 	@Override
 	public Ride findOne(Long id) {
-		Ride ride = this.rideRepository.findById(id).get();
-		if(ride != null)
+		if(this.rideRepository.findById(id).isPresent())
 		{
+			Ride ride = this.rideRepository.findById(id).get();
 			ride.setDriver(this.driverRepository.findDriverByRidesContaining(ride).get());
 			ride.setPassengers(this.passengerService.findPassengersByRidesContaining(ride));
 			ride.setLocations(this.rideRepository.getLocationsByRide(ride.getId()));
 		}
-		return ride;
+		return null;
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class RideService implements IRideService {
 		}
 		passengers.add(this.passengerService.findOne(passengerId).get());
 		ride.setPassengers(passengers);
-		ride.setStatus(RideStatus.ON_HOLD);
+		ride.setStatus(RideStatus.PENDING);
 
 //		if(ride.getScheduledTime() != null){
 //			Runnable task = () -> {
@@ -139,6 +139,7 @@ public class RideService implements IRideService {
 				ride.setEstimatedTime((Double) result[1]);
 				ride.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(ride.getLocations()), this.locationService.getLastLocation(ride.getLocations())) * ride.getVehicleType().getPricePerKm());
 			}
+			ride.setScheduledTime(rideDTO.getScheduleTime());
 		return new RideDTO(this.rideRepository.save(ride));
 	}
 
@@ -520,6 +521,12 @@ public class RideService implements IRideService {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public boolean checkForPendingRide(Long passengerId) {
+		if (this.rideRepository.findAllRidesByPassengerIdAndRideStatus(passengerId, RideStatus.PENDING).isEmpty()) return false;
+		return true;
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.reesen.Reesen.dto;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -25,6 +26,8 @@ public class RideDTO {
  	private boolean petTransport;
 	 private RideStatus status;
 
+	 private LocalDateTime scheduledTime;
+
     public RideDTO(){
 
     }
@@ -42,8 +45,9 @@ public class RideDTO {
 		setPassengers(ride);
 		setVehicleType(ride);
 		setLocations(ride);
-		if(ride.getDeduction() == null) this.rejection = new DeductionDTO();
+		if(ride.getDeduction() == null) this.rejection = null;
 		else this.rejection = new DeductionDTO(ride.getDeduction().getReason(), ride.getDeduction().getDeductionTime());
+		this.scheduledTime = ride.getScheduledTime();
 	}
 
 	private void setLocations(Ride ride) {
@@ -172,5 +176,13 @@ public class RideDTO {
 
 	public void setStatus(RideStatus status) {
 		this.status = status;
+	}
+
+	public LocalDateTime getScheduledTime() {
+		return scheduledTime;
+	}
+
+	public void setScheduledTime(LocalDateTime scheduledTime) {
+		this.scheduledTime = scheduledTime;
 	}
 }
