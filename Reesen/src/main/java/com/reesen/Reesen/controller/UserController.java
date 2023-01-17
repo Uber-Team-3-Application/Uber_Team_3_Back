@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -34,7 +35,9 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -82,8 +85,8 @@ public class UserController {
     public ResponseEntity<Paginated<UserRidesDTO>> getRides(
             @PathVariable(value = "id") Long id,
             Pageable page,
-            @RequestParam(value = "from", required = false) String from,
-            @RequestParam(value = "to", required = false) String to
+            @RequestParam(value = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate from,
+            @RequestParam(value = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate to
     ) {
 
         // -1 none, 0 driver, 1 passengeer
@@ -96,15 +99,16 @@ public class UserController {
         Date dateTo = null;
 
         if (from != null || to != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             if  (from != null)
-                dateFrom = java.sql.Timestamp.valueOf(LocalDateTime.parse(from, formatter));
+                dateFrom = Date.from(from.atStartOfDay(ZoneId.systemDefault()).toInstant());
             if (to != null)
-                dateTo = java.sql.Timestamp.valueOf(LocalDateTime.parse(to, formatter));
+                dateTo = Date.from(to.atStartOfDay(ZoneId.systemDefault()).toInstant());
         }
         Page<Ride> userRides = null;
-        if(userIndicator == 0)
+        if(userIndicator == 0) {
             userRides = this.rideService.findAllForUserWithRole(id, page, dateFrom, dateTo, Role.DRIVER);
+
+        }
         else
             userRides = this.rideService.findAllForUserWithRole(id, page, dateFrom, dateTo, Role.PASSENGER);
 
@@ -152,7 +156,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<TokenDTO> logIn(@Valid @RequestBody LoginDTO login) {
-
+        System.out.println("aaaaaaaa");
         try {
             TokenDTO token = new TokenDTO();
             SecurityUser userDetails = (SecurityUser) this.userService.findByUsername(login.getEmail());
@@ -170,7 +174,7 @@ public class UserController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             return new ResponseEntity<>(token, HttpStatus.OK);
-        } catch (BadCredentialsException e) {
+        } catch (Exception e) {
             return new ResponseEntity(new ErrorResponseMessage(
                     this.messageSource.getMessage("user.badCredentials", null, Locale.getDefault())
             ), HttpStatus.BAD_REQUEST);
@@ -204,7 +208,7 @@ public class UserController {
     public ResponseEntity<MessageFullDTO> sendMessageToTheUser(
 
             @PathVariable int id,
-            @RequestBody MessageDTO messageDto,
+            @Valid @RequestBody MessageDTO messageDto,
             @RequestHeader Map<String, String> headers
     ) {
         User receiver = userService.findOne((long)id);
@@ -218,12 +222,12 @@ public class UserController {
         if (sender == null)
             return new ResponseEntity("User does not exist!", HttpStatus.NOT_FOUND);
 
-        if (rideService.findOne(messageDto.getRideId()) == null) {
+        if (rideService.findOne((long)messageDto.getRideId()) == null) {
             return new ResponseEntity("Ride does not exist!", HttpStatus.NOT_FOUND);
 
         }
 
-        Message message = new Message(sender, receiver, messageDto.getMessage(), Date.from(Instant.now()), messageDto.getType(), messageDto.getRideId());
+        Message message = new Message(sender, receiver, messageDto.getMessage(), Date.from(Instant.now()), messageDto.getType(), (long)messageDto.getRideId());
         message = messageService.save(message);
         MessageFullDTO messageFullDTO = new MessageFullDTO(message);
         return new ResponseEntity<>(messageFullDTO, HttpStatus.OK);
@@ -278,14 +282,14 @@ public class UserController {
             @PathVariable Long id) {
 
         User user = this.userService.findOne(id);
-        if(user == null) return new ResponseEntity<>("User does not exist!", HttpStatus.NOT_FOUND);
+        if(user == null) return new ResponseEntity("User does not exist!", HttpStatus.NOT_FOUND);
 
         boolean passwordChanged = this.userService.changePassword(changePasswordDTO.getOldPassword(), changePasswordDTO.getNewPassword(), id);
         if(!passwordChanged) return new ResponseEntity(new ErrorResponseMessage(
                 this.messageSource.getMessage("user.passwordNotMatching", null, Locale.getDefault())
         ), HttpStatus.BAD_REQUEST);
 
-        return new ResponseEntity<>("Password successfully changed", HttpStatus.NO_CONTENT);
+        return new ResponseEntity("Password successfully changed", HttpStatus.NO_CONTENT);
 
     }
 
@@ -295,12 +299,13 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RemarkDTO> createNote(
             @PathVariable Long id,
-            @RequestBody @NotNull @Max(500) String message
+            @Valid @RequestBody NoteDTO note
     ) {
         User user = userService.findOne(id);
         if (user == null)
             return new ResponseEntity("User does not exist!", HttpStatus.NOT_FOUND);
 
+        String message = note.getMessage();
         Remark remark = new Remark(message,  Date.from(Instant.now()), user);
         System.out.println(remark.getMessage());
         remark = remarkService.save(remark);
@@ -346,7 +351,7 @@ public class UserController {
 
         User user = this.userService.findOne(id);
         if (user == null)
-            return new ResponseEntity<>("'User does not exist!'", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("User does not exist!", HttpStatus.NOT_FOUND);
 
         ResetPasswordToken resetPasswordToken = new ResetPasswordToken(id);
         this.userService.saveResetPasswordToken(resetPasswordToken);

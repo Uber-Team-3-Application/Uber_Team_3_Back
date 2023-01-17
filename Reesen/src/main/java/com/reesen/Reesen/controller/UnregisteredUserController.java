@@ -22,6 +22,7 @@ import java.util.function.DoubleFunction;
 @CrossOrigin
 @RestController
 @RequestMapping("api/unregisteredUser/")
+//TODO : NE DOZVOLITI
 public class UnregisteredUserController {
 
     private final IVehicleService vehicleService;
