@@ -1,6 +1,7 @@
 package com.reesen.Reesen.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -13,6 +14,7 @@ public class Remark implements Serializable {
     private Long id;
 
     @Column
+    @Size(max = 1200)
     private String message;
 
     @Column
