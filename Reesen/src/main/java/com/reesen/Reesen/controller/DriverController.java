@@ -191,10 +191,10 @@ public class DriverController {
         Optional<Driver> driver = this.workingHoursService.getDriverFromWorkingHours(workingHourId);
         if(driver.isPresent()) {
             boolean areIdsEqual = this.userRequestValidation.areIdsEqual(headers, driver.get().getId());
-            if (!areIdsEqual) return new ResponseEntity("Driver does not exist.", HttpStatus.NOT_FOUND);
+            if (!areIdsEqual) return new ResponseEntity("Driver does not exist!", HttpStatus.NOT_FOUND);
         }
         Optional<WorkingHours> workingHours = this.workingHoursService.findOne(workingHourId);
-        if (workingHours.isEmpty()) return new ResponseEntity("Working hour does not exist", HttpStatus.NOT_FOUND);
+        if (workingHours.isEmpty()) return new ResponseEntity("Working hour does not exist!", HttpStatus.NOT_FOUND);
         String workingHoursValid = this.workingHoursService.validateWorkingHours(workingHours.get(), workingHoursDTO);
         if(!workingHoursValid.equalsIgnoreCase("valid")){
             return new ResponseEntity(new ErrorResponseMessage(workingHoursValid), HttpStatus.BAD_REQUEST);
