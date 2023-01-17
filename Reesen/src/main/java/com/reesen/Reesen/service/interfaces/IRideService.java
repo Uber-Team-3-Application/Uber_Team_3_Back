@@ -58,4 +58,6 @@ public interface IRideService {
 	double calculateDistance(Location departure, Location destination);
 
 	boolean validateCreateRideDTO(CreateRideDTO createRideDTO);
+
+	boolean checkForPendingRide(Long passengerId);
 }

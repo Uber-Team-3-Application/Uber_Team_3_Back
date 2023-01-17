@@ -119,7 +119,10 @@ public class DriverService implements IDriverService {
 
     @Override
     public Driver findDriverByRidesContaining(Ride ride) {
-        return  this.driverRepository.findDriverByRidesContaining(ride).get();
+        Optional<Driver> driver =  this.driverRepository.findDriverByRidesContaining(ride);
+        if(driver.isPresent()) return driver.get();
+        return null;
+
     }
 
     @Override
