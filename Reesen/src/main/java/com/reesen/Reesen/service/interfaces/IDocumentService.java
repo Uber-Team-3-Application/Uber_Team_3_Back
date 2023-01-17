@@ -2,6 +2,7 @@ package com.reesen.Reesen.service.interfaces;
 
 import com.reesen.Reesen.dto.DocumentDTO;
 import com.reesen.Reesen.model.Document;
+import com.reesen.Reesen.model.Driver.Driver;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,4 +17,6 @@ public interface IDocumentService {
     List<Document> findAllByDriverId(Long driverId);
 
     Set<DocumentDTO> getDocumentDTOS(List<Document> documents);
+
+    Optional<Long> getDriverFromDocumentId(Long id);
 }
