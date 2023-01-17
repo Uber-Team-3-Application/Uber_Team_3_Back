@@ -19,10 +19,8 @@ public class MessageDTO {
     @NotEmpty(message = "{required}")
     private String message;
     @NotNull
-    @NotEmpty(message = "{required}")
     private TypeOfMessage type;
     @NotNull
-    @NotEmpty(message = "{required}")
-    private Long rideId;
+    private int rideId;
 
 }
