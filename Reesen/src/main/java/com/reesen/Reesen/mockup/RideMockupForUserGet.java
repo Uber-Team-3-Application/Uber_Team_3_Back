@@ -31,7 +31,7 @@ public class RideMockupForUserGet {
         passengers.add(new UserDTO(Long.parseLong("123"), "user@example.com"));
         rideDTO.setPassengers(passengers);
         rideDTO.setEstimatedTimeInMinutes(5);
-        rideDTO.setVehicleType(VehicleTypeDTO.STANDARDNO);
+        rideDTO.setVehicleType(VehicleTypeDTO.STANDARD);
         rideDTO.setBabyTransport(true);
         rideDTO.setPetTransport(true);
         rideDTO.setRejection(new DeductionDTO("Ride is canceled due to previous problems with the passenger", LocalDateTime.now()));

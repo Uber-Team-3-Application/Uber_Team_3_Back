@@ -38,6 +38,7 @@ public class ValidationHandler {
 
     }
 
+
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> handleAccessDeniedException(Exception ex, WebRequest request) {
         return new ResponseEntity("Access Denied", HttpStatus.FORBIDDEN);
