@@ -101,14 +101,15 @@ public class RideController {
 
     @PutMapping(value = "/{id}/panic")
     @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
-    public ResponseEntity<RideDTO> pressedPanic(@PathVariable Long id, @Valid @RequestBody String reason){
-        if(id < 1)
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    public ResponseEntity<RideDTO> pressedPanic(@PathVariable Long id,
+                                                @Valid @RequestBody String reason,
+                                                Map<String, String> headers){
+
         if(this.rideService.findOne(id) == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         Ride ride = this.rideService.findOne(id);
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        Long userId = Long.valueOf(request.getHeader("Id"));
+
+        Long userId = this.userRequestValidation.getIdFromToken(headers);
         ride = this.rideService.panicRide(ride, reason, userId);
         this.rideService.save(ride);
         RideDTO panicRide = new RideDTO(ride);

@@ -70,7 +70,7 @@ public class RideService implements IRideService {
      }
 		if(this.rideRepository.findById(id).isPresent())
 		{
-			Ride ride = this.rideRepository.findById(id).get();
+			ride = this.rideRepository.findById(id).get();
 			ride.setDriver(this.driverRepository.findDriverByRidesContaining(ride).get());
 			ride.setPassengers(this.passengerService.findPassengersByRidesContaining(ride));
 			ride.setLocations(this.rideRepository.getLocationsByRide(ride.getId()));
