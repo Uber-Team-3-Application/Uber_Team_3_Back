@@ -162,6 +162,7 @@ public class UserController {
 
             boolean isEmailConfirmed = this.passengerService.getIsEmailConfirmed(login.getEmail());
 
+
             String tokenValue = this.jwtTokenUtil.generateToken(userDetails);
             token.setToken(tokenValue);
             token.setRefreshToken(this.jwtTokenUtil.generateRefreshToken(userDetails));
@@ -348,7 +349,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/resetPassword")
-    public ResponseEntity<String> Password(@PathVariable Long id) {
+    public ResponseEntity<String> resetPassword(@PathVariable Long id) {
 
         User user = this.userService.findOne(id);
         if (user == null)

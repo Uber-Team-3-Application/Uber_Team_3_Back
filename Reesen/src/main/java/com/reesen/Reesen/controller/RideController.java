@@ -96,6 +96,7 @@ public class RideController {
         return new ResponseEntity<>(withdrawRide, HttpStatus.OK);
     }
 
+
     @PutMapping(value = "/{id}/panic")
     @PreAuthorize("hasAnyRole('PASSENGER', 'DRIVER')")
     public ResponseEntity<RideDTO> pressedPanic(@PathVariable Long id, @RequestBody String reason, @RequestHeader Map<String, String> headers){
