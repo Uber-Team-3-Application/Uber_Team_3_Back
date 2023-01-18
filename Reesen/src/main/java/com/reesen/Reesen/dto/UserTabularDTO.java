@@ -17,17 +17,14 @@ public class UserTabularDTO {
     private String telephoneNumber;
     private String email;
     private String address;
-    private boolean isBlocked;
-    private String role;
 
-    public UserTabularDTO(String name, String surname, String telephoneNumber, String email, String address, boolean isBlocked, String role) {
+    public UserTabularDTO(String name, String surname, String telephoneNumber, String email, String address) {
         this.name = name;
         this.surname = surname;
         this.telephoneNumber = telephoneNumber;
         this.email = email;
         this.address = address;
-        this.isBlocked = isBlocked;
-        this.role = role;
+
     }
 
     public UserTabularDTO(User user) {
@@ -37,7 +34,5 @@ public class UserTabularDTO {
         this.telephoneNumber = user.getTelephoneNumber();
         this.email = user.getEmail();
         this.address = user.getAddress();
-        this.role = user.getRole().toString();
-        this.isBlocked = user.isBlocked();
     }
 }

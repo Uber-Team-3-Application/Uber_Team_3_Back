@@ -42,7 +42,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Pattern;
 
-@CrossOrigin
 @RestController
 @RequestMapping("api/user")
 public class UserController {
@@ -122,16 +121,16 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Paginated<UserTabularDTO>> getUsers(
+    public ResponseEntity<Paginated<UserFullDTO>> getUsers(
             Pageable page
     ) {
 
         Page<User> users = this.userService.findAll(page);
 
-        Set<UserTabularDTO> userDTOS = new HashSet<>();
+        Set<UserFullDTO> userDTOS = new HashSet<>();
         for (User user : users) {
             if(user.getRole() != Role.ADMIN)
-                userDTOS.add(new UserTabularDTO(user));
+                userDTOS.add(new UserFullDTO(user));
         }
 
         return new ResponseEntity<>(
@@ -156,12 +155,13 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<TokenDTO> logIn(@Valid @RequestBody LoginDTO login) {
-        System.out.println("aaaaaaaa");
         try {
+
             TokenDTO token = new TokenDTO();
             SecurityUser userDetails = (SecurityUser) this.userService.findByUsername(login.getEmail());
 
             boolean isEmailConfirmed = this.passengerService.getIsEmailConfirmed(login.getEmail());
+
 
             String tokenValue = this.jwtTokenUtil.generateToken(userDetails);
             token.setToken(tokenValue);
@@ -284,6 +284,8 @@ public class UserController {
         User user = this.userService.findOne(id);
         if(user == null) return new ResponseEntity("User does not exist!", HttpStatus.NOT_FOUND);
 
+        System.out.println(changePasswordDTO.getOldPassword());
+        System.out.println(changePasswordDTO.getNewPassword());
         boolean passwordChanged = this.userService.changePassword(changePasswordDTO.getOldPassword(), changePasswordDTO.getNewPassword(), id);
         if(!passwordChanged) return new ResponseEntity(new ErrorResponseMessage(
                 this.messageSource.getMessage("user.passwordNotMatching", null, Locale.getDefault())
