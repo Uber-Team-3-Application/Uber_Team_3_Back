@@ -94,6 +94,11 @@ public class RideService implements IRideService {
 	}
 
 	@Override
+	public Set<Review> findAllReviewsBySpecificDriverAndRide(Long rideId) {
+		return null;
+	}
+
+	@Override
 	public RideDTO createRideDTO(CreateRideDTO rideDTO, Long passengerId) {
 		Ride ride = new Ride();
 		Set<RouteDTO> locationsDTOs = rideDTO.getLocations();
