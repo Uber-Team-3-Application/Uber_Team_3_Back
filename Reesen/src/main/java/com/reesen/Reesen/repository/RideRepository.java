@@ -4,6 +4,7 @@ import com.reesen.Reesen.Enums.RideStatus;
 
 import com.reesen.Reesen.dto.ReportDTO;
 import com.reesen.Reesen.dto.RideLocationWithTimeDTO;
+import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Review;
 import com.reesen.Reesen.model.Route;
 import org.springframework.data.domain.Page;
@@ -22,6 +23,12 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
 
     @Query("select r.locations from Ride r where r.id = :id")
     LinkedHashSet<Route> getLocationsByRide(Long id);
+
+    @Query("select r.driver from Ride r where r.id=:id")
+    Driver findDriverByRideId(Long id);
+
+    @Query("select r.passengers from Ride r where r.id = :id")
+    Set<Passenger> findPassengerByRideId(Long id);
 
 
     Optional<Ride> findRideByDriverIdAndStatus(Long driverId, RideStatus status);
@@ -173,5 +180,13 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "p member of r.passengers " +
             "and r.status=:rideStatus")
     Set<Ride> findAllRidesByPassengerIdAndRideStatus(Long passengerId, RideStatus rideStatus);
+
+
+    @Transactional
+    @Modifying
+    @Query("update Ride p set p.status=:rideStatus where p.id=:id")
+    void updateRideStatus(Long id, RideStatus rideStatus);
+
+
 
 }

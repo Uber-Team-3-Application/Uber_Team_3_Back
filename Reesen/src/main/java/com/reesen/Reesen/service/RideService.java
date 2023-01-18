@@ -546,4 +546,84 @@ public class RideService implements IRideService {
 		return true;
 	}
 
+	@Override
+	public RideDTO startRide(Long id) {
+		Optional<Ride> optionalRide = rideRepository.findById(id);
+		if (optionalRide.isEmpty()) {
+			return null;
+		}
+		Ride ride = optionalRide.get();
+		ride.setStatus(RideStatus.STARTED);
+		LinkedHashSet<Route> locations = this.rideRepository.getLocationsByRide(ride.getId());
+		for(Route route: locations){
+			route.setDeparture(this.routeRepository.getDepartureByRoute(route).get());
+			route.setDestination(this.routeRepository.getDestinationByRoute(route).get());
+		}
+		ride.setLocations(locations);
+		Ride newRide = rideRepository.save(ride);
+		Optional<Driver> driver = this.driverRepository.findDriverByRidesContaining(newRide);
+		if(driver.isPresent())
+			newRide.setDriver(driver.get());
+		else
+			newRide.setDriver(this.driverRepository.findByEmail("mirko@gmail.com"));
+		Set<Passenger> ridePassengers = this.passengerRepository.findPassengersByRidesContaining(ride);
+		newRide.setPassengers(ridePassengers);
+		Long vehicleTypeId = this.rideRepository.getVehicleTypeId(ride.getId());
+		VehicleType type = this.vehicleTypeRepository.findById(vehicleTypeId).get();
+		newRide.setVehicleType(type);
+		LinkedHashSet<Route> newLocations = this.rideRepository.getLocationsByRide(ride.getId());
+		for(Route route: newLocations){
+			route.setDeparture(this.routeRepository.getDepartureByRoute(route).get());
+			route.setDestination(this.routeRepository.getDestinationByRoute(route).get());
+		}
+		newRide.setLocations(newLocations);
+		return new RideDTO(newRide);
+	}
+
+	@Override
+	public void deleteFavouriteRides(Long id) {
+
+	}
+
+	@Override
+	public FavoriteRideDTO addFavouriteRide(CreateFavoriteRideDTO favouriteRide) {
+		return null;
+	}
+
+	@Override
+	public Set<FavoriteRouteDTO> getFavouriteRides(Long id) {
+		Set<FavoriteRouteDTO> routes = new HashSet<>();
+		//for(FavoriteRoute route: favoriteRouteRepository.findAllByPassengerId(id))
+		//{
+		//	route.setRoute(this.favoriteRouteRepository.getLocationsByRoute(route).get());
+		//	routes.add(route);
+		//}
+		return routes;
+	}
+
+	@Override
+	public boolean validateRideDTO(CreateFavoriteRideDTO createRideDTO) {
+		if (createRideDTO.getPassengers() == null ||
+				createRideDTO.getLocations() == null ||
+				createRideDTO.getVehicleType() == null) {
+			return true;
+		}
+		for (UserDTO passenger : createRideDTO.getPassengers()) {
+			if (passenger.getEmail() == null) {
+				return true;
+			}
+		}
+		for (RouteDTO location : createRideDTO.getLocations()) {
+			if (location.getDeparture() == null || location.getDestination() == null) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public Driver findDriverByRideId(Long id) {
+		return this.rideRepository.findDriverByRideId(id);
+	}
+
 }

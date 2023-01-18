@@ -99,7 +99,10 @@ public class ReviewController {
 
         Set<ReviewWithPassengerDTO> retVal = new HashSet<>();
         for (Review review : reviewService.getReviews()) {
-            if (Objects.equals(review.getRide().getDriver().getVehicle().getId(), vehicle.getId())) {
+            Ride ride = review.getRide();
+            Driver driver = this.rideService.findDriverByRideId(ride.getId());
+            Vehicle vehicle1 = this.vehicleService.findVehicleByDriverId(driver.getId());
+            if (Objects.equals(vehicle1.getId(), vehicle.getId())) {
                 retVal.add(new ReviewWithPassengerDTO(review, false));
             }
         }
