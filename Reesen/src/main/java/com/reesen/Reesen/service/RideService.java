@@ -72,7 +72,7 @@ public class RideService implements IRideService {
      }
 		if(this.rideRepository.findById(id).isPresent())
 		{
-			Ride ride = this.rideRepository.findById(id).get();
+			ride = this.rideRepository.findById(id).get();
 			ride.setDriver(this.rideRepository.findDriverByRideId(id));
 			ride.setPassengers(this.rideRepository.findPassengerByRideId(id));
 			LinkedHashSet<Route> routes = new LinkedHashSet<Route>();
