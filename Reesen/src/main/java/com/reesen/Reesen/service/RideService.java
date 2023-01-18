@@ -31,6 +31,7 @@ public class RideService implements IRideService {
 	
     private final RideRepository rideRepository;
 	private final RouteRepository routeRepository;
+	private final FavoriteRouteRepository favoriteRouteRepository;
 	private final PassengerRepository passengerRepository;
 	private final VehicleTypeRepository vehicleTypeRepository;
 	private final PanicRepository panicRepository;
@@ -44,9 +45,10 @@ public class RideService implements IRideService {
 	private PassengerService passengerService;
 
 	@Autowired
-    public RideService(RideRepository rideRepository, RouteRepository routeRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, UserRepository userRepository, DriverRepository driverRepository, IWorkingHoursService workingHoursService, ILocationService locationService, DeductionRepository deductionRepository, ReviewRepository reviewRepository, PassengerService passengerService){
+    public RideService(RideRepository rideRepository, RouteRepository routeRepository, FavoriteRouteRepository favoriteRouteRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, UserRepository userRepository, DriverRepository driverRepository, IWorkingHoursService workingHoursService, ILocationService locationService, DeductionRepository deductionRepository, ReviewRepository reviewRepository, PassengerService passengerService){
         this.rideRepository = rideRepository;
 		this.routeRepository = routeRepository;
+		this.favoriteRouteRepository = favoriteRouteRepository;
 		this.passengerRepository = passengerRepository;
 		this.vehicleTypeRepository = vehicleTypeRepository;
 		this.panicRepository = panicRepository;
@@ -70,10 +72,18 @@ public class RideService implements IRideService {
      }
 		if(this.rideRepository.findById(id).isPresent())
 		{
-			ride = this.rideRepository.findById(id).get();
-			ride.setDriver(this.driverRepository.findDriverByRidesContaining(ride).get());
-			ride.setPassengers(this.passengerService.findPassengersByRidesContaining(ride));
-			ride.setLocations(this.rideRepository.getLocationsByRide(ride.getId()));
+			Ride ride = this.rideRepository.findById(id).get();
+			ride.setDriver(this.rideRepository.findDriverByRideId(id));
+			ride.setPassengers(this.rideRepository.findPassengerByRideId(id));
+			LinkedHashSet<Route> routes = new LinkedHashSet<Route>();
+			for(Route route: this.rideRepository.getLocationsByRide(id))
+			{
+				Location departure = this.routeRepository.getDepartureByRoute(route).get();
+				Location destination = this.routeRepository.getDestinationByRoute(route).get();
+				routes.add(new Route(departure, destination));
+			}
+			ride.setLocations(routes);
+			return ride;
 		}
 		return null;
 	}
@@ -212,47 +222,81 @@ public class RideService implements IRideService {
 	@Override
 	public Ride findDriverActiveRide(Long driverId) {
 		Ride ride = null;
-		if(this.rideRepository.findRideByDriverIdAndStatus(driverId, RideStatus.ACTIVE).isPresent())
+		if(this.rideRepository.findRideByDriverIdAndStatus(driverId, RideStatus.STARTED).isPresent())
 		{
-			ride.setDriver(this.driverRepository.findDriverByRidesContaining(ride).get());
-			ride.setPassengers(this.passengerService.findPassengersByRidesContaining(ride));
-			ride.setLocations(this.rideRepository.getLocationsByRide(ride.getId()));
-			ride = this.rideRepository.findRideByDriverIdAndStatus(driverId, RideStatus.ACTIVE).get();
+			ride = this.rideRepository.findRideByDriverIdAndStatus(driverId, RideStatus.STARTED).get();
+			ride.setDriver(this.rideRepository.findDriverByRideId(ride.getId()));
+			ride.setPassengers(this.rideRepository.findPassengerByRideId(ride.getId()));
+			LinkedHashSet<Route> routes = new LinkedHashSet<Route>();
+			for(Route route: this.rideRepository.getLocationsByRide(ride.getId()))
+			{
+				Location departure = this.routeRepository.getDepartureByRoute(route).get();
+				Location destination = this.routeRepository.getDestinationByRoute(route).get();
+				routes.add(new Route(departure, destination));
+			}
+			ride.setLocations(routes);
 		}
 		return ride;
 	}
 
 	@Override
-	public Ride withdrawRide(Ride ride) {
+	public RideDTO withdrawRide(Long id) {
+		Optional<Ride> optionalRide = rideRepository.findById(id);
+		if (optionalRide.isEmpty()) {
+			return null;
+		}
+		Ride ride = optionalRide.get();
 		ride.setStatus(RideStatus.WITHDRAWN);
-		return ride;
+		ride.setTimeOfEnd(new Date());
+		rideRepository.save(ride);
+		return new RideDTO(findOne(id));
 	}
 
 	@Override
-	public Ride panicRide(Ride ride, String reason, Long id) {
-		this.panicRepository.save(new Panic(new Date(), reason, ride, passengerRepository.findById(id).get()));
+	public RideDTO panicRide(Long id, String reason, Long passengerId) {
+		Optional<Ride> optionalRide = rideRepository.findById(id);
+		if (optionalRide.isEmpty()) {
+			return null;
+		}
+		Ride ride = this.findOne(id);
 		ride.setStatus(RideStatus.FINISHED);
-		return ride;
+		ride.setTimeOfEnd(new Date());
+		this.panicRepository.save(new Panic(new Date(), reason, ride, passengerRepository.findById(passengerId).get()));
+		rideRepository.save(ride);
+		return new RideDTO(ride);
 	}
 
 	@Override
-	public Ride cancelRide(Ride ride, String reason) {
-		ride.setStatus(RideStatus.REJECTED);
+	public Deduction cancelRide(Ride ride, String reason) {
+		rideRepository.updateRideStatus(ride.getId(), RideStatus.REJECTED);
 		Deduction deduction = new Deduction(ride, ride.getDriver(), reason, LocalDateTime.now());
-		ride.setDeduction(deduction);
-		return ride;
+		deductionRepository.save(deduction);
+		return deduction;
 	}
 
 	@Override
-	public Ride endRide(Ride ride) {
+	public RideDTO endRide(Long id) {
+		Optional<Ride> optionalRide = rideRepository.findById(id);
+		if (optionalRide.isEmpty()) {
+			return null;
+		}
+		Ride ride = optionalRide.get();
 		ride.setStatus(RideStatus.FINISHED);
-		return ride;
+		ride.setTimeOfEnd(new Date());
+		rideRepository.save(ride);
+		return new RideDTO(findOne(id));
 	}
 
 	@Override
-	public Ride acceptRide(Ride ride) {
+	public RideDTO acceptRide(Long id) {
+		Optional<Ride> optionalRide = rideRepository.findById(id);
+		if (optionalRide.isEmpty()) {
+			return null;
+		}
+		Ride ride = optionalRide.get();
 		ride.setStatus(RideStatus.ACCEPTED);
-		return ride;
+		rideRepository.save(ride);
+		return new RideDTO(this.findOne(id));
 	}
 
 	@Override
@@ -302,12 +346,20 @@ public class RideService implements IRideService {
 
 	@Override
 	public Ride findPassengerActiveRide(Long passengerId) {
-		Ride ride = this.rideRepository.findPassengerActiveRide(passengerId, RideStatus.ACTIVE);
+		Ride ride = this.rideRepository.findPassengerActiveRide(passengerId, RideStatus.STARTED);
 		if(ride != null)
 		{
-			ride.setDriver(this.driverRepository.findDriverByRidesContaining(ride).get());
-			ride.setPassengers(this.passengerService.findPassengersByRidesContaining(ride));
-			ride.setLocations(this.rideRepository.getLocationsByRide(ride.getId()));
+			ride = this.rideRepository.findPassengerActiveRide(passengerId, RideStatus.STARTED);
+			ride.setDriver(this.rideRepository.findDriverByRideId(ride.getId()));
+			ride.setPassengers(this.rideRepository.findPassengerByRideId(ride.getId()));
+			LinkedHashSet<Route> routes = new LinkedHashSet<Route>();
+			for(Route route: this.rideRepository.getLocationsByRide(ride.getId()))
+			{
+				Location departure = this.routeRepository.getDepartureByRoute(route).get();
+				Location destination = this.routeRepository.getDestinationByRoute(route).get();
+				routes.add(new Route(departure, destination));
+			}
+			ride.setLocations(routes);
 		}
 		return ride;
 	}
@@ -544,6 +596,59 @@ public class RideService implements IRideService {
 	public boolean checkForPendingRide(Long passengerId) {
 		if (this.rideRepository.findAllRidesByPassengerIdAndRideStatus(passengerId, RideStatus.PENDING).isEmpty()) return false;
 		return true;
+	}
+
+	@Override
+	public RideDTO startRide(Long id) {
+		Optional<Ride> optionalRide = rideRepository.findById(id);
+		if (optionalRide.isEmpty()) {
+			return null;
+		}
+		Ride ride = optionalRide.get();
+		ride.setStatus(RideStatus.STARTED);
+		rideRepository.save(ride);
+		return new RideDTO(this.findOne(id));
+	}
+
+	@Override
+	public void deleteFavouriteRides(Long id) {
+
+	}
+
+	@Override
+	public FavoriteRideDTO addFavouriteRide(CreateFavoriteRideDTO favouriteRide) {
+		return null;
+	}
+
+	@Override
+	public Set<FavoriteRouteDTO> getFavouriteRides(Long id) {
+		Set<FavoriteRouteDTO> routes = new HashSet<>();
+		//for(FavoriteRoute route: favoriteRouteRepository.findAllByPassengerId(id))
+		//{
+		//	route.setRoute(this.favoriteRouteRepository.getLocationsByRoute(route).get());
+		//	routes.add(route);
+		//}
+		return routes;
+	}
+
+	@Override
+	public boolean validateRideDTO(CreateFavoriteRideDTO createRideDTO) {
+		if (createRideDTO.getPassengers() == null ||
+				createRideDTO.getLocations() == null ||
+				createRideDTO.getVehicleType() == null) {
+			return true;
+		}
+		for (UserDTO passenger : createRideDTO.getPassengers()) {
+			if (passenger.getEmail() == null) {
+				return true;
+			}
+		}
+		for (RouteDTO location : createRideDTO.getLocations()) {
+			if (location.getDeparture() == null || location.getDestination() == null) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
