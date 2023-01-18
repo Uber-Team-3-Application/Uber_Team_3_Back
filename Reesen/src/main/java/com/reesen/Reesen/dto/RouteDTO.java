@@ -2,11 +2,15 @@ package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.model.Route;
 
+import javax.validation.constraints.NotNull;
+
 public class RouteDTO {
 
 	private Long id;
-    private LocationDTO departure;
-    private LocationDTO destination;
+	@NotNull(message = "{required}")
+	private LocationDTO departure;
+	@NotNull(message = "{required}")
+	private LocationDTO destination;
     
 	public RouteDTO() {
 

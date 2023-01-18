@@ -6,6 +6,7 @@ import com.reesen.Reesen.dto.ReportDTO;
 import com.reesen.Reesen.dto.RideLocationWithTimeDTO;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Passenger;
+import com.reesen.Reesen.model.Review;
 import com.reesen.Reesen.model.Route;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -169,6 +170,13 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "and r.status=:rideStatus")
     Ride findPassengerActiveRide(Long passengerId, RideStatus rideStatus);
 
+
+    @Query("select r.review from Ride r " +
+            "where r.id=:rideId")
+    Set<Review> findAllReviewsBySpecificDriverAndRide(Long rideId);
+
+    List<Ride> findAll();
+
     @Query("select r from Ride r, Passenger p  " +
             "where p.id=:passengerId " +
             "and " +
@@ -180,4 +188,5 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
     @Modifying
     @Query("update Ride p set p.status=:rideStatus where p.id=:id")
     void updateRideStatus(Long id, RideStatus rideStatus);
+
 }

@@ -53,10 +53,18 @@ public class UserRequestValidation {
             Integer id = jwtTokenUtil.getId(refreshToken);
             return givenId.intValue() == id;
 
-
         }
         Integer id = jwtTokenUtil.getId(token);
         return givenId.intValue() == id;
+    }
+
+    public Integer getUserId(Map<String, String> headers) {
+        String token = headers.get("x-auth-token");
+        String refreshToken = headers.get("refreshtoken");
+        if (isTokenExpired(token))
+            return jwtTokenUtil.getId(refreshToken);
+        else
+            return jwtTokenUtil.getId(token);
     }
 
     private  boolean isTokenExpired(String token){

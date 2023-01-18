@@ -16,10 +16,12 @@ import java.util.Set;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     Set<Review> findReviewsByRide(Ride ride);
 
-
     @Query("select r from Review r where r.ride.id=:rideId")
     Set<Review> findAllByRideId(Long rideId);
 
     @Query("select r.passenger from Review r where r.id=:reviewID")
     Optional<Passenger> findPassengerByReviewId(Long reviewID);
+
+    Optional<Review> findReviewByPassengerAndRide(Passenger passenger, Ride ride);
+
 }

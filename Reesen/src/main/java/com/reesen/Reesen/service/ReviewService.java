@@ -46,4 +46,9 @@ public class ReviewService implements IReviewService {
 		return this.reviewRepository.findPassengerByReviewId(reviewID);
 	}
 
+	@Override
+	public Optional<Review> findReviewByPassengerAndRide(Passenger passenger, Ride ride) {
+		return this.reviewRepository.findReviewByPassengerAndRide(passenger,ride);
+	}
+
 }

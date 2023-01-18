@@ -11,6 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class UserRidesDTO {
+
     private  Long id;
     private Date startTime;
     private  Date endTime;
@@ -182,4 +183,22 @@ public class UserRidesDTO {
         this.locations = locations;
     }
 
+    @Override
+    public String toString() {
+        return "UserRidesDTO{" +
+                "id=" + id +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", totalCost=" + totalCost +
+                ", driver=" + driver +
+                ", passengers=" + passengers +
+                ", estimatedTimeInMinutes=" + estimatedTimeInMinutes +
+                ", vehicleType='" + vehicleType + '\'' +
+                ", babyTransport=" + babyTransport +
+                ", petTransport=" + petTransport +
+                ", rejection=" + rejection +
+                ", locations=" + locations +
+                ", reviews=" + reviews +
+                '}';
+    }
 }

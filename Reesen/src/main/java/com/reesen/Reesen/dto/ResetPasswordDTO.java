@@ -1,37 +1,24 @@
 package com.reesen.Reesen.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ResetPasswordDTO {
-    public String password;
-    public Long passengerId;
+
+    @NotEmpty(message = "{required}")
+    @Pattern(regexp = "^(?=.*\\d)(?=.*[A-Z])(?!.*[^a-zA-Z0-9@#$^+=])(.{8,15})$", message = "{regex}")
+    public String newPassword;
+
+    @NotEmpty(message = "{required}")
+    @Pattern(regexp = "^[0-9]{6}$", message = "{regex}")
     public String code;
-
-    public ResetPasswordDTO(String password, Long passengerId, String code) {
-        this.password = password;
-        this.passengerId = passengerId;
-        this.code = code;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Long getPassengerId() {
-        return passengerId;
-    }
-
-    public void setPassengerId(Long passengerId) {
-        this.passengerId = passengerId;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
 }

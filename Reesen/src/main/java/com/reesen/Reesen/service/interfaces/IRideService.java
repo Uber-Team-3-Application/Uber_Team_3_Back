@@ -3,6 +3,7 @@ import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.Deduction;
 import com.reesen.Reesen.model.Location;
+import com.reesen.Reesen.model.Review;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.Route;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,8 @@ public interface IRideService {
 
 	RideDTO acceptRide(Long id);
 
+	List<Ride> findAll();
+
 	Page<Ride> findAll(Long driverId, Pageable page, Date from, Date to);
 	Page<Ride> findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to);
 
@@ -50,8 +53,10 @@ public interface IRideService {
 	ReportSumAverageDTO filterReports(List<ReportDTO<Double>> reportDTOS, long totalDays);
 	ReportSumAverageDTO filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS, long totalDays);
 
+	Set<Review> findAllReviewsBySpecificDriverAndRide(Long rideId);
 
-    double calculateDistance(Location departure, Location destination);
+
+	double calculateDistance(Location departure, Location destination);
 
 	boolean validateCreateRideDTO(CreateRideDTO createRideDTO);
 

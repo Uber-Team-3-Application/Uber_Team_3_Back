@@ -1,9 +1,16 @@
 package com.reesen.Reesen.dto;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 public class LoginDTO {
 
+    @NotNull
+    @NotEmpty(message = "{required}")
     private String email;
 
+    @NotNull
+    @NotEmpty(message = "{required}")
     private String password;
 
     public LoginDTO() {}

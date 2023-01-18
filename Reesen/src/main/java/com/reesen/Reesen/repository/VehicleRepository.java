@@ -1,4 +1,5 @@
 package com.reesen.Reesen.repository;
+import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.dto.VehicleLocationWithAvailabilityDTO;
 import com.reesen.Reesen.model.Location;
 import com.reesen.Reesen.model.Vehicle;

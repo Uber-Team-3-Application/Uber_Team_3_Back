@@ -65,6 +65,11 @@ public class RideService implements IRideService {
 
 	@Override
 	public Ride findOne(Long id) {
+		Ride ride = this.rideRepository.findById(id).orElse(null);
+		if(ride != null)
+		{
+			ride.setDriver(this.driverRepository.findDriverByRidesContaining(ride).orElse(null));
+     }
 		if(this.rideRepository.findById(id).isPresent())
 		{
 			Ride ride = this.rideRepository.findById(id).get();
@@ -294,6 +299,11 @@ public class RideService implements IRideService {
 		return new RideDTO(this.findOne(id));
 	}
 
+	@Override
+	public List<Ride> findAll() {
+		return rideRepository.findAll();
+	}
+
 	public Page<Ride> findAll(Long driverId, Pageable page, Date from, Date to){
 		if(from == null && to == null)
 			return this.rideRepository.findAllByDriverId(driverId, page);
@@ -363,7 +373,6 @@ public class RideService implements IRideService {
 	public UserRidesDTO getFilteredRide(Ride ride, Long driverId){
 
 		ride.setPassengers(passengerRepository.findPassengersByRidesContaining(ride));
-
 		Set<Review> reviews = this.reviewRepository.findAllByRideId(ride.getId());
 		for(Review review:reviews){
 			review.setPassenger(this.passengerRepository.findbyReviewId(review.getId()));
@@ -380,6 +389,8 @@ public class RideService implements IRideService {
 
 		ride.setLocations(locations);
 		UserRidesDTO rideDTO = new UserRidesDTO(ride);
+
+
 		if(driverId != 0L)
 			rideDTO.setDriver(new UserDTO(
 					this.userRepository.findById(driverId).get()
@@ -499,6 +510,11 @@ public class RideService implements IRideService {
 	}
 
 	@Override
+	public Set<Review> findAllReviewsBySpecificDriverAndRide(Long rideId) {
+		return this.rideRepository.findAllReviewsBySpecificDriverAndRide(rideId);
+	}
+
+	@Override
 	public double calculateDistance(Location departure, Location destination) {
 		double theta = departure.getLongitude() - destination.getLongitude();
 		double dist = Math.sin(Math.toRadians(departure.getLatitude())) * Math.sin(Math.toRadians(destination.getLatitude()))
@@ -546,9 +562,10 @@ public class RideService implements IRideService {
 
 	@Override
 	public Set<UserRidesDTO> getFilteredRides(Page<Ride> userRides, Long driverId) {
-		Set<UserRidesDTO> rides = new LinkedHashSet<>();
-		for (Ride ride : userRides) {
 
+		Set<UserRidesDTO> rides = new LinkedHashSet<>();
+
+		for (Ride ride :  userRides) {
 			rides.add(this.getFilteredRide(ride, driverId));
 		}
 
