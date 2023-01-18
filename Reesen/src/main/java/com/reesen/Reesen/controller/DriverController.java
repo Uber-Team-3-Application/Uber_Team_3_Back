@@ -596,7 +596,6 @@ public class DriverController {
             @PathVariable("document-id") Long id,
             @RequestHeader Map<String, String> headers) {
 
-
         Optional<Document> document = this.documentService.findOne(id);
         if (document.isEmpty())
             return new ResponseEntity<>("Document does not exist!", HttpStatus.NOT_FOUND);
