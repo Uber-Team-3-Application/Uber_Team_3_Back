@@ -121,16 +121,16 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Paginated<UserTabularDTO>> getUsers(
+    public ResponseEntity<Paginated<UserFullDTO>> getUsers(
             Pageable page
     ) {
 
         Page<User> users = this.userService.findAll(page);
 
-        Set<UserTabularDTO> userDTOS = new HashSet<>();
+        Set<UserFullDTO> userDTOS = new HashSet<>();
         for (User user : users) {
             if(user.getRole() != Role.ADMIN)
-                userDTOS.add(new UserTabularDTO(user));
+                userDTOS.add(new UserFullDTO(user));
         }
 
         return new ResponseEntity<>(
@@ -283,6 +283,8 @@ public class UserController {
         User user = this.userService.findOne(id);
         if(user == null) return new ResponseEntity("User does not exist!", HttpStatus.NOT_FOUND);
 
+        System.out.println(changePasswordDTO.getOldPassword());
+        System.out.println(changePasswordDTO.getNewPassword());
         boolean passwordChanged = this.userService.changePassword(changePasswordDTO.getOldPassword(), changePasswordDTO.getNewPassword(), id);
         if(!passwordChanged) return new ResponseEntity(new ErrorResponseMessage(
                 this.messageSource.getMessage("user.passwordNotMatching", null, Locale.getDefault())
@@ -345,8 +347,8 @@ public class UserController {
         return new ResponseEntity<>("Email sent successfuly", HttpStatus.OK);
     }
 
-        @GetMapping("/{id}/resetPassword")
-    public ResponseEntity<String> resetPassword(@PathVariable Long id) {
+    @GetMapping("/{id}/resetPassword")
+    public ResponseEntity<String> Password(@PathVariable Long id) {
 
         User user = this.userService.findOne(id);
         if (user == null)

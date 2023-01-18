@@ -2,6 +2,8 @@ package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.PassengerDTO;
 import com.reesen.Reesen.dto.PassengerRideDTO;
+import com.reesen.Reesen.dto.UserDTO;
+import com.reesen.Reesen.dto.UserFullDTO;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.service.interfaces.*;
@@ -90,12 +92,12 @@ public class PassengerController {
 
     @GetMapping(value = "/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'PASSENGER', 'DRIVER')")
-    public ResponseEntity<PassengerDTO> getPassengerDetails(@PathVariable Long id){
+    public ResponseEntity<UserFullDTO> getPassengerDetails(@PathVariable Long id){
 
         Optional<Passenger> passenger = this.passengerService.findOne(id);
         if(passenger.isEmpty())
             return new ResponseEntity("Passenger does not exist!", HttpStatus.NOT_FOUND);
-        PassengerDTO passengerDTO = new PassengerDTO(passenger.get());
+        UserFullDTO passengerDTO = new UserFullDTO(passenger.get());
         return new ResponseEntity<>(passengerDTO, HttpStatus.OK);
     }
 
