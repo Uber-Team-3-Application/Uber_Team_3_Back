@@ -4,6 +4,7 @@ import com.reesen.Reesen.security.jwt.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -33,6 +34,8 @@ public class WebSecurityConfiguration {
                  http.csrf().disable()
                 .authorizeRequests()
                          .antMatchers("/api/user/login").permitAll()
+                         .antMatchers(HttpMethod.GET, "/api/user/{id}/resetPassword").permitAll()
+                         .antMatchers(HttpMethod.PUT, "/api/user/{id}/resetPassword").permitAll()
                          .antMatchers("/api/unregisteredUser/**").permitAll()
                          .antMatchers("/api/**").authenticated()
                 .and()
