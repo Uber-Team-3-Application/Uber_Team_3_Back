@@ -155,6 +155,16 @@ public class RideService implements IRideService {
 				ride.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(ride.getLocations()), this.locationService.getLastLocation(ride.getLocations())) * ride.getVehicleType().getPricePerKm());
 			}
 			ride.setScheduledTime(rideDTO.getScheduleTime());
+			Ride newRide = this.rideRepository.save(ride);
+			Optional<Driver> driver = this.driverRepository.findDriverByRidesContaining(newRide);
+			newRide.setDriver(driver.get());
+			Set<Passenger> ridePassengers = this.passengerRepository.findPassengersByRidesContaining(ride);
+			newRide.setPassengers(ridePassengers);
+			Long vehicleTypeId = this.rideRepository.getVehicleTypeId(ride.getId());
+			VehicleType type = this.vehicleTypeRepository.findById(vehicleTypeId).get();
+			newRide.setVehicleType(type);
+			LinkedHashSet<Route> newLocations = this.rideRepository.getLocationsByRide(ride.getId());
+			ride.setLocations(newLocations);
 		return new RideDTO(this.rideRepository.save(ride));
 	}
 
