@@ -2,17 +2,26 @@ package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.model.FavoriteRoute;
 
+import java.util.Set;
+
 public class FavoriteRouteDTO {
 	
 	private Long id;
-	private Long routeId;
+	private Set<LocationDTO> locations;
+	private String favoriteName;
 
 	public FavoriteRouteDTO() {
 	}
 
-	public FavoriteRouteDTO(FavoriteRoute favoriteRoute) {
-		this.id = favoriteRoute.getId();
-		this.routeId = favoriteRoute.getRoute().getId();
+	public FavoriteRouteDTO(Set<LocationDTO> locations, String favoriteName) {
+		this.locations = locations;
+		this.favoriteName = favoriteName;
+	}
+
+	public FavoriteRouteDTO(Long id, Set<LocationDTO> locations, String favoriteName) {
+		this.id = id;
+		this.locations = locations;
+		this.favoriteName = favoriteName;
 	}
 
 	public Long getId() {
@@ -23,12 +32,19 @@ public class FavoriteRouteDTO {
 		this.id = id;
 	}
 
-	public Long getRouteId() {
-		return routeId;
+	public Set<LocationDTO> getLocations() {
+		return locations;
 	}
 
-	public void setRouteId(Long routeId) {
-		this.routeId = routeId;
+	public void setLocations(Set<LocationDTO> locations) {
+		this.locations = locations;
 	}
-	
+
+	public String getFavoriteName() {
+		return favoriteName;
+	}
+
+	public void setFavoriteName(String favoriteName) {
+		this.favoriteName = favoriteName;
+	}
 }

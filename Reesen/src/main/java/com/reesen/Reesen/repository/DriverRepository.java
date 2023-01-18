@@ -2,11 +2,13 @@ package com.reesen.Reesen.repository;
 
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Ride;
+import com.reesen.Reesen.model.Route;
 import com.reesen.Reesen.model.Vehicle;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +25,7 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
     String getPasswordWithId(Long id);
 
     Optional<Driver> findDriverByRidesContaining(Ride ride);
+
 
     @Query("select size(d.rides) from Driver d where d.id=:id")
     int countTotalNumberOfRides(Long id);

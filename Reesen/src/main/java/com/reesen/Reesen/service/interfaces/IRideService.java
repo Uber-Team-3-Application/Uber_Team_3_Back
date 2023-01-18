@@ -1,6 +1,7 @@
 package com.reesen.Reesen.service.interfaces;
 import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.*;
+import com.reesen.Reesen.model.Deduction;
 import com.reesen.Reesen.model.Location;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.Route;
@@ -21,13 +22,13 @@ public interface IRideService {
 
 	Ride withdrawRide(Ride ride);
 
-	Ride panicRide(Ride ride, String reason, Long id);
+	RideDTO panicRide(Long rideId, String reason, Long id);
 
-	Ride cancelRide(Ride ride, String reason);
+	Deduction cancelRide(Ride ride, String reason);
 
-	Ride endRide(Ride ride);
+	RideDTO endRide(Long id);
 
-	Ride acceptRide(Ride ride);
+	RideDTO acceptRide(Long id);
 
 	Page<Ride> findAll(Long driverId, Pageable page, Date from, Date to);
 	Page<Ride> findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to);
@@ -55,4 +56,12 @@ public interface IRideService {
 	boolean validateCreateRideDTO(CreateRideDTO createRideDTO);
 
 	boolean checkForPendingRide(Long passengerId);
+
+	RideDTO startRide(Long id);
+
+	void deleteFavouriteRides(Long id);
+
+	FavoriteRouteDTO addFavouriteRide(RouteDTO favouriteRide);
+
+	Set<FavoriteRouteDTO> getFavouriteRides(Long idFromToken);
 }
