@@ -20,7 +20,7 @@ public interface IRideService {
 
 	Ride findDriverActiveRide(Long driverId);
 
-	Ride withdrawRide(Ride ride);
+	RideDTO withdrawRide(Long id);
 
 	RideDTO panicRide(Long rideId, String reason, Long id);
 
@@ -61,7 +61,9 @@ public interface IRideService {
 
 	void deleteFavouriteRides(Long id);
 
-	FavoriteRouteDTO addFavouriteRide(RouteDTO favouriteRide);
+	FavoriteRideDTO addFavouriteRide(CreateFavoriteRideDTO favouriteRide);
 
 	Set<FavoriteRouteDTO> getFavouriteRides(Long idFromToken);
+
+	boolean validateRideDTO(CreateFavoriteRideDTO  favouriteRide);
 }

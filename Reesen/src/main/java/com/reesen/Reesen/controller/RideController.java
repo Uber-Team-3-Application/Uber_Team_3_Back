@@ -76,15 +76,13 @@ public class RideController {
 
     @GetMapping(value = "/{id}")
     @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
-    public ResponseEntity<UserRidesDTO> getRideDetail(@PathVariable Long id){
+    public ResponseEntity<RideDTO> getRideDetail(@PathVariable Long id){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         Ride ride = this.rideService.findOne(id);
         if(ride == null)
             return new ResponseEntity("Ride does not exist", HttpStatus.NOT_FOUND);
-        Optional<Driver> driver = this.driverService.findDriverWithRide(ride);
-        UserRidesDTO rideDTO = this.rideService.getFilteredRide(ride, driver.get().getId());
-        return new ResponseEntity<>(rideDTO, HttpStatus.OK);
+        return new ResponseEntity<>(new RideDTO(ride), HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/withdraw")
@@ -92,26 +90,23 @@ public class RideController {
     public ResponseEntity<RideDTO> cancelExistingRide(@PathVariable Long id){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(this.rideService.findOne(id) == null)
+        RideDTO withdrawRide = this.rideService.withdrawRide(id);
+        if(withdrawRide == null)
             return new ResponseEntity("Ride does not exist!", HttpStatus.NOT_FOUND);
-        Ride ride = this.rideService.findOne(id);
-        ride = this.rideService.withdrawRide(ride);
-        this.rideService.save(ride);
-        RideDTO withdrawRide = new RideDTO(ride);
         return new ResponseEntity<>(withdrawRide, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/panic")
-    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
-    public ResponseEntity<RideDTO> pressedPanic(@PathVariable Long id, @Valid @RequestBody String reason){
+    @PreAuthorize("hasAnyRole('PASSENGER')")
+    public ResponseEntity<RideDTO> pressedPanic(@PathVariable Long id, @RequestBody String reason, @RequestHeader Map<String, String> headers){
+        String role = this.userRequestValidation.getRoleFromToken(headers);
+        if(!role.equalsIgnoreCase("passenger"))   return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(this.rideService.findOne(id) == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         Ride ride = this.rideService.findOne(id);
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        Long userId = Long.valueOf(request.getHeader("Id"));
-        RideDTO panicRide  = this.rideService.panicRide(id, reason, userId);
+        RideDTO panicRide  = this.rideService.panicRide(id, reason, this.userRequestValidation.getIdFromToken(headers));
         return new ResponseEntity<>(panicRide, HttpStatus.OK);
     }
 
@@ -154,7 +149,7 @@ public class RideController {
 
     @PutMapping(value = "/{id}/cancel")
     @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
-    public ResponseEntity<RideDTO> cancelRide(@PathVariable Long id, @Valid @RequestBody String reason){
+    public ResponseEntity<RideDTO> cancelRide(@PathVariable Long id, @RequestBody String reason){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(this.rideService.findOne(id) == null)
@@ -183,8 +178,9 @@ public class RideController {
 
     @PostMapping(value = "/favorites", consumes = "application/json")
     @PreAuthorize("hasAnyRole('USER')")
-    public ResponseEntity<FavoriteRouteDTO> addFavouriteRide(@Valid @RequestBody RouteDTO favouriteRide){
-        FavoriteRouteDTO response = rideService.addFavouriteRide(favouriteRide);
+    public ResponseEntity<FavoriteRideDTO> addFavouriteRide(@Valid @RequestBody CreateFavoriteRideDTO  favouriteRide){
+        if(this.rideService.validateRideDTO(favouriteRide))  return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        FavoriteRideDTO response = rideService.addFavouriteRide(favouriteRide);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @GetMapping(value = "/favorites")

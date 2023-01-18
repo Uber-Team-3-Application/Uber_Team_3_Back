@@ -235,9 +235,16 @@ public class RideService implements IRideService {
 	}
 
 	@Override
-	public Ride withdrawRide(Ride ride) {
+	public RideDTO withdrawRide(Long id) {
+		Optional<Ride> optionalRide = rideRepository.findById(id);
+		if (optionalRide.isEmpty()) {
+			return null;
+		}
+		Ride ride = optionalRide.get();
 		ride.setStatus(RideStatus.WITHDRAWN);
-		return ride;
+		ride.setTimeOfEnd(new Date());
+		rideRepository.save(ride);
+		return new RideDTO(findOne(id));
 	}
 
 	@Override
@@ -248,6 +255,7 @@ public class RideService implements IRideService {
 		}
 		Ride ride = this.findOne(id);
 		ride.setStatus(RideStatus.FINISHED);
+		ride.setTimeOfEnd(new Date());
 		this.panicRepository.save(new Panic(new Date(), reason, ride, passengerRepository.findById(passengerId).get()));
 		rideRepository.save(ride);
 		return new RideDTO(ride);
@@ -591,7 +599,7 @@ public class RideService implements IRideService {
 	}
 
 	@Override
-	public FavoriteRouteDTO addFavouriteRide(RouteDTO favouriteRide) {
+	public FavoriteRideDTO addFavouriteRide(CreateFavoriteRideDTO favouriteRide) {
 		return null;
 	}
 
@@ -604,6 +612,26 @@ public class RideService implements IRideService {
 		//	routes.add(route);
 		//}
 		return routes;
+	}
+
+	@Override
+	public boolean validateRideDTO(CreateFavoriteRideDTO createRideDTO) {
+		if (createRideDTO.getPassengers() == null ||
+				createRideDTO.getLocations() == null ||
+				createRideDTO.getVehicleType() == null) {
+			return true;
+		}
+		for (UserDTO passenger : createRideDTO.getPassengers()) {
+			if (passenger.getEmail() == null) {
+				return true;
+			}
+		}
+		for (RouteDTO location : createRideDTO.getLocations()) {
+			if (location.getDeparture() == null || location.getDestination() == null) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
