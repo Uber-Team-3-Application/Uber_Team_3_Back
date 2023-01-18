@@ -69,11 +69,6 @@ public interface IRideService {
 
 	void deleteFavouriteRides(Long id);
 
-	FavoriteRideDTO addFavouriteRide(CreateFavoriteRideDTO favouriteRide);
-
-	Set<FavoriteRouteDTO> getFavouriteRides(Long idFromToken);
-
-	boolean validateRideDTO(CreateFavoriteRideDTO  favouriteRide);
 
     Driver findDriverByRideId(Long id);
 

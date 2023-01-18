@@ -585,41 +585,7 @@ public class RideService implements IRideService {
 
 	}
 
-	@Override
-	public FavoriteRideDTO addFavouriteRide(CreateFavoriteRideDTO favouriteRide) {
-		return null;
-	}
 
-	@Override
-	public Set<FavoriteRouteDTO> getFavouriteRides(Long id) {
-		Set<FavoriteRouteDTO> routes = new HashSet<>();
-		//for(FavoriteRoute route: favoriteRouteRepository.findAllByPassengerId(id))
-		//{
-		//	route.setRoute(this.favoriteRouteRepository.getLocationsByRoute(route).get());
-		//	routes.add(route);
-		//}
-		return routes;
-	}
-
-	@Override
-	public boolean validateRideDTO(CreateFavoriteRideDTO createRideDTO) {
-		if (createRideDTO.getPassengers() == null ||
-				createRideDTO.getLocations() == null ||
-				createRideDTO.getVehicleType() == null) {
-			return true;
-		}
-		for (UserDTO passenger : createRideDTO.getPassengers()) {
-			if (passenger.getEmail() == null) {
-				return true;
-			}
-		}
-		for (RouteDTO location : createRideDTO.getLocations()) {
-			if (location.getDeparture() == null || location.getDestination() == null) {
-				return true;
-			}
-		}
-		return false;
-	}
 
 	@Override
 	public Driver findDriverByRideId(Long id) {
