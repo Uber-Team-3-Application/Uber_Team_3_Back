@@ -42,7 +42,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Pattern;
 
-@CrossOrigin
 @RestController
 @RequestMapping("api/user")
 public class UserController {
@@ -156,8 +155,8 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<TokenDTO> logIn(@Valid @RequestBody LoginDTO login) {
-        System.out.println("aaaaaaaa");
         try {
+
             TokenDTO token = new TokenDTO();
             SecurityUser userDetails = (SecurityUser) this.userService.findByUsername(login.getEmail());
 
@@ -346,7 +345,7 @@ public class UserController {
         return new ResponseEntity<>("Email sent successfuly", HttpStatus.OK);
     }
 
-    @GetMapping("/{id}/resetPassword")
+        @GetMapping("/{id}/resetPassword")
     public ResponseEntity<String> resetPassword(@PathVariable Long id) {
 
         User user = this.userService.findOne(id);

@@ -89,6 +89,7 @@ public class PassengerController {
     }
 
     @GetMapping(value = "/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PASSENGER', 'DRIVER')")
     public ResponseEntity<PassengerDTO> getPassengerDetails(@PathVariable Long id){
 
         Optional<Passenger> passenger = this.passengerService.findOne(id);
