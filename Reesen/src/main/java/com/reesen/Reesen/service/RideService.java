@@ -570,12 +570,7 @@ public class RideService implements IRideService {
 		reportSumAverageDTO.setAverage(sum/ totalDays);
 		return reportSumAverageDTO;
 	}
-
-	@Override
-	public Set<Review> findAllReviewsBySpecificDriverAndRide(Long rideId) {
-		return this.rideRepository.findAllReviewsBySpecificDriverAndRide(rideId);
-	}
-
+	
 	@Override
 	public double calculateDistance(Location departure, Location destination) {
 		double theta = departure.getLongitude() - destination.getLongitude();
