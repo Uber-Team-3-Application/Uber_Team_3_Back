@@ -110,23 +110,26 @@ insert into Message(ride_id, text, time_of_send, type_of_message, receiver_id, s
             values(1, 'Where you at hommie?', TO_DATE('15/11/2022 09:10', 'dd/MM/yyyy HH:mm'), 'RIDE', 1, 3);
 
 insert into Message(ride_id, text, time_of_send, type_of_message, receiver_id, sender_id)
-values(1, 'Im here bra, where u', TO_DATE('15/11/2022 09:12', 'dd/MM/yyyy HH:mm'), 'RIDE', 3, 1);
+            values(1, 'Im here bra, where u', TO_DATE('15/11/2022 09:12', 'dd/MM/yyyy HH:mm'), 'RIDE', 3, 1);
 
 insert into Message(ride_id, text, time_of_send, type_of_message, receiver_id, sender_id)
-values(1, 'Ya crazy, i cant see u homes?', TO_DATE('15/11/2022 09:14', 'dd/MM/yyyy HH:mm'), 'RIDE', 3, 1);
+            values(1, 'Ya crazy, i cant see u homes?', TO_DATE('15/11/2022 09:14', 'dd/MM/yyyy HH:mm'), 'RIDE', 3, 1);
 
 insert into Message(ride_id, text, time_of_send, type_of_message, receiver_id, sender_id)
-values(1, 'U trippin blood, get out?', TO_DATE('15/11/2022 09:15', 'dd/MM/yyyy HH:mm'), 'RIDE', 3, 1);
-
-
-insert into Message(ride_id, text, time_of_send, type_of_message, receiver_id, sender_id)
-values(1, 'Help me obi wan kenobi, you are my only hope', TO_DATE('15/11/2022 10:10', 'dd/MM/yyyy HH:mm'), 'PANIC', 6, 1);
-insert into Message(ride_id, text, time_of_send, type_of_message, receiver_id, sender_id)
-values(1, 'Hello there', TO_DATE('15/11/2022 10:11', 'dd/MM/yyyy HH:mm'), 'PANIC', 1, 6);
+            values(1, 'U trippin blood, get out?', TO_DATE('15/11/2022 09:15', 'dd/MM/yyyy HH:mm'), 'RIDE', 3, 1);
 
 
 insert into Message(ride_id, text, time_of_send, type_of_message, receiver_id, sender_id)
-values(1, 'Your ride is starting blood!', TO_DATE('15/11/2022 09:18', 'dd/MM/yyyy HH:mm'), 'NOTIFICATION', 1, 6);
+            values(1, 'Help me obi wan kenobi, you are my only hope', TO_DATE('15/11/2022 10:10', 'dd/MM/yyyy HH:mm'), 'PANIC', 6, 1);
+insert into Message(ride_id, text, time_of_send, type_of_message, receiver_id, sender_id)
+            values(1, 'Hello there', TO_DATE('15/11/2022 10:11', 'dd/MM/yyyy HH:mm'), 'PANIC', 1, 6);
+
 
 insert into Message(ride_id, text, time_of_send, type_of_message, receiver_id, sender_id)
-values(1, 'Ride finished', TO_DATE('15/11/2022 10:00', 'dd/MM/yyyy HH:mm'), 'NOTIFICATION', 1, 6);
+            values(1, 'Your ride is starting blood!', TO_DATE('15/11/2022 09:18', 'dd/MM/yyyy HH:mm'), 'NOTIFICATION', 1, 6);
+
+insert into Message(ride_id, text, time_of_send, type_of_message, receiver_id, sender_id)
+            values(1, 'Ride finished', TO_DATE('15/11/2022 10:02', 'dd/MM/yyyy HH:mm'), 'NOTIFICATION', 1, 6);
+
+insert into Message(text, time_of_send, type_of_message, receiver_id, sender_id)
+    values('I need backup', TO_DATE('15/11/2022 10:03', 'dd/MM/yyyy HH:mm'), 'SUPPORT', 6, 1);
