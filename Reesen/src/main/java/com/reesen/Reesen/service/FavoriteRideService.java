@@ -55,7 +55,7 @@ public class FavoriteRideService implements IFavoriteRideService {
 
 
 	@Override
-	public void deleteFavouriteRides(Long id) {
+	public void deleteFavouriteRides(Long id, Long passId) {
 		this.favoriteRouteRepository.deleteById(id);
 	}
 
