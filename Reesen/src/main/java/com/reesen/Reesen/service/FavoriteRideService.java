@@ -121,10 +121,23 @@ public class FavoriteRideService implements IFavoriteRideService {
 		for(UserDTO userDTO: passengersDTOs){
 			passengers.add(this.passengerRepository.findByEmail(userDTO.getEmail()));
 		}
+
+		Passenger favoritePassenger = this.passengerService.findOne(passengerId).get();
+		Set<FavoriteRide> passengerFavoriteRides = this.passengerRepository.getFavoriteRides(passengerId);
+		for(FavoriteRide favoriteRide :passengerFavoriteRides){
+			favoriteRide = this.favoriteRouteRepository.findById(favoriteRide.getId()).get();
+			
+		}
+
 		passengers.add(passenger);
 		ride.setPassengers(passengers);
 		ride.setFavoriteName(favouriteRide.getFavoriteName());
-		return new FavoriteRideDTO(this.favoriteRouteRepository.save(ride));
+		FavoriteRide favRide = this.favoriteRouteRepository.save(ride);
+
+		favoritePassenger.setFavouriteRoutes(passengerFavoriteRides);
+
+		ride.setId(favRide.getId());
+		return new FavoriteRideDTO(ride);
 	}
 
 	@Override
