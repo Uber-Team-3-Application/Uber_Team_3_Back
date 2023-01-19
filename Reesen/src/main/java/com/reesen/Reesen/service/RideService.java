@@ -221,16 +221,7 @@ public class RideService implements IRideService {
 		if(this.rideRepository.findRideByDriverIdAndStatus(driverId, RideStatus.STARTED).isPresent())
 		{
 			ride = this.rideRepository.findRideByDriverIdAndStatus(driverId, RideStatus.STARTED).get();
-			ride.setDriver(this.rideRepository.findDriverByRideId(ride.getId()));
-			ride.setPassengers(this.rideRepository.findPassengerByRideId(ride.getId()));
-			LinkedHashSet<Route> routes = new LinkedHashSet<Route>();
-			for(Route route: this.rideRepository.getLocationsByRide(ride.getId())){
-					Location departure = this.locationService.save(this.routeRepository.getDepartureByRoute(route).get());
-					Location destination = this.locationService.save(this.routeRepository.getDestinationByRoute(route).get());
-					Route r = this.routeRepository.save(new Route(departure, destination));
-					routes.add(r);
-				}
-			ride.setLocations(routes);
+			return this.findOne(ride.getId());
 		}
 		return ride;
 	}
@@ -241,19 +232,8 @@ public class RideService implements IRideService {
 		if (optionalRide.isEmpty()) {
 			return null;
 		}
-		Ride ride = optionalRide.get();
+		Ride ride = this.findOne(id);
 		ride.setStatus(RideStatus.CANCELED);
-		ride.setDriver(this.rideRepository.findDriverByRideId(id));
-		ride.setPassengers(this.rideRepository.findPassengerByRideId(id));
-		LinkedHashSet<Route> routes = new LinkedHashSet<Route>();
-		for(Route route: this.rideRepository.getLocationsByRide(id))
-		{
-			Location departure = this.locationService.save(this.routeRepository.getDepartureByRoute(route).get());
-			Location destination = this.locationService.save(this.routeRepository.getDestinationByRoute(route).get());
-			Route r = this.routeRepository.save(new Route(departure, destination));
-			routes.add(r);
-		}
-		ride.setLocations(routes);
 		rideRepository.save(ride);
 		return new RideDTO(ride);
 	}
@@ -264,19 +244,7 @@ public class RideService implements IRideService {
 		if (optionalRide.isEmpty()) {
 			return null;
 		}
-		Ride ride = optionalRide.get();
-		ride.setStatus(RideStatus.CANCELED);
-		ride.setDriver(this.rideRepository.findDriverByRideId(id));
-		ride.setPassengers(this.rideRepository.findPassengerByRideId(id));
-		LinkedHashSet<Route> routes = new LinkedHashSet<Route>();
-		for(Route route: this.rideRepository.getLocationsByRide(id))
-		{
-			Location departure = this.routeRepository.getDepartureByRoute(route).get();
-			Location destination = this.routeRepository.getDestinationByRoute(route).get();
-			Route r = this.routeRepository.save(new Route(departure, destination));
-			routes.add(r);
-		}
-		ride.setLocations(routes);
+		Ride ride = this.findOne(id);
 		ride.setStatus(RideStatus.FINISHED);
 		ride.setPanicPressed(true);
 		ride.setTimeOfEnd(new Date());
@@ -291,21 +259,10 @@ public class RideService implements IRideService {
 		if (optionalRide.isEmpty()) {
 			return null;
 		}
-		Ride ride = optionalRide.get();
+		Ride ride = this.findOne(id);
 		rideRepository.updateRideStatus(ride.getId(), RideStatus.REJECTED);
 		Deduction deduction = deductionRepository.save(new Deduction(ride, ride.getDriver(), reason, LocalDateTime.now()));
 		ride.setDeduction(deduction);
-		ride.setDriver(this.rideRepository.findDriverByRideId(id));
-		ride.setPassengers(this.rideRepository.findPassengerByRideId(id));
-		LinkedHashSet<Route> routes = new LinkedHashSet<Route>();
-		for(Route route: this.rideRepository.getLocationsByRide(id))
-		{
-			Location departure = this.locationService.save(this.routeRepository.getDepartureByRoute(route).get());
-			Location destination = this.locationService.save(this.routeRepository.getDestinationByRoute(route).get());
-			Route r = this.routeRepository.save(new Route(departure, destination));
-			routes.add(r);
-		}
-		ride.setLocations(routes);
 		rideRepository.save(ride);
 		return new RideDTO(ride);
 	}
@@ -316,18 +273,7 @@ public class RideService implements IRideService {
 		if (optionalRide.isEmpty()) {
 			return null;
 		}
-		Ride ride = optionalRide.get();
-		ride.setDriver(this.rideRepository.findDriverByRideId(id));
-		ride.setPassengers(this.rideRepository.findPassengerByRideId(id));
-		LinkedHashSet<Route> routes = new LinkedHashSet<Route>();
-		for(Route route: this.rideRepository.getLocationsByRide(id))
-		{
-			Location departure = this.locationService.save(this.routeRepository.getDepartureByRoute(route).get());
-			Location destination = this.locationService.save(this.routeRepository.getDestinationByRoute(route).get());
-			Route r = this.routeRepository.save(new Route(departure, destination));
-			routes.add(r);
-		}
-		ride.setLocations(routes);
+		Ride ride = this.findOne(id);
 		ride.setStatus(RideStatus.FINISHED);
 		ride.setTimeOfEnd(new Date());
 		rideRepository.save(ride);
@@ -340,18 +286,7 @@ public class RideService implements IRideService {
 		if (optionalRide.isEmpty()) {
 			return null;
 		}
-		Ride ride = optionalRide.get();
-		ride.setDriver(this.rideRepository.findDriverByRideId(id));
-		ride.setPassengers(this.rideRepository.findPassengerByRideId(id));
-		LinkedHashSet<Route> routes = new LinkedHashSet<Route>();
-		for(Route route: this.rideRepository.getLocationsByRide(id))
-		{
-			Location departure = this.locationService.save(this.routeRepository.getDepartureByRoute(route).get());
-			Location destination = this.locationService.save(this.routeRepository.getDestinationByRoute(route).get());
-			Route r = this.routeRepository.save(new Route(departure, destination));
-			routes.add(r);
-		}
-		ride.setLocations(routes);
+		Ride ride = this.findOne(id);
 		ride.setStatus(RideStatus.ACCEPTED);
 		rideRepository.save(ride);
 		return new RideDTO(ride);
@@ -402,18 +337,7 @@ public class RideService implements IRideService {
 		Ride ride = this.rideRepository.findPassengerActiveRide(passengerId, RideStatus.STARTED);
 		if(ride != null)
 		{
-			ride = this.rideRepository.findPassengerActiveRide(passengerId, RideStatus.STARTED);
-			ride.setDriver(this.rideRepository.findDriverByRideId(ride.getId()));
-			ride.setPassengers(this.rideRepository.findPassengerByRideId(ride.getId()));
-			LinkedHashSet<Route> routes = new LinkedHashSet<Route>();
-			for(Route route: this.rideRepository.getLocationsByRide(ride.getId()))
-			{
-				Location departure = this.locationService.save(this.routeRepository.getDepartureByRoute(route).get());
-				Location destination = this.locationService.save(this.routeRepository.getDestinationByRoute(route).get());
-				Route r = this.routeRepository.save(new Route(departure, destination));
-				routes.add(r);
-			}
-			ride.setLocations(routes);
+			ride = this.findOne(ride.getId());
 		}
 		return ride;
 	}
@@ -651,18 +575,7 @@ public class RideService implements IRideService {
 		if (optionalRide.isEmpty()) {
 			return null;
 		}
-		Ride ride = optionalRide.get();
-		ride.setDriver(this.rideRepository.findDriverByRideId(id));
-		ride.setPassengers(this.rideRepository.findPassengerByRideId(id));
-		LinkedHashSet<Route> routes = new LinkedHashSet<Route>();
-		for(Route route: this.rideRepository.getLocationsByRide(id))
-		{
-			Location departure = this.locationService.save(this.routeRepository.getDepartureByRoute(route).get());
-			Location destination = this.locationService.save(this.routeRepository.getDestinationByRoute(route).get());
-			Route r = this.routeRepository.save(new Route(departure, destination));
-			routes.add(r);
-		}
-		ride.setLocations(routes);
+		Ride ride = this.findOne(id);
 		ride.setStatus(RideStatus.STARTED);
 		ride.setTimeOfStart(new Date());
 		rideRepository.save(ride);
