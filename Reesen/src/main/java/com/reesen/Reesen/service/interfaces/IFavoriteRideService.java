@@ -11,7 +11,7 @@ public interface IFavoriteRideService {
     FavoriteRide findOne(Long id);
     FavoriteRide save(FavoriteRide favoriteRide);
 
-    void deleteFavouriteRides(Long id);
+    void deleteFavouriteRides(Long id, Long passId);
 
     FavoriteRideDTO addFavouriteRide(CreateFavoriteRideDTO favouriteRide, Long id);
 
