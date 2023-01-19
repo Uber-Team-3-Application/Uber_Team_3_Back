@@ -109,6 +109,7 @@ values(TO_DATE('15/11/2022 09:10', 'dd/MM/yyyy HH:mm'), 'Rider went of course', 
 
 insert into Ride ( estimated_time, is_baby_accessible, is_panic_pressed, is_pet_accessible,
                    status, time_of_end, time_of_start, total_price, deduction_id, driver_id, vehicle_type_id)
+
 values (21, false , false, false,'FINISHED',TO_DATE('20/5/2022 18:35', 'dd/MM/yyyy HH:mm'),
         TO_DATE('26/7/2022 18:00', 'dd/MM/yyyy HH:mm'), 2045, null, 2, 3);
 
@@ -131,6 +132,7 @@ insert into Ride (estimated_time, is_baby_accessible, is_panic_pressed, is_pet_a
                   status, time_of_end, time_of_start, total_price, deduction_id, driver_id, vehicle_type_id)
 values ( 16, true, false, false,'FINISHED',TO_DATE('20/9/2022 13:22', 'dd/MM/yyyy HH:mm'),
          TO_DATE('20/9/2022 13:00', 'dd/MM/yyyy HH:mm'), 1669, null, 2, 2);
+        TO_DATE('20/9/2022 13:00', 'dd/MM/yyyy HH:mm'), 1669, null, 2, 2);
 
 insert into Drivers_Rides (driver_id, rides_id) values (2, 3);
 insert into Passenger_Rides (passenger_id, rides_id) values (3, 3);
@@ -210,7 +212,6 @@ insert into Review (driver_comment, driver_rating, vehicle_comment, vehicle_rati
 values ('Vozač je bio jako neljubazan.', 2, 'Vozilo je jako prljavo', 3, 5, 7);
 insert into Ride_Review (ride_id, review_id) values (7, 10);
 
-// MESSAGES
 
 insert into Message(ride_id, text, time_of_send, type_of_message, receiver_id, sender_id)
             values(1, 'Where you at hommie?', TO_DATE('15/11/2022 09:10', 'dd/MM/yyyy HH:mm'), 'RIDE', 1, 3);
@@ -220,6 +221,7 @@ values(1, 'Im here bra, where u', TO_DATE('15/11/2022 09:12', 'dd/MM/yyyy HH:mm'
 
 insert into Message(ride_id, text, time_of_send, type_of_message, receiver_id, sender_id)
 values(1, 'Ya crazy, i cant see u homes?', TO_DATE('15/11/2022 09:14', 'dd/MM/yyyy HH:mm'), 'RIDE', 1, 3);
+            values(1, 'Ya crazy, i cant see u homes?', TO_DATE('15/11/2022 09:14', 'dd/MM/yyyy HH:mm'), 'RIDE', 1, 3);
 
 insert into Message(ride_id, text, time_of_send, type_of_message, receiver_id, sender_id)
 values(1, 'U trippin blood, get out?', TO_DATE('15/11/2022 09:15', 'dd/MM/yyyy HH:mm'), 'RIDE', 3, 1);
