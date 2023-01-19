@@ -1,12 +1,21 @@
 package com.reesen.Reesen.model;
 
 import com.reesen.Reesen.Enums.TypeOfMessage;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
+@NoArgsConstructor
+@Getter
+@Setter
+@AllArgsConstructor
 public class Message implements Serializable {
 
     @Id
@@ -34,8 +43,6 @@ public class Message implements Serializable {
     @Column(nullable = true)
     private Long rideId;
 
-    public Message() {
-    }
 
     public Message(User sender, User receiver, String text, Date timeOfSend, TypeOfMessage typeOfMessage, Long rideId) {
         this.sender = sender;
@@ -55,59 +62,4 @@ public class Message implements Serializable {
 
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public User getSender() {
-        return sender;
-    }
-
-    public void setSender(User sender) {
-        this.sender = sender;
-    }
-
-    public User getReceiver() {
-        return receiver;
-    }
-
-    public void setReceiver(User receiver) {
-        this.receiver = receiver;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public Date getTimeOfSend() {
-        return timeOfSend;
-    }
-
-    public void setTimeOfSend(Date timeOfSend) {
-        this.timeOfSend = timeOfSend;
-    }
-
-    public TypeOfMessage getTypeOfMessage() {
-        return typeOfMessage;
-    }
-
-    public void setTypeOfMessage(TypeOfMessage typeOfMessage) {
-        this.typeOfMessage = typeOfMessage;
-    }
-
-    public Long getRideId() {
-        return rideId;
-    }
-
-    public void setRideId(Long rideId) {
-        this.rideId = rideId;
-    }
 }

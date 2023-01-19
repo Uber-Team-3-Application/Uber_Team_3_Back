@@ -95,6 +95,7 @@ public class RideController {
         return new ResponseEntity<>(withdrawRide, HttpStatus.OK);
     }
 
+
     @PutMapping(value = "/{id}/panic")
     @PreAuthorize("hasAnyRole('PASSENGER')")
     public ResponseEntity<RideDTO> pressedPanic(@PathVariable Long id, @Nullable @RequestBody ReasonDTO reason, @RequestHeader Map<String, String> headers){
@@ -102,6 +103,7 @@ public class RideController {
         if(!role.equalsIgnoreCase("passenger"))   return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
         if(this.rideService.findOne(id) == null)
             return new ResponseEntity("Ride does not exist!", HttpStatus.NOT_FOUND);
         if(reason == null)

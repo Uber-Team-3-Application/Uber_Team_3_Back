@@ -111,6 +111,7 @@ public class PanicService implements IPanicService {
 
     private void setDriverForPanicRide(Ride ride) {
         Long driverId = this.rideRepository.getDriverIdFromRide(ride.getId());
+        if(driverId == null) ride.setDriver(null);
         Optional<Driver> driver = this.driverRepository.findById(driverId);
         if(driver.isEmpty()) ride.setDriver(new Driver());
         else ride.setDriver(driver.get());

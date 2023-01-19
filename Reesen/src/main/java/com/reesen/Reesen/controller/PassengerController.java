@@ -2,18 +2,23 @@ package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.PassengerDTO;
 import com.reesen.Reesen.dto.PassengerRideDTO;
+import com.reesen.Reesen.dto.UserDTO;
+import com.reesen.Reesen.dto.UserFullDTO;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.service.interfaces.*;
+import com.reesen.Reesen.validation.UserRequestValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.reesen.Reesen.security.jwt.JwtTokenUtil;
 
+import javax.validation.Valid;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,23 +36,28 @@ public class PassengerController {
     private final IDriverService driverService;
     private final IDeductionService deductionService;
     private final IRouteService routeService;
-
+    private final UserRequestValidation userRequestValidation;
     private final JwtTokenUtil tokens;
 
     @Autowired
-    public PassengerController(IPassengerService passengerService, IRideService rideService, IDriverService driverService, IDeductionService deductionService, IRouteService routeService, JwtTokenUtil tokens) {
+    public PassengerController(IPassengerService passengerService, IRideService rideService, IDriverService driverService, IDeductionService deductionService, IRouteService routeService, UserRequestValidation userRequestValidation, JwtTokenUtil tokens) {
         this.passengerService = passengerService;
         this.rideService = rideService;
         this.driverService = driverService;
         this.deductionService = deductionService;
         this.routeService = routeService;
+        this.userRequestValidation = userRequestValidation;
         this.tokens = tokens;
     }
 
     @PostMapping
-    public ResponseEntity<PassengerDTO> createPassenger(@RequestBody PassengerDTO passengerDTO){
+    @PreAuthorize("hasAnyRole('ADMIN', 'PASSENGER')")
+    public ResponseEntity<PassengerDTO> createPassenger(@RequestBody @Valid PassengerDTO passengerDTO){
         if(this.passengerService.findByEmail(passengerDTO.getEmail()) != null)
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(
+                    new ErrorResponseMessage("User with that email already exists!"),
+                    HttpStatus.BAD_REQUEST
+            );
         PassengerDTO passenger = this.passengerService.createPassengerDTO(passengerDTO);
         return new ResponseEntity<>(passenger, HttpStatus.OK);
     }
@@ -62,8 +72,9 @@ public class PassengerController {
     @GetMapping(value = "/activate/account")
     public ResponseEntity<String> activatePassengerAccount(@RequestParam String url){
         VerificationToken verificationToken = this.passengerService.findByUrl(url);
+        if(verificationToken == null) return new ResponseEntity("Not found!", HttpStatus.NOT_FOUND);
         if(verificationToken.getExpirationDate().isBefore(LocalDateTime.now()))
-            return new ResponseEntity<>("Activation expired!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(new ErrorResponseMessage("Activation expired!"), HttpStatus.BAD_REQUEST);
         passengerService.activateAccount(verificationToken.getPassengerId());
         return new ResponseEntity<>("Successful account activation", HttpStatus.OK);
     }
@@ -76,18 +87,17 @@ public class PassengerController {
         for(Passenger passenger: passengers){
             passengerDTOs.add(new PassengerDTO(passenger));
         }
-        return new ResponseEntity<>(new Paginated<PassengerDTO>(passengers.getNumberOfElements(), passengerDTOs), HttpStatus.OK);
+        return new ResponseEntity<>(new Paginated<>(passengers.getNumberOfElements(), passengerDTOs), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
-    public ResponseEntity<PassengerDTO> getPassengerDetails(@PathVariable Long id){
-        if(id < 1)
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    @PreAuthorize("hasAnyRole('ADMIN', 'PASSENGER', 'DRIVER')")
+    public ResponseEntity<UserFullDTO> getPassengerDetails(@PathVariable Long id){
+
         Optional<Passenger> passenger = this.passengerService.findOne(id);
         if(passenger.isEmpty())
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        PassengerDTO passengerDTO = new PassengerDTO(passenger.get());
+            return new ResponseEntity("Passenger does not exist!", HttpStatus.NOT_FOUND);
+        UserFullDTO passengerDTO = new UserFullDTO(passenger.get());
         return new ResponseEntity<>(passengerDTO, HttpStatus.OK);
     }
 
@@ -95,24 +105,26 @@ public class PassengerController {
     @PreAuthorize("hasAnyRole('ADMIN', 'PASSENGER')")
     public ResponseEntity<Paginated<PassengerRideDTO>> getPassengerRides(@PathVariable Long id,
                                                                          Pageable page,
-                                                                         @RequestParam(value = "sort", required = false) String sort,
-                                                                         @RequestParam(value = "from", required = false) String from,
-                                                                         @RequestParam(value = "to", required = false) String to) throws ParseException {
-        if(id < 1)
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                                                                         @RequestParam(value = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate from,
+                                                                         @RequestParam(value = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate to,
+                                                                         @RequestHeader Map<String, String> headers) {
+
+        String role = this.userRequestValidation.getRoleFromToken(headers);
+        if(role.equalsIgnoreCase("passenger")){
+            boolean areIdsEqual = this.userRequestValidation.areIdsEqual(headers, id);
+            if(!areIdsEqual) return new ResponseEntity("Passenger does not exist!", HttpStatus.NOT_FOUND);
+        }
         Optional<Passenger> passenger = this.passengerService.findOne(id);
         if (passenger.isEmpty()) return new ResponseEntity("Passenger does not exist!", HttpStatus.NOT_FOUND);
-        Page<Ride> rides = this.rideService.findAllRidesForPassenger(id, page, null, null);
         Date dateFrom = null;
         Date dateTo = null;
+
         if (from != null || to != null) {
             if  (from != null) {
-                LocalDate date = LocalDate.parse(from, DateTimeFormatter.ISO_DATE);
-                dateFrom = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                dateFrom = Date.from(from.atStartOfDay(ZoneId.systemDefault()).toInstant());
             }
             if (to != null) {
-                LocalDate date = LocalDate.parse(to, DateTimeFormatter.ISO_DATE);
-                dateTo = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                dateTo = Date.from(to.atStartOfDay(ZoneId.systemDefault()).toInstant());
             }
         }
         Page<Ride> passengerRides = this.rideService.findAllRidesForPassenger(id, page, dateFrom, dateTo);
@@ -137,12 +149,19 @@ public class PassengerController {
 
     @PutMapping(value = "/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'PASSENGER')")
-    public ResponseEntity<PassengerDTO> updatePassenger(@RequestBody PassengerDTO passengerDTO, @PathVariable Long id){
+    public ResponseEntity<PassengerDTO> updatePassenger(@RequestBody @Valid PassengerDTO passengerDTO,
+                                                        @PathVariable Long id,
+                                                        @RequestHeader Map<String, String> headers){
+        String role = this.userRequestValidation.getRoleFromToken(headers);
+        if(role.equalsIgnoreCase("passenger")){
+            boolean areIdsEqual = this.userRequestValidation.areIdsEqual(headers, id);
+            if(!areIdsEqual) return new ResponseEntity("Passenger does not exist!", HttpStatus.NOT_FOUND);
+        }
         if(this.passengerService.findOne(id).isEmpty())
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity("Passenger does not exist!", HttpStatus.NOT_FOUND);
         Passenger passenger = this.passengerService.findByEmail(passengerDTO.getEmail());
         if(passenger != null && !passenger.getId().toString().equals(id.toString())){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("Invalid data. For example Bad email format.", HttpStatus.BAD_REQUEST);
         }
         passenger = this.passengerService.getPassengerFromPassengerDTO(id, passengerDTO);
         passenger = this.passengerService.save(passenger);

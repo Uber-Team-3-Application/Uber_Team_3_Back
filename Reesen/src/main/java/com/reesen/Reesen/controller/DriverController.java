@@ -6,6 +6,7 @@ import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Driver.DriverEditBasicInformation;
 import com.reesen.Reesen.model.Driver.DriverEditVehicle;
 import com.reesen.Reesen.model.paginated.Paginated;
+import com.reesen.Reesen.service.ReviewService;
 import com.reesen.Reesen.service.interfaces.*;
 import com.reesen.Reesen.validation.UserRequestValidation;
 import com.reesen.Reesen.validation.interfaces.IImageValidationService;
@@ -41,7 +42,7 @@ public class DriverController {
     private final UserRequestValidation userRequestValidation;
     private final IImageValidationService imageValidationService;
     private final MessageSource messageSource;
-
+    private final ReviewService reviewService;
     @Autowired
     public DriverController(IDriverService driverService,
                             IDocumentService documentService,
@@ -51,7 +52,7 @@ public class DriverController {
                             IRideService rideService,
                             IPassengerService passengerService,
                             IDeductionService deductionService,
-                            IRouteService routeService, UserRequestValidation userRequestValidation, IImageValidationService imageValidationService, MessageSource messageSource) {
+                            IRouteService routeService, UserRequestValidation userRequestValidation, IImageValidationService imageValidationService, MessageSource messageSource, ReviewService reviewService) {
         this.driverService = driverService;
         this.documentService = documentService;
         this.vehicleService = vehicleService;
@@ -64,6 +65,7 @@ public class DriverController {
         this.userRequestValidation = userRequestValidation;
         this.imageValidationService = imageValidationService;
         this.messageSource = messageSource;
+        this.reviewService = reviewService;
     }
 
 
@@ -159,11 +161,11 @@ public class DriverController {
         if (driver.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Vehicle vehicle = this.driverService.getVehicle(driverId);
-        // if ! exists -> create
+        // if ! exists => create
         if (vehicle == null) {
             vehicle = this.vehicleService.createVehicle(vehicleDTO, driver.get());
         } else {
-            // if exists -> edit
+            // if exists => edit
             vehicle = this.vehicleService.editVehicle(vehicle, vehicleDTO);
         }
         this.vehicleService.save(vehicle);
@@ -580,6 +582,7 @@ public class DriverController {
                 location.setDeparture(this.routeService.getDepartureByRoute(location).get());
 
             }
+            ride.setReview(this.reviewService.findReviewsByRide(ride));
             ride.setLocations(locations);
             rideDTOs.add(new DriverRideDTO(ride));
         }
@@ -595,7 +598,6 @@ public class DriverController {
     public ResponseEntity<String> deleteDocuments(
             @PathVariable("document-id") Long id,
             @RequestHeader Map<String, String> headers) {
-
 
         Optional<Document> document = this.documentService.findOne(id);
         if (document.isEmpty())

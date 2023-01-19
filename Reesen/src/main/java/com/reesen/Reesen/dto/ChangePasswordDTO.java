@@ -4,6 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 
 @Getter
 @Setter
@@ -11,6 +15,11 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ChangePasswordDTO {
 
-    private String new_password;
-    private String old_password;
+    @NotEmpty(message = "{required}")
+    @Pattern(regexp = "^(?=.*\\d)(?=.*[A-Z])(?!.*[^a-zA-Z0-9@#$^+=])(.{8,15})$", message = "{regex}")
+    private String newPassword;
+
+    @NotEmpty(message = "{required}")
+    @Pattern(regexp = "^(?=.*\\d)(?=.*[A-Z])(?!.*[^a-zA-Z0-9@#$^+=])(.{8,15})$", message = "{regex}")
+    private String oldPassword;
 }
