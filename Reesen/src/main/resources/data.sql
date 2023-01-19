@@ -24,10 +24,9 @@ CREATE ALIAS TO_DATE as '
 import java.text.*;
 @CODE
 java.util.Date toDate(String originalDate, String dateFormat) throws Exception {
-    return new SimpleDateFormat('dd/MM/yyyy HH:mm').parse(originalDate);
+    return new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(originalDate);
 }
 ';
-
 
 insert into Passenger(id, is_confirmed_mail, amount_of_money) values(3, true, 1000);
 insert into Passenger(id, is_confirmed_mail, amount_of_money) values(4, true, 3000);
@@ -103,6 +102,9 @@ insert into Ride_Review (ride_id, review_id) values (1, 2);
 
 insert into Panic(time_of_press, reason, ride_id, user_id)
 values(TO_DATE('15/11/2022 09:10', 'dd/MM/yyyy HH:mm'), 'Rider went of course', 1, 3);
+
+
+
 
 // MESSAGES
 
