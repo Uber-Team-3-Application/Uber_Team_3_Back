@@ -17,4 +17,7 @@ public interface RouteRepository extends JpaRepository<Route, Long>{
 
     @Query ("select location.destination from Route location where location=:route")
     Optional<Location> getDestinationByRoute(Route route);
+
+
+
 }

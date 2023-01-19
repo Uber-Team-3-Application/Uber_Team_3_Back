@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -61,44 +62,51 @@ public class FavoriteRideService implements IFavoriteRideService {
 	@Override
 	public FavoriteRideDTO addFavouriteRide(CreateFavoriteRideDTO favouriteRide, Long passengerId) {
 		FavoriteRide ride = new FavoriteRide();
-		Set<RouteDTO> locationsDTOs = favouriteRide.getLocations();
-		LinkedHashSet<Route> locations = new LinkedHashSet<>();
-		for(RouteDTO routeDTO: locationsDTOs){
-			Route route = new Route();
-			Location departure = new Location(routeDTO.getDeparture().getLatitude(), routeDTO.getDeparture().getLongitude(), routeDTO.getDeparture().getAddress());
-			this.locationService.save(departure);
-			route.setDeparture(departure);
-			Location destination = new Location(routeDTO.getDestination().getLatitude(), routeDTO.getDestination().getLongitude(), routeDTO.getDestination().getAddress());
-			this.locationService.save(destination);
-			route.setDestination(destination);
-			locations.add(route);
-			this.routeRepository.save(route);
-		}
-
-		ride.setLocations(locations);
-		ride.setVehicleType(this.vehicleTypeRepository.findByName(VehicleName.valueOf(favouriteRide.getVehicleType())));
 		ride.setBabyAccessible(favouriteRide.isBabyTransport());
-		ride.setPetAccessible(favouriteRide.isPetTransport());
-		Set<UserDTO> passengersDTOs = favouriteRide.getPassengers();
-		Set<Passenger> passengers = new HashSet<>();
-		for(UserDTO userDTO: passengersDTOs){
-			passengers.add(this.passengerRepository.findByEmail(userDTO.getEmail()));
-		}
-		Passenger favoritePassenger = this.passengerService.findOne(passengerId).get();
-		Set<FavoriteRide> passengerFavoriteRides = this.passengerRepository.getFavoriteRides(passengerId);
-		for(FavoriteRide favoriteRide :passengerFavoriteRides){
-			favoriteRide = this.favoriteRouteRepository.findById(favoriteRide.getId()).get();
-			
-		}
-
-		passengers.add(this.passengerService.findOne(passengerId).get());
-		ride.setPassengers(passengers);
+		ride.setPetAccessible(favouriteRide.isBabyTransport());
+		ride.setVehicleType(this.vehicleTypeRepository.findByName(VehicleName.getVehicleName(favouriteRide.getVehicleType())));
 		ride.setFavoriteName(favouriteRide.getFavoriteName());
-		FavoriteRide favRide = this.favoriteRouteRepository.save(ride);
 
-		favoritePassenger.setFavouriteRoutes(passengerFavoriteRides);
+		ride.setPassengers(new LinkedHashSet<>());
+		for(UserDTO user: favouriteRide.getPassengers()){
+			Optional<Passenger> passenger = passengerRepository.findById(user.getId());
+			passenger.ifPresent(value -> ride.getPassengers().add(value));
+		}
+		ride.getPassengers().add(this.passengerService.findOne(passengerId).get());
 
-		ride.setId(favRide.getId());
+		Route route = new Route();
+		for(RouteDTO location: favouriteRide.getLocations()){
+			Location departure = new Location(
+					location.getDeparture().getLatitude(),
+					location.getDeparture().getLongitude(),
+					location.getDeparture().getAddress()
+			);
+			Location destination = new Location(
+					location.getDestination().getLatitude(),
+					location.getDestination().getLongitude(),
+					location.getDestination().getAddress()
+			);
+			departure = this.locationService.save(departure);
+			destination = this.locationService.save(destination);
+			route.setDeparture(departure);
+			route.setDestination(destination);
+			routeRepository.save(route);
+			Set<Route> routes = new HashSet<>();
+			routes.add(route);
+			ride.setLocations(routes);
+			break;
+
+		}
+
+		FavoriteRide newFavoriteRide = favoriteRouteRepository.save(ride);
+
+		Passenger passenger = this.passengerService.findOne(passengerId).get();
+		Set<FavoriteRide> passengerFavoriteRides =this.passengerRepository.getFavoriteRides(passengerId);
+		passenger.setFavouriteRoutes(passengerFavoriteRides);
+		passenger.getFavouriteRoutes().add(newFavoriteRide);
+		this.passengerRepository.save(passenger);
+
+
 		return new FavoriteRideDTO(ride);
 	}
 
@@ -109,8 +117,8 @@ public class FavoriteRideService implements IFavoriteRideService {
 
 		for(FavoriteRide ride: faves)
 		{
-			ride.setPassengers(this.favoriteRouteRepository.findPassengerByRideId(id));
-			LinkedHashSet<Route> routes = this.favoriteRouteRepository.getLocationsByRide(id);
+			ride.setPassengers(this.favoriteRouteRepository.findPassengerByRideId(ride.getId()));
+			LinkedHashSet<Route> routes = this.favoriteRouteRepository.getLocationsByRide(ride.getId());
 			for(Route route: routes)
 			{
 				Location departure = this.routeRepository.getDepartureByRoute(route).get();
