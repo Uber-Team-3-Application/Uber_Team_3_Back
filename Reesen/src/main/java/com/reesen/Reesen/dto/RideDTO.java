@@ -25,7 +25,6 @@ public class RideDTO {
  	private boolean babyTransport;
  	private boolean petTransport;
  	private RideStatus status;
- 	private Set<Review> reviews;
 
 	 private LocalDateTime scheduledTime;
 
@@ -46,7 +45,6 @@ public class RideDTO {
 		setPassengers(ride);
 		setVehicleType(ride);
 		setLocations(ride);
-		reviews = ride.getReview();
 		if(ride.getDeduction() == null) this.rejection = null;
 		else this.rejection = new DeductionDTO(ride.getDeduction().getReason(), ride.getDeduction().getDeductionTime());
 		this.scheduledTime = ride.getScheduledTime();
@@ -74,14 +72,6 @@ public class RideDTO {
 			this.vehicleType = VehicleTypeDTO.LUXURY;
 		else if (ride.getVehicleType().getName() == VehicleName.STANDARD)
 			this.vehicleType = VehicleTypeDTO.STANDARD;
-	}
-
-	public Set<Review> getReviews() {
-		return reviews;
-	}
-
-	public void setReviews(Set<Review> reviews) {
-		this.reviews = reviews;
 	}
 
 	public DeductionDTO getRejection() {

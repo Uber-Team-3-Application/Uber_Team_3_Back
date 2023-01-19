@@ -43,10 +43,9 @@ public class RideService implements IRideService {
 	private final ReviewRepository reviewRepository;
 	private final ScheduledExecutorService executor;
 	private final PassengerService passengerService;
-	private final ReviewService reviewService;
 
 	@Autowired
-    public RideService(RideRepository rideRepository, RouteRepository routeRepository, FavoriteRouteRepository favoriteRouteRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, UserRepository userRepository, DriverRepository driverRepository, IWorkingHoursService workingHoursService, ILocationService locationService, DeductionRepository deductionRepository, ReviewRepository reviewRepository, PassengerService passengerService, ReviewService reviewService){
+    public RideService(RideRepository rideRepository, RouteRepository routeRepository, FavoriteRouteRepository favoriteRouteRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, UserRepository userRepository, DriverRepository driverRepository, IWorkingHoursService workingHoursService, ILocationService locationService, DeductionRepository deductionRepository, ReviewRepository reviewRepository, PassengerService passengerService){
         this.rideRepository = rideRepository;
 		this.routeRepository = routeRepository;
 		this.favoriteRouteRepository = favoriteRouteRepository;
@@ -60,7 +59,6 @@ public class RideService implements IRideService {
 		this.deductionRepository = deductionRepository;
 		this.reviewRepository = reviewRepository;
 		this.passengerService = passengerService;
-		this.reviewService = reviewService;
 		this.executor = Executors.newScheduledThreadPool(1);
 	}
 
@@ -85,12 +83,6 @@ public class RideService implements IRideService {
 				routes.add(new Route(departure, destination));
 			}
 			ride.setLocations(routes);
-			Set<Review> reviews = this.reviewService.findReviewsByRide(ride);
-			for(Review review: reviews){
-				review.setRide(ride);
-				review.setPassenger(this.reviewService.findPassengerByReviewId(review.getId()).get());
-			}
-			ride.setReview(this.reviewService.findReviewsByRide(ride));
 			return ride;
 		}
 		return null;
