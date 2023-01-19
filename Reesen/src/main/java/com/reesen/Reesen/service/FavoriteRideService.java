@@ -54,7 +54,27 @@ public class FavoriteRideService implements IFavoriteRideService {
 
 
 	@Override
-	public void deleteFavouriteRides(Long id) {
+	public void deleteFavouriteRides(Long id, Long passengerId) {
+		Passenger passenger = this.passengerService.findOne(passengerId).get();
+		Set<FavoriteRide> allRides = passenger.getFavouriteRoutes();
+		FavoriteRide removeRide = null;
+		for(FavoriteRide ride: allRides)
+		{
+			if(ride.getId() == id) removeRide = ride;
+			ride.setPassengers(this.favoriteRouteRepository.findPassengerByRideId(ride.getId()));
+			LinkedHashSet<Route> routes = this.favoriteRouteRepository.getLocationsByRide(ride.getId());
+			for(Route route: routes)
+			{
+				Location departure = this.routeRepository.getDepartureByRoute(route).get();
+				Location destination = this.routeRepository.getDestinationByRoute(route).get();
+				route.setDeparture(departure);
+				route.setDestination(destination);
+			}
+			ride.setLocations(routes);
+		}
+		allRides.remove(removeRide);
+		passenger.setFavouriteRoutes(allRides);
+		passengerService.save(passenger);
 		this.favoriteRouteRepository.deleteById(id);
 	}
 
@@ -74,7 +94,24 @@ public class FavoriteRideService implements IFavoriteRideService {
 			locations.add(route);
 			this.routeRepository.save(route);
 		}
-
+		Passenger passenger = this.passengerService.findOne(passengerId).get();
+		Set<FavoriteRide> allRides = passenger.getFavouriteRoutes();
+		for(FavoriteRide fav: allRides)
+		{
+			ride.setPassengers(this.favoriteRouteRepository.findPassengerByRideId(fav.getId()));
+			LinkedHashSet<Route> routes = this.favoriteRouteRepository.getLocationsByRide(fav.getId());
+			for(Route route: routes)
+			{
+				Location departure = this.routeRepository.getDepartureByRoute(route).get();
+				Location destination = this.routeRepository.getDestinationByRoute(route).get();
+				route.setDeparture(departure);
+				route.setDestination(destination);
+			}
+			ride.setLocations(routes);
+		}
+		allRides.add(ride);
+		passenger.setFavouriteRoutes(allRides);
+		passengerService.save(passenger);
 		ride.setLocations(locations);
 		ride.setVehicleType(this.vehicleTypeRepository.findByName(VehicleName.valueOf(favouriteRide.getVehicleType())));
 		ride.setBabyAccessible(favouriteRide.isBabyTransport());
@@ -84,7 +121,7 @@ public class FavoriteRideService implements IFavoriteRideService {
 		for(UserDTO userDTO: passengersDTOs){
 			passengers.add(this.passengerRepository.findByEmail(userDTO.getEmail()));
 		}
-		passengers.add(this.passengerService.findOne(passengerId).get());
+		passengers.add(passenger);
 		ride.setPassengers(passengers);
 		ride.setFavoriteName(favouriteRide.getFavoriteName());
 		return new FavoriteRideDTO(this.favoriteRouteRepository.save(ride));
@@ -92,21 +129,24 @@ public class FavoriteRideService implements IFavoriteRideService {
 
 	@Override
 	public Set<FavoriteRideDTO> getFavouriteRides(Long id) {
-		Set<FavoriteRideDTO> favoriteRides = new HashSet<>();
-		for(FavoriteRide ride: favoriteRouteRepository.findAllByPassengerId(id))
+		Passenger passenger = this.passengerService.findOne(id).get();
+		Set<FavoriteRide> allRides = passenger.getFavouriteRoutes();
+		Set<FavoriteRideDTO> response = new HashSet<>();
+		for(FavoriteRide ride: allRides)
 		{
-			ride.setPassengers(this.favoriteRouteRepository.findPassengerByRideId(id));
-			LinkedHashSet<Route> routes = new LinkedHashSet<Route>();
-			for(Route route: this.favoriteRouteRepository.getLocationsByRide(id))
+			ride.setPassengers(this.favoriteRouteRepository.findPassengerByRideId(ride.getId()));
+			LinkedHashSet<Route> routes = this.favoriteRouteRepository.getLocationsByRide(ride.getId());
+			for(Route route: routes)
 			{
 				Location departure = this.routeRepository.getDepartureByRoute(route).get();
 				Location destination = this.routeRepository.getDestinationByRoute(route).get();
-				routes.add(new Route(departure, destination));
+				route.setDeparture(departure);
+				route.setDestination(destination);
 			}
 			ride.setLocations(routes);
-			favoriteRides.add(new FavoriteRideDTO(ride));
+			response.add(new FavoriteRideDTO(ride));
 		}
-		return favoriteRides;
+		return response;
 	}
 
 	@Override

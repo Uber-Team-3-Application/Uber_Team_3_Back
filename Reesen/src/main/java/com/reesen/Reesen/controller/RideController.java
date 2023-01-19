@@ -153,7 +153,7 @@ public class RideController {
 
     @PutMapping(value = "/{id}/cancel")
     @PreAuthorize("hasAnyRole('DRIVER')")
-    public ResponseEntity<RideDTO> cancelRide(@PathVariable Long id, @Nullable @RequestBody String reason, @RequestHeader Map<String, String> headers){
+    public ResponseEntity<RideDTO> cancelRide(@PathVariable Long id, @Nullable @RequestBody ReasonDTO reason, @RequestHeader Map<String, String> headers){
         String role = this.userRequestValidation.getRoleFromToken(headers);
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -164,7 +164,7 @@ public class RideController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         if(reason == null)
             return new ResponseEntity("Must give a reason!", HttpStatus.BAD_REQUEST);
-        RideDTO canceledRide = this.rideService.cancelRide(id, reason);
+        RideDTO canceledRide = this.rideService.cancelRide(id, reason.getReason());
         return new ResponseEntity<>(canceledRide, HttpStatus.OK);
     }
 
@@ -199,13 +199,13 @@ public class RideController {
     }
     @DeleteMapping(value = "/favorites/{id}")
     @PreAuthorize("hasAnyRole('PASSENGER')")
-    public ResponseEntity<String> deleteFavouriteRides(@PathVariable Long id)
+    public ResponseEntity<String> deleteFavouriteRides(@PathVariable Long id, @RequestHeader Map<String, String> headers)
     {
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(this.favoriteRideService.findOne(id) == null)
             return new ResponseEntity("Favorite location does not exist!", HttpStatus.NOT_FOUND);
-        this.favoriteRideService.deleteFavouriteRides(id);
+        this.favoriteRideService.deleteFavouriteRides(id, this.userRequestValidation.getIdFromToken(headers));
         return new ResponseEntity<>("Successful deletion of favorite location!",HttpStatus.NO_CONTENT);
     }
 
