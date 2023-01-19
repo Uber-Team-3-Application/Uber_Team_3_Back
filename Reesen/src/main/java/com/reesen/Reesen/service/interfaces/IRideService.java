@@ -29,6 +29,9 @@ public interface IRideService {
 
 	RideDTO cancelRide(Long id, String reason);
 
+	// TODO: ------> JELENA
+
+	//TODO : VELJA
 	RideDTO endRide(Long id);
 
 	RideDTO acceptRide(Long id);
@@ -36,7 +39,7 @@ public interface IRideService {
 	List<Ride> findAll();
 
 	Page<Ride> findAll(Long driverId, Pageable page, Date from, Date to);
-	// TODO: ------> JELENA
+	//TODO : -------> VELJA
 
 
 	//TODO: VUGA
@@ -76,18 +79,8 @@ public interface IRideService {
 	boolean checkForPendingRide(Long passengerId);
 
 	RideDTO startRide(Long id);
-	boolean validateRideDTO(CreateFavoriteRideDTO  favouriteRide);
 	// TODO: -----> JELENA
 
 
-
-	// TODO: VELJA
-	void deleteFavouriteRides(Long id);
-
-	FavoriteRideDTO addFavouriteRide(CreateFavoriteRideDTO favouriteRide);
-
-	Set<FavoriteRouteDTO> getFavouriteRides(Long idFromToken);
-
-	// TODO: ---> VELJA
 
 }
