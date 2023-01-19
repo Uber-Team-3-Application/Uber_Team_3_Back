@@ -23,12 +23,12 @@ public class LocationService implements ILocationService {
 
     @Override
     public Location findOne(Long id) {
-        return null;
+        return this.locationRepository.findById(id).get();
     }
 
     @Override
     public Location save(Location location) {
-        return null;
+       return this.locationRepository.save(location);
     }
 
     @Override
