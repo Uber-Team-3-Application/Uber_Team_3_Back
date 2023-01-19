@@ -30,6 +30,7 @@ public interface PassengerRepository extends JpaRepository<Passenger, Long> {
     @Query("update Passenger p set p.isConfirmedMail=:true where p.id=:passengerId")
     void activateAccount(Long passengerId);
 
+    @Query("select p from Passenger p where :ride member of p.rides")
     Set<Passenger> findPassengersByRidesContaining(Ride ride);
 
 

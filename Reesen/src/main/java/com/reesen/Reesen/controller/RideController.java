@@ -97,7 +97,7 @@ public class RideController {
 
     @PutMapping(value = "/{id}/panic")
     @PreAuthorize("hasAnyRole('PASSENGER')")
-    public ResponseEntity<RideDTO> pressedPanic(@PathVariable Long id, @Nullable @RequestBody String reason, @RequestHeader Map<String, String> headers){
+    public ResponseEntity<RideDTO> pressedPanic(@PathVariable Long id, @Nullable @RequestBody ReasonDTO reason, @RequestHeader Map<String, String> headers){
         String role = this.userRequestValidation.getRoleFromToken(headers);
         if(!role.equalsIgnoreCase("passenger"))   return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         if(id < 1)
@@ -107,7 +107,7 @@ public class RideController {
         if(reason == null)
             return new ResponseEntity("Must give a reason!", HttpStatus.BAD_REQUEST);
         Ride ride = this.rideService.findOne(id);
-        RideDTO panicRide  = this.rideService.panicRide(id, reason, this.userRequestValidation.getIdFromToken(headers));
+        RideDTO panicRide  = this.rideService.panicRide(id, reason.getReason(), this.userRequestValidation.getIdFromToken(headers));
         return new ResponseEntity<>(panicRide, HttpStatus.OK);
     }
 

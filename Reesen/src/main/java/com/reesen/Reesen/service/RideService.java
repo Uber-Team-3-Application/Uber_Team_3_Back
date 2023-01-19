@@ -97,14 +97,20 @@ public class RideService implements IRideService {
 		for(RouteDTO routeDTO: locationsDTOs){
 			Route route = new Route();
 			Location departure = new Location(routeDTO.getDeparture().getLatitude(), routeDTO.getDeparture().getLongitude(), routeDTO.getDeparture().getAddress());
-			this.locationService.save(departure);
+			departure = this.locationService.save(departure);
+
 			route.setDeparture(departure);
 			Location destination = new Location(routeDTO.getDestination().getLatitude(), routeDTO.getDestination().getLongitude(), routeDTO.getDestination().getAddress());
-			this.locationService.save(destination);
+			destination = this.locationService.save(destination);
+			route.setDestination(destination);
+
+			route = this.routeRepository.save(route);
+			route.setDeparture(departure);
 			route.setDestination(destination);
 			locations.add(route);
-			this.routeRepository.save(route);
+
 		}
+
 
 		ride.setLocations(locations);
 		ride.setVehicleType(this.vehicleTypeRepository.findByName(VehicleName.valueOf(rideDTO.getVehicleType())));
@@ -113,7 +119,9 @@ public class RideService implements IRideService {
 		Set<UserDTO> passengersDTOs = rideDTO.getPassengers();
 		Set<Passenger> passengers = new HashSet<>();
 		for(UserDTO userDTO: passengersDTOs){
-			passengers.add(this.passengerRepository.findByEmail(userDTO.getEmail()));
+			Passenger pass = this.passengerRepository.findByEmail(userDTO.getEmail());
+			if(pass != null)
+				passengers.add(pass);
 		}
 		passengers.add(this.passengerService.findOne(passengerId).get());
 		ride.setPassengers(passengers);
@@ -151,7 +159,9 @@ public class RideService implements IRideService {
 				ride.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(ride.getLocations()), this.locationService.getLastLocation(ride.getLocations())) * ride.getVehicleType().getPricePerKm());
 			}
 			ride.setScheduledTime(rideDTO.getScheduleTime());
-		return new RideDTO(this.rideRepository.save(ride));
+		Ride newRide = this.rideRepository.save(ride);
+		ride.setId(newRide.getId());
+		return new RideDTO(ride);
 	}
 
 	private Object[] findSuitableDriver(Ride ride) {

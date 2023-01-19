@@ -71,7 +71,6 @@ public class PanicService implements IPanicService {
         setDeductionForPanicRide(ride);
         setLocationsForPanicRide(ride);
         setVehicleTypeForRide(ride);
-
         setReviewsForPanicRide(ride);
     }
 
@@ -106,7 +105,7 @@ public class PanicService implements IPanicService {
     }
 
     private void setPassengersForPanicRide(Ride ride) {
-        Set<Passenger> passengers = this.passengerRepository.findPassengersByRidesContaining(ride);
+        Set<Passenger> passengers = this.rideRepository.findPassengerByRideId(ride.getId());
         ride.setPassengers(passengers);
     }
 
