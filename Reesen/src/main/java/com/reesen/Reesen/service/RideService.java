@@ -85,6 +85,11 @@ public class RideService implements IRideService {
 				routes.add(new Route(departure, destination));
 			}
 			ride.setLocations(routes);
+			Set<Review> reviews = this.reviewService.findReviewsByRide(ride);
+			for(Review review: reviews){
+				review.setRide(ride);
+				review.setPassenger(this.reviewService.findPassengerByReviewId(review.getId()).get());
+			}
 			ride.setReview(this.reviewService.findReviewsByRide(ride));
 			return ride;
 		}
