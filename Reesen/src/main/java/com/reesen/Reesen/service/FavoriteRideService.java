@@ -84,24 +84,39 @@ public class FavoriteRideService implements IFavoriteRideService {
 		for(UserDTO userDTO: passengersDTOs){
 			passengers.add(this.passengerRepository.findByEmail(userDTO.getEmail()));
 		}
+		Passenger favoritePassenger = this.passengerService.findOne(passengerId).get();
+		Set<FavoriteRide> passengerFavoriteRides = this.passengerRepository.getFavoriteRides(passengerId);
+		for(FavoriteRide favoriteRide :passengerFavoriteRides){
+			favoriteRide = this.favoriteRouteRepository.findById(favoriteRide.getId()).get();
+			
+		}
+
 		passengers.add(this.passengerService.findOne(passengerId).get());
 		ride.setPassengers(passengers);
 		ride.setFavoriteName(favouriteRide.getFavoriteName());
-		return new FavoriteRideDTO(this.favoriteRouteRepository.save(ride));
+		FavoriteRide favRide = this.favoriteRouteRepository.save(ride);
+
+		favoritePassenger.setFavouriteRoutes(passengerFavoriteRides);
+
+		ride.setId(favRide.getId());
+		return new FavoriteRideDTO(ride);
 	}
 
 	@Override
 	public Set<FavoriteRideDTO> getFavouriteRides(Long id) {
 		Set<FavoriteRideDTO> favoriteRides = new HashSet<>();
-		for(FavoriteRide ride: favoriteRouteRepository.findAllByPassengerId(id))
+		Set<FavoriteRide> faves = favoriteRouteRepository.findAllByPassengerId(id);
+
+		for(FavoriteRide ride: faves)
 		{
 			ride.setPassengers(this.favoriteRouteRepository.findPassengerByRideId(id));
-			LinkedHashSet<Route> routes = new LinkedHashSet<Route>();
-			for(Route route: this.favoriteRouteRepository.getLocationsByRide(id))
+			LinkedHashSet<Route> routes = this.favoriteRouteRepository.getLocationsByRide(id);
+			for(Route route: routes)
 			{
 				Location departure = this.routeRepository.getDepartureByRoute(route).get();
 				Location destination = this.routeRepository.getDestinationByRoute(route).get();
-				routes.add(new Route(departure, destination));
+				route.setDeparture(departure);
+				route.setDestination(destination);
 			}
 			ride.setLocations(routes);
 			favoriteRides.add(new FavoriteRideDTO(ride));
