@@ -27,7 +27,7 @@ public interface IRideService {
 
 	RideDTO panicRide(Long rideId, String reason, Long id);
 
-	Deduction cancelRide(Ride ride, String reason);
+	RideDTO cancelRide(Long id, String reason);
 
 	RideDTO endRide(Long id);
 
@@ -80,6 +80,7 @@ public interface IRideService {
 	// TODO: -----> JELENA
 
 
+
 	// TODO: VELJA
 	void deleteFavouriteRides(Long id);
 
@@ -88,6 +89,5 @@ public interface IRideService {
 	Set<FavoriteRouteDTO> getFavouriteRides(Long idFromToken);
 
 	// TODO: ---> VELJA
-
 
 }

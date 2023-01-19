@@ -1,5 +1,6 @@
 package com.reesen.Reesen.repository;
 
+import com.reesen.Reesen.model.FavoriteRide;
 import com.reesen.Reesen.model.Passenger;
 import com.reesen.Reesen.model.Route;
 import com.reesen.Reesen.model.Ride;
@@ -22,6 +23,9 @@ public interface PassengerRepository extends JpaRepository<Passenger, Long> {
     @Query("select pas.isConfirmedMail from Passenger pas where pas.email=:username")
     Boolean getEmailConfirmation(String username);
 
+    @Query("select p.favouriteRoutes from Passenger p where p.id=:id")
+    Set<FavoriteRide> getFavoriteRides(Long id);
+
     @Query("select d.password from Passenger d where d.id=:id")
     String getPasswordWithId(Long id);
 
@@ -30,6 +34,7 @@ public interface PassengerRepository extends JpaRepository<Passenger, Long> {
     @Query("update Passenger p set p.isConfirmedMail=:true where p.id=:passengerId")
     void activateAccount(Long passengerId);
 
+    @Query("select p from Passenger p where :ride member of p.rides")
     Set<Passenger> findPassengersByRidesContaining(Ride ride);
 
 

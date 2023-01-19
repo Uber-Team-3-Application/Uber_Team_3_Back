@@ -24,14 +24,15 @@ import java.util.*;
 @Repository
 public interface RideRepository extends JpaRepository<Ride, Long> {
 
+
     // TODO: JELENA
-    @Query("select r.locations from Ride r where r.id = :id")
+    @Query("select r.locations from Ride r where r.id=:id")
     LinkedHashSet<Route> getLocationsByRide(Long id);
 
-    @Query("select r.driver from Ride r where r.id = :id")
+    @Query("select r.driver from Ride r where r.id=:id")
     Driver findDriverByRideId(Long id);
 
-    @Query("select r.passengers from Ride r where r.id = :id")
+    @Query("select r.passengers from Ride r where r.id=:id")
     Set<Passenger> findPassengerByRideId(Long id);
     // TODO ---->: JELENA
 
