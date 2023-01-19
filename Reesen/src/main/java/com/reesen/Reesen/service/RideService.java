@@ -331,6 +331,11 @@ public class RideService implements IRideService {
 
 	}
 
+	@Override
+	public List<Ride> findAll() {
+		return this.rideRepository.findAll();
+	}
+
 	public Page<Ride> findAll(Long driverId, Pageable page, Date from, Date to){
 		if(from == null && to == null)
 			return this.rideRepository.findAllByDriverId(driverId, page);
