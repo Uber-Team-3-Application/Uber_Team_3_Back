@@ -3,23 +3,20 @@ package com.reesen.Reesen.controller;
 import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.Deduction;
-import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.ErrorResponseMessage;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.service.interfaces.IDriverService;
+import com.reesen.Reesen.service.interfaces.IFavoriteRideService;
 import com.reesen.Reesen.service.interfaces.IRideService;
 import com.reesen.Reesen.validation.UserRequestValidation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 @CrossOrigin
@@ -28,21 +25,23 @@ import java.util.Set;
 public class RideController {
 
     private final IRideService rideService;
+    private final IFavoriteRideService favoriteRideService;
     private final IDriverService driverService;
     private final UserRequestValidation userRequestValidation;
 
-    public RideController(IRideService rideService, IDriverService driverService, UserRequestValidation userRequestValidation) {
+    public RideController(IRideService rideService, IFavoriteRideService favoriteRideService, IDriverService driverService, UserRequestValidation userRequestValidation) {
         this.rideService = rideService;
+        this.favoriteRideService = favoriteRideService;
         this.driverService = driverService;
         this.userRequestValidation = userRequestValidation;
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('PASSENGER', 'ADMIN')")
-    public ResponseEntity<RideDTO> createRide(@Valid @RequestBody CreateRideDTO rideDTO, @RequestHeader Map<String, String> headers){
+    @PreAuthorize("hasAnyRole('PASSENGER')")
+    public ResponseEntity<RideDTO> createRide(@Valid @Nullable @RequestBody CreateRideDTO rideDTO, @RequestHeader Map<String, String> headers){
         String role = this.userRequestValidation.getRoleFromToken(headers);
-        if(role.equalsIgnoreCase("admin")) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        if (this.rideService.validateCreateRideDTO(rideDTO)) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(!role.equalsIgnoreCase("passenger")) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        if (rideDTO == null || this.rideService.validateCreateRideDTO(rideDTO)) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if (this.rideService.checkForPendingRide(userRequestValidation.getIdFromToken(headers))) return new ResponseEntity(new ErrorResponseMessage("Cannot create a ride while you have one already pending!"), HttpStatus.BAD_REQUEST);
         RideDTO ride = this.rideService.createRideDTO(rideDTO, userRequestValidation.getIdFromToken(headers));
         return new ResponseEntity<>(ride, HttpStatus.OK);
@@ -86,78 +85,86 @@ public class RideController {
     }
 
     @PutMapping(value = "/{id}/withdraw")
-    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
+    @PreAuthorize("hasAnyRole('PASSENGER')")
     public ResponseEntity<RideDTO> cancelExistingRide(@PathVariable Long id){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        RideDTO withdrawRide = this.rideService.withdrawRide(id);
-        if(withdrawRide == null)
+        if(this.rideService.findOne(id) == null)
             return new ResponseEntity("Ride does not exist!", HttpStatus.NOT_FOUND);
+        RideDTO withdrawRide = this.rideService.withdrawRide(id);
         return new ResponseEntity<>(withdrawRide, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/panic")
     @PreAuthorize("hasAnyRole('PASSENGER')")
-    public ResponseEntity<RideDTO> pressedPanic(@PathVariable Long id, @RequestBody String reason, @RequestHeader Map<String, String> headers){
+    public ResponseEntity<RideDTO> pressedPanic(@PathVariable Long id, @Nullable @RequestBody String reason, @RequestHeader Map<String, String> headers){
         String role = this.userRequestValidation.getRoleFromToken(headers);
         if(!role.equalsIgnoreCase("passenger"))   return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(this.rideService.findOne(id) == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity("Ride does not exist!", HttpStatus.NOT_FOUND);
+        if(reason == null)
+            return new ResponseEntity("Must give a reason!", HttpStatus.BAD_REQUEST);
         Ride ride = this.rideService.findOne(id);
         RideDTO panicRide  = this.rideService.panicRide(id, reason, this.userRequestValidation.getIdFromToken(headers));
         return new ResponseEntity<>(panicRide, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/accept")
-    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
+    @PreAuthorize("hasAnyRole('DRIVER')")
     public ResponseEntity<RideDTO> acceptRide(@PathVariable Long id){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(this.rideService.findOne(id) == null)
             return new ResponseEntity("Ride does not exist!", HttpStatus.NOT_FOUND);
         RideDTO acceptedRide = this.rideService.acceptRide(id);
-        if(acceptedRide == null )
-            return new ResponseEntity("Ride does not exist!", HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(acceptedRide, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/start")
-    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
-    public ResponseEntity<RideDTO> startRide(@PathVariable Long id){
+    @PreAuthorize("hasAnyRole('DRIVER')")
+    public ResponseEntity<RideDTO> startRide(@PathVariable Long id, @RequestHeader Map<String, String> headers){
+        String role = this.userRequestValidation.getRoleFromToken(headers);
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(this.rideService.findOne(id) == null)
             return new ResponseEntity("Ride does not exist!", HttpStatus.NOT_FOUND);
+        if(!role.equalsIgnoreCase("driver"))// ||
+               // !(this.driverService.findDriverByRidesContaining(this.rideService.findOne(id)).getId() == this.userRequestValidation.getIdFromToken(headers)) )
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         RideDTO startedRide = this.rideService.startRide(id);
-        if(startedRide == null )
-            return new ResponseEntity("Ride does not exist!", HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(startedRide, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/end")
-    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
-    public ResponseEntity<RideDTO> endRide(@PathVariable Long id){
+    @PreAuthorize("hasAnyRole('DRIVER')")
+    public ResponseEntity<RideDTO> endRide(@PathVariable Long id, @RequestHeader Map<String, String> headers){
+        String role = this.userRequestValidation.getRoleFromToken(headers);
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(this.rideService.findOne(id) == null)
             return new ResponseEntity("Ride does not exist!", HttpStatus.NOT_FOUND);
+        if(!role.equalsIgnoreCase("driver"))
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         RideDTO endedRide = this.rideService.endRide(id);
         return new ResponseEntity<>(endedRide, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/cancel")
-    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
-    public ResponseEntity<RideDTO> cancelRide(@PathVariable Long id, @RequestBody String reason){
+    @PreAuthorize("hasAnyRole('DRIVER')")
+    public ResponseEntity<RideDTO> cancelRide(@PathVariable Long id, @Nullable @RequestBody String reason, @RequestHeader Map<String, String> headers){
+        String role = this.userRequestValidation.getRoleFromToken(headers);
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(this.rideService.findOne(id) == null)
-            return new ResponseEntity(new ErrorResponseMessage("Ride does not exist!"), HttpStatus.NOT_FOUND);
-        Ride ride = this.rideService.findOne(id);
-        Deduction deduction = this.rideService.cancelRide(ride, reason);
-        ride.setDeduction(deduction);
-        RideDTO canceledRide = new RideDTO(ride);
+            return new ResponseEntity("Ride does not exist!", HttpStatus.NOT_FOUND);
+        if(!role.equalsIgnoreCase("driver"))
+              //  !(this.driverService.findDriverByRidesContaining(this.rideService.findOne(id)).getId() == this.userRequestValidation.getIdFromToken(headers)) )
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        if(reason == null)
+            return new ResponseEntity("Must give a reason!", HttpStatus.BAD_REQUEST);
+        RideDTO canceledRide = this.rideService.cancelRide(id, reason);
         return new ResponseEntity<>(canceledRide, HttpStatus.OK);
     }
 
@@ -177,26 +184,28 @@ public class RideController {
     }
 
     @PostMapping(value = "/favorites", consumes = "application/json")
-    @PreAuthorize("hasAnyRole('USER')")
-    public ResponseEntity<FavoriteRideDTO> addFavouriteRide(@Valid @RequestBody CreateFavoriteRideDTO  favouriteRide){
-        if(this.rideService.validateRideDTO(favouriteRide))  return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        FavoriteRideDTO response = rideService.addFavouriteRide(favouriteRide);
+    @PreAuthorize("hasAnyRole('PASSENGER')")
+    public ResponseEntity<FavoriteRideDTO> addFavouriteRide(@Valid @Nullable @RequestBody CreateFavoriteRideDTO  favouriteRide, @RequestHeader Map<String, String> headers){
+        if(favouriteRide == null || this.favoriteRideService.validateRideDTO(favouriteRide))  return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        FavoriteRideDTO response = this.favoriteRideService.addFavouriteRide(favouriteRide, this.userRequestValidation.getIdFromToken(headers));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @GetMapping(value = "/favorites")
-    @PreAuthorize("hasAnyRole('USER')")
-    public ResponseEntity<Set<FavoriteRouteDTO>> getFavouriteRides(@RequestHeader Map<String, String> headers)
+    @PreAuthorize("hasAnyRole('PASSENGER')")
+    public ResponseEntity<Set<FavoriteRideDTO>> getFavouriteRides(@RequestHeader Map<String, String> headers)
     {
-        Set<FavoriteRouteDTO> response = rideService.getFavouriteRides(userRequestValidation.getIdFromToken(headers));
+        Set<FavoriteRideDTO> response = this.favoriteRideService.getFavouriteRides(userRequestValidation.getIdFromToken(headers));
         return new ResponseEntity<>(response, HttpStatus.OK);
-
-
     }
     @DeleteMapping(value = "/favorites/{id}")
-    @PreAuthorize("hasAnyRole('USER')")
+    @PreAuthorize("hasAnyRole('PASSENGER')")
     public ResponseEntity<String> deleteFavouriteRides(@PathVariable Long id)
     {
-        rideService.deleteFavouriteRides(id);
+        if(id < 1)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(this.favoriteRideService.findOne(id) == null)
+            return new ResponseEntity("Favorite location does not exist!", HttpStatus.NOT_FOUND);
+        this.favoriteRideService.deleteFavouriteRides(id);
         return new ResponseEntity<>("Successful deletion of favorite location!",HttpStatus.NO_CONTENT);
     }
 

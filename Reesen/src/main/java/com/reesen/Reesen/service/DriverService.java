@@ -117,9 +117,11 @@ public class DriverService implements IDriverService {
 
     @Override
     public Driver findDriverByRidesContaining(Ride ride) {
-        return  this.driverRepository.findDriverByRidesContaining(ride).get();
+        if(this.driverRepository.findDriverByRidesContaining(ride).isPresent())
+            return this.driverRepository.findDriverByRidesContaining(ride).get();
+        else
+            return null;
     }
-
     @Override
     public int getTotalEditRequests() {
         return this.driverEditBasicInfoRepository.countTotal() + this.driverEditVehicleInfoRepository.countTotal();
