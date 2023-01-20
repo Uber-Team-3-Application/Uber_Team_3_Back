@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,16 +26,17 @@ import java.util.Set;
 public class VehicleController {
 
     private final IVehicleService vehicleService;
-
+    private final SimpMessagingTemplate simpMessagingTemplate;
     @Autowired
-    public VehicleController(IVehicleService vehicleService
-                             ){
+    public VehicleController(IVehicleService vehicleService,
+                             SimpMessagingTemplate simpMessagingTemplate){
         this.vehicleService = vehicleService;
+        this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
     @PutMapping(value = "/{vehicleId}/location")
     @PreAuthorize("hasRole('DRIVER')")
-    public ResponseEntity<String> updateLocation(@RequestBody @Valid LocationDTO locationDTO, @PathVariable Long vehicleId){
+    public ResponseEntity<LocationVehicleDTO> updateLocation(@RequestBody @Valid LocationDTO locationDTO, @PathVariable Long vehicleId){
 
         if(this.vehicleService.findOne(vehicleId).isEmpty()) {
             return new ResponseEntity(
@@ -43,8 +44,10 @@ public class VehicleController {
         }
         Vehicle vehicle = this.vehicleService.findOne(vehicleId).get();
         vehicle = this.vehicleService.setCurrentLocation(vehicle, locationDTO);
+        LocationVehicleDTO returnVehicleDTO = new LocationVehicleDTO(vehicle);
         this.vehicleService.save(vehicle);
-        return new ResponseEntity<>("Coordinates successfully updated", HttpStatus.NO_CONTENT);
+        this.simpMessagingTemplate.convertAndSend("/map-updates/update-vehicle-position", returnVehicleDTO);
+        return new ResponseEntity<>(returnVehicleDTO, HttpStatus.OK);
     }
 
     @GetMapping(value="/{vehicleId}/location")
