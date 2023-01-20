@@ -106,8 +106,7 @@ public class PassengerController {
     public ResponseEntity<Paginated<PassengerRideDTO>> getPassengerRides(@PathVariable Long id,
                                                                          Pageable page,
                                                                          @RequestParam(value = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate from,
-                                                                         @RequestParam(value = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate to,
-                                                                         @RequestHeader Map<String, String> headers) {
+                                                                         @RequestParam(value = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate to,@RequestHeader Map<String, String> headers) {
 
         String role = this.userRequestValidation.getRoleFromToken(headers);
         if(role.equalsIgnoreCase("passenger")){
