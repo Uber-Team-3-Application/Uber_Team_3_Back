@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
@@ -16,8 +17,8 @@ public class DriveAssessmentDTO {
 
     @NotNull(message = "{required}")
     private Set<RouteDTO> locations;
-    @NotNull(message = "{required}")
-    private VehicleTypeDTO vehicleType;
+    @NotBlank(message = "{required}")
+    private String vehicleType;
     @NotNull(message = "{required}")
     private boolean babyTransport;
     @NotNull(message = "{required}")
