@@ -34,7 +34,7 @@ public class UnregisteredUserController {
     public ResponseEntity<EstimatedTimeDTO> getAssumption(@RequestBody @Valid DriveAssessmentDTO driveAssessment) {
 
 
-        VehicleType vehicleType = vehicleService.findVehicleTypeByName(VehicleName.getVehicleName(driveAssessment.getVehicleType().name()));
+        VehicleType vehicleType = vehicleService.findVehicleTypeByName(VehicleName.getVehicleName(driveAssessment.getVehicleType()));
         EstimatedTimeDTO timeDTO = UserService.getEstimatedTime(driveAssessment, vehicleType);
         return new ResponseEntity<>(timeDTO, HttpStatus.OK);
     }

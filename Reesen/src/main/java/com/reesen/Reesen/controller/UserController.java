@@ -42,6 +42,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Pattern;
 
+@CrossOrigin
 @RestController
 @RequestMapping("api/user")
 public class UserController {
