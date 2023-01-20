@@ -173,6 +173,21 @@ public class RideService implements IRideService {
 		ride.setScheduledTime(rideDTO.getScheduleTime());
 		Ride newRide = this.rideRepository.save(ride);
 		ride.setId(newRide.getId());
+		for (Passenger passenger : ride.getPassengers()) {
+			// must do this because of LAZY
+			Set<Ride> passengersRides = this.passengerRepository.getPassengerRides(passenger.getId());
+			passengersRides.add(newRide);
+			passenger.setRides(passengersRides);
+			this.passengerRepository.save(passenger);
+		}
+		if (ride.getDriver() != null) {
+			// must do this because of LAZY
+			Driver driver = ride.getDriver();
+			Set<Ride> driversRides = this.driverRepository.getDriverRides(driver.getId());
+			driversRides.add(newRide);
+			driver.setRides(driversRides);
+			this.driverRepository.save(driver);
+		}
 		return new RideDTO(ride);
 	}
 
@@ -398,16 +413,18 @@ public class RideService implements IRideService {
 	}
 
 	@Override
-	public UserRidesDTO getFilteredRide(Ride ride, Long driverId) {
+	public PassengerRideDTO getFilteredRide(Ride ride, Long driverId) {
 
-		ride.setPassengers(passengerRepository.findPassengersByRidesContaining(ride));
-		Set<Review> reviews = this.reviewRepository.findAllByRideId(ride.getId());
-		for (Review review : reviews) {
-			review.setPassenger(this.passengerRepository.findbyReviewId(review.getId()));
-		}
+		Set<Passenger> passengers_ = passengerRepository.findPassengersByRidesContaining(ride);
+		ride.setPassengers(passengers_);
 
-		ride.setReview(reviews);
-		ride.setDeduction(deductionRepository.findDeductionByRide(ride).orElse(new Deduction()));
+//		Set<Review> reviews = this.reviewRepository.findAllByRideId(ride.getId());
+//		for (Review review : reviews) {
+//			review.setPassenger(this.passengerRepository.findbyReviewId(review.getId()));
+//		}
+
+//		ride.setReview(reviews);
+		ride.setDeduction(deductionRepository.findDeductionByRide(ride).orElse(null));
 		LinkedHashSet<Route> locations;
 		locations = this.getLocationsByRide(ride.getId());
 		for (Route location : locations) {
@@ -416,19 +433,13 @@ public class RideService implements IRideService {
 		}
 
 		ride.setLocations(locations);
-		UserRidesDTO rideDTO = new UserRidesDTO(ride);
+		PassengerRideDTO rideDTO = new PassengerRideDTO();
 
-
+		rideDTO = rideDTO.newInstance(ride);
 		if (driverId != 0L)
-			rideDTO.setDriver(new UserDTO(
-					this.userRepository.findById(driverId).get()
-
-			));
-
+			rideDTO.setDriver(new UserDTO(this.userRepository.findById(driverId).get()));
 		else
-			rideDTO.setDriver(new UserDTO(
-					this.driverRepository.findDriverByRidesContaining(ride).get()
-			));
+			rideDTO.setDriver(new UserDTO(this.driverRepository.findDriverByRidesContaining(ride).get()));
 
 		return rideDTO;
 	}
@@ -584,16 +595,16 @@ public class RideService implements IRideService {
 	}
 
 	@Override
-	public Set<UserRidesDTO> getFilteredRides(Page<Ride> userRides, Long driverId) {
+	public Set<PassengerRideDTO> getFilteredRides(Page<Ride> userRides, Long driverId) {
 
-		Set<UserRidesDTO> rides = new LinkedHashSet<>();
-
+		Set<PassengerRideDTO> rides = new LinkedHashSet<>();
 		for (Ride ride : userRides) {
 			rides.add(this.getFilteredRide(ride, driverId));
 		}
-
 		return rides;
 	}
+
+
 
 	@Override
 	public boolean validateCreateRideDTO(CreateRideDTO createRideDTO) {
@@ -636,20 +647,5 @@ public class RideService implements IRideService {
 
 	}
 
-	@Override
-	public void deleteFavouriteRides(Long id) {
-		
-	}
-
-
-	@Override
-	public FavoriteRideDTO addFavouriteRide(CreateFavoriteRideDTO favouriteRide) {
-		return null;
-	}
-
-	@Override
-	public Set<FavoriteRouteDTO> getFavouriteRides(Long idFromToken) {
-		return null;
-	}
 
 }
