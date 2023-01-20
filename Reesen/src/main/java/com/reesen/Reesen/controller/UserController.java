@@ -2,7 +2,6 @@ package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.*;
-import com.reesen.Reesen.exceptions.BadRequestException;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.paginated.Paginated;
 import com.reesen.Reesen.security.SecurityUser;
@@ -19,9 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,16 +28,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.regex.Pattern;
 
 @CrossOrigin
 @RestController
@@ -82,7 +74,7 @@ public class UserController {
 
     @GetMapping("/{id}/ride")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Paginated<UserRidesDTO>> getRides(
+    public ResponseEntity<Paginated<PassengerRideDTO>> getRides(
             @PathVariable(value = "id") Long id,
             Pageable page,
             @RequestParam(value = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate from,
@@ -105,17 +97,17 @@ public class UserController {
                 dateTo = Date.from(to.atStartOfDay(ZoneId.systemDefault()).toInstant());
         }
         Page<Ride> userRides = null;
+        Set<PassengerRideDTO> rides;
         if(userIndicator == 0) {
             userRides = this.rideService.findAllForUserWithRole(id, page, dateFrom, dateTo, Role.DRIVER);
+            rides = this.rideService.getFilteredRides(userRides, id);
+        }
+        else {
+            userRides = this.rideService.findAllForUserWithRole(id, page, dateFrom, dateTo, Role.PASSENGER);
+            rides = this.rideService.getFilteredRides(userRides, 0L);
 
         }
-        else
-            userRides = this.rideService.findAllForUserWithRole(id, page, dateFrom, dateTo, Role.PASSENGER);
-
-        Set<UserRidesDTO> rides = new LinkedHashSet<>();
-        rides = this.rideService.getFilteredRides(userRides, id);
-
-        Paginated<UserRidesDTO> ridePaginated = new Paginated<>(userRides.getNumberOfElements(), rides);
+        Paginated<PassengerRideDTO> ridePaginated = new Paginated<>(userRides.getNumberOfElements(), rides);
         return new ResponseEntity<>(ridePaginated, HttpStatus.OK);
 
     }
