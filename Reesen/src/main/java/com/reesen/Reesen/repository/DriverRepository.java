@@ -41,5 +41,6 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
     Set<Review> getAllReviews(Long driverId);
 
 
-
+    @Query("select d.rides from Driver d where d.id=:id")
+    Set<Ride> getDriverRides(Long id);
 }
