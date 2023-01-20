@@ -46,11 +46,30 @@ public class PassengerRideDTO {
 
     }
 
+
+    public PassengerRideDTO newInstance(Ride ride) {
+        this.id = ride.getId();
+        this.startTime = ride.getTimeOfStart();
+        this.endTime = ride.getTimeOfEnd();
+        this.totalCost = ride.getTotalPrice();
+        this.estimatedTimeInMinutes = ride.getEstimatedTime();
+        this.babyTransport = ride.isBabyAccessible();
+        this.petTransport = ride.isPetAccessible();
+        this.vehicleType = ride.getVehicleType().toString();
+        setPassengers(ride);
+        if (ride.getDeduction() != null)
+             this.rejection = new DeductionDTO(ride.getDeduction().getReason(), ride.getDeduction().getDeductionTime());
+        else this.rejection = null;
+        this.locations = setLocations(ride);
+        return this;
+    }
+
     private void setPassengers(Ride ride) {
-        this.passengers = new HashSet<UserDTO>();
+        Set<UserDTO> passengers = new HashSet<>();
         for (Passenger passenger : ride.getPassengers()) {
             passengers.add(new UserDTO(passenger.getId(), passenger.getEmail()));
         }
+        this.passengers = passengers;
     }
     private Set<RouteDTO> setLocations(Ride ride){
 
