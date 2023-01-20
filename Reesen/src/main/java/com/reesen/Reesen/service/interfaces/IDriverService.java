@@ -55,6 +55,9 @@ public interface IDriverService {
 
     Vehicle updateVehicleBasedOnEditRequest(Driver driver, DriverEditVehicle driverEditVehicle);
 
+    Set<Ride> getDriverRides(Long id);
+
+
     Optional<Driver> findDriverWithRide(Ride ride);
     Set<Review> getAllReviews(Long driverId);
 
