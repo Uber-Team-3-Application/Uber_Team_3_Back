@@ -96,6 +96,7 @@ public class VehicleService implements IVehicleService {
         return this.vehicleRepository.getLocation(id);
     }
 
+
     @Override
     public Vehicle setCurrentLocation(Vehicle vehicle, LocationDTO locationDTO) {
         Location location = new Location(locationDTO.getLatitude(), locationDTO.getLongitude(), locationDTO.getAddress());
@@ -124,6 +125,11 @@ public class VehicleService implements IVehicleService {
     public LocationDTO getCurrentLocation(Long vehicleId) {
         Location location = this.vehicleRepository.getLocation(vehicleId);
         return new LocationDTO(location);
+    }
+
+    @Override
+    public Vehicle findVehicleByDriverId(Long id) {
+        return this.vehicleRepository.findVehicleByDriverId(id);
     }
 
     @Override

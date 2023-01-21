@@ -46,9 +46,10 @@ public interface IRideService {
 	Page<Ride> findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to);
 
 	Page<Ride> findAllForUserWithRole(Long userId, Pageable page, Date from, Date to, Role role);
-	Set<UserRidesDTO> getFilteredRides(Page<Ride> userRides, Long driverId);
+	Set<PassengerRideDTO> getFilteredRides(Page<Ride> userRides, Long driverId);
 
-	UserRidesDTO getFilteredRide(Ride ride, Long driverId);
+
+	PassengerRideDTO getFilteredRide(Ride ride, Long driverId);
 
 	ReportSumAverageDTO getReport(ReportRequestDTO reportRequestDTO);
 	//TODO: ----> VUGA

@@ -2,7 +2,9 @@ package com.reesen.Reesen.dto;
 
 
 import com.reesen.Reesen.model.User;
+import lombok.ToString;
 
+@ToString
 public class UserDTO {
 
     private Long id;

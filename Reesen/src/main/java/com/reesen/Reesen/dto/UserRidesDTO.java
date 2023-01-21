@@ -80,7 +80,7 @@ public class UserRidesDTO {
         for(Route route: ride.getLocations()){
             LocationDTO departure = new LocationDTO(route.getDeparture());
             LocationDTO destination = new LocationDTO(route.getDestination());
-            routes.add(new RouteDTO(route.getId(), departure, destination));
+            routes.add(new RouteDTO(departure, destination));
         }
         return routes;
 

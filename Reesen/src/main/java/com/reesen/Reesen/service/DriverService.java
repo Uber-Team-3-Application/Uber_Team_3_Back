@@ -198,6 +198,11 @@ public class DriverService implements IDriverService {
     }
 
     @Override
+    public Set<Ride> getDriverRides(Long id) {
+        return this.driverRepository.getDriverRides(id);
+    }
+
+    @Override
     public Optional<Driver> findDriverWithRide(Ride ride) {
         return this.driverRepository.findDriverByRidesContaining(ride);
     }

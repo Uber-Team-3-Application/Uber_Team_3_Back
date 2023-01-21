@@ -15,8 +15,8 @@ public class RidePanicMockup {
     public RidePanicMockup(){
         id = Long.parseLong("10");
         user = PassengerMockup.getPassenger();
-        RideMockup rideMockup = new RideMockup();
-        ride = rideMockup.getRide();
+//        RideMockup rideMockup = new RideMockup();
+//        ride = rideMockup.getRide();
         time = Date.from(Instant.now());
         reason = "Pije";
     }

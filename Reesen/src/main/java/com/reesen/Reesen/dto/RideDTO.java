@@ -25,7 +25,6 @@ public class RideDTO {
  	private boolean babyTransport;
  	private boolean petTransport;
  	private RideStatus status;
-
 	 private LocalDateTime scheduledTime;
 
     public RideDTO(){

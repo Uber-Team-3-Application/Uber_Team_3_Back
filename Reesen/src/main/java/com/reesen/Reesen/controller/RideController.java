@@ -81,7 +81,8 @@ public class RideController {
         Ride ride = this.rideService.findOne(id);
         if(ride == null)
             return new ResponseEntity("Ride does not exist", HttpStatus.NOT_FOUND);
-        return new ResponseEntity<>(new RideDTO(ride), HttpStatus.OK);
+        RideDTO rto = new RideDTO(ride);
+        return new ResponseEntity<>(rto, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/withdraw")

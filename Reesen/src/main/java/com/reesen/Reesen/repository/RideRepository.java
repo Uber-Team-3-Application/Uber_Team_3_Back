@@ -34,6 +34,8 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
 
     @Query("select r.passengers from Ride r where r.id=:id")
     Set<Passenger> findPassengerByRideId(Long id);
+
+
     // TODO ---->: JELENA
 
     // TODO: JELENA
@@ -207,7 +209,9 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
     @Query("update Ride p set p.status=:rideStatus where p.id=:id")
     void updateRideStatus(Long id, RideStatus rideStatus);
 
+
     // TODO: ---: JELENA
+
 
 
 }
