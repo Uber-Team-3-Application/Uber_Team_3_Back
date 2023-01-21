@@ -209,6 +209,31 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
     @Query("update Ride p set p.status=:rideStatus where p.id=:id")
     void updateRideStatus(Long id, RideStatus rideStatus);
 
+    @Query("select new com.reesen.Reesen.dto.ReportDTO(r.timeOfStart, count(r)) " +
+            "from Ride r inner join Passenger p on p member of r.passengers " +
+            "where p.id=:passengerId and " +
+            "r.timeOfStart BETWEEN :from and :to " +
+            "group by r.timeOfStart " +
+            "order by r.timeOfStart asc")
+    List<ReportDTO<Long>> getRidesPerDayForSpecificPassenger(Date from, Date to, long passengerId);
+
+    @Query("select new " +
+            "com.reesen.Reesen.dto.RideLocationWithTimeDTO(r.id, r.timeOfStart)" +
+            " from Ride r inner join Passenger p on p member of r.passengers " +
+            "where p.id=:passengerId and " +
+            "r.timeOfStart BETWEEN :from and :to " +
+            "order by r.timeOfStart asc")
+    List<RideLocationWithTimeDTO> getRidesWithStartTimeBetweenForSpecificPassenger(Date from, Date to, long passengerId);
+
+
+    @Query("select new com.reesen.Reesen.dto.ReportDTO(r.timeOfStart, sum(r.totalPrice))" +
+            " from Ride r inner join Passenger p on p member of r.passengers " +
+            "where p.id=:passengerId and " +
+            "r.timeOfStart BETWEEN :from and :to " +
+            "group by r.timeOfStart " +
+            "order by r.timeOfStart asc")
+    List<ReportDTO<Double>> getTotalCostPerDayForSpecificPassenger(Date from, Date to, long passengerId);
+
 
     // TODO: ---: JELENA
 

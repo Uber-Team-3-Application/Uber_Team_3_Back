@@ -647,5 +647,37 @@ public class RideService implements IRideService {
 
 	}
 
+	@Override
+	public ReportSumAverageDTO getReportForPassenger(ReportRequestDTO reportRequestDTO) {
+		long diffInMillies = Math.abs(reportRequestDTO.getTo().getTime() - reportRequestDTO.getFrom().getTime());
+		long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+		long passengerId = reportRequestDTO.getDriverId();
+
+		if (reportRequestDTO.getTypeOfReport() == TypeOfReport.RIDES_PER_DAY) {
+			List<ReportDTO<Long>> reportDTOS = this.rideRepository.getRidesPerDayForSpecificPassenger(reportRequestDTO.getFrom(),
+					reportRequestDTO.getTo(), passengerId);
+
+			return this.filterTotalRidesReports(reportDTOS, diff);
+		} else if (reportRequestDTO.getTypeOfReport() == TypeOfReport.KILOMETERS_PER_DAY) {
+
+			List<RideLocationWithTimeDTO> rideLocationWithTimeDTO =
+					this.rideRepository.getRidesWithStartTimeBetweenForSpecificPassenger(reportRequestDTO.getFrom(),
+							reportRequestDTO.getTo(), passengerId);
+
+			List<ReportDTO<Double>> reportDTOS = new ArrayList<>();
+			FilterRideLocations(rideLocationWithTimeDTO, reportDTOS);
+			return this.filterReports(reportDTOS, diff);
+
+		} else if (reportRequestDTO.getTypeOfReport() == TypeOfReport.MONEY_SPENT_PER_DAY) {
+
+			List<ReportDTO<Double>> reportDTOS = this.rideRepository.getTotalCostPerDayForSpecificPassenger(
+					reportRequestDTO.getFrom(), reportRequestDTO.getTo(), passengerId);
+			return this.filterReports(reportDTOS, diff);
+
+		}
+
+		return null;
+	}
+
 
 }

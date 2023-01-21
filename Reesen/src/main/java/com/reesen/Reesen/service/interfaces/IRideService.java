@@ -80,7 +80,9 @@ public interface IRideService {
 	boolean checkForPendingRide(Long passengerId);
 
 	RideDTO startRide(Long id);
-	// TODO: -----> JELENA
+
+    ReportSumAverageDTO getReportForPassenger(ReportRequestDTO reportRequestDTO);
+    // TODO: -----> JELENA
 
 
 }
