@@ -418,12 +418,12 @@ public class RideService implements IRideService {
 		Set<Passenger> passengers_ = passengerRepository.findPassengersByRidesContaining(ride);
 		ride.setPassengers(passengers_);
 
-//		Set<Review> reviews = this.reviewRepository.findAllByRideId(ride.getId());
-//		for (Review review : reviews) {
-//			review.setPassenger(this.passengerRepository.findbyReviewId(review.getId()));
-//		}
+		Set<Review> reviews = this.reviewRepository.findAllByRideId(ride.getId());
+		for (Review review : reviews) {
+			review.setPassenger(this.passengerRepository.findbyReviewId(review.getId()));
+		}
 
-//		ride.setReview(reviews);
+		ride.setReview(reviews);
 		ride.setDeduction(deductionRepository.findDeductionByRide(ride).orElse(null));
 		LinkedHashSet<Route> locations;
 		locations = this.getLocationsByRide(ride.getId());

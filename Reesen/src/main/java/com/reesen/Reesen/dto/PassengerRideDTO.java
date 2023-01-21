@@ -1,6 +1,7 @@
 package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.model.Passenger;
+import com.reesen.Reesen.model.Review;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.Route;
 import lombok.AllArgsConstructor;
@@ -30,6 +31,8 @@ public class PassengerRideDTO {
     private  DeductionDTO rejection;
     private  Set<RouteDTO> locations;
 
+    private Set<RideReviewDTO> reviews;
+
     public PassengerRideDTO(Ride ride) {
         this.id = ride.getId();
         this.startTime = ride.getTimeOfStart();
@@ -43,6 +46,7 @@ public class PassengerRideDTO {
         setPassengers(ride);
         this.rejection = new DeductionDTO(ride.getDeduction().getReason(), ride.getDeduction().getDeductionTime());
         this.locations = setLocations(ride);
+        this.reviews = setRideReviews(ride.getReview());
 
     }
 
@@ -61,8 +65,31 @@ public class PassengerRideDTO {
              this.rejection = new DeductionDTO(ride.getDeduction().getReason(), ride.getDeduction().getDeductionTime());
         else this.rejection = null;
         this.locations = setLocations(ride);
+        this.reviews = setRideReviews(ride.getReview());
         return this;
     }
+
+    private Set<RideReviewDTO> setRideReviews(Set<Review> reviews) {
+        Set<RideReviewDTO> reviewDTOS = new HashSet<>();
+        for(Review review: reviews){
+            UserDTO passenger = new UserDTO(review.getPassenger().getId(), review.getPassenger().getEmail());
+            ReviewWithPassengerDTO driverReview =
+                    new ReviewWithPassengerDTO(review.getId(),
+                            review.getDriverRating(),
+                            review.getDriverComment(),
+                            passenger
+                    );
+            ReviewWithPassengerDTO vehicleReview =
+                    new ReviewWithPassengerDTO(review.getId(),
+                            review.getVehicleRating(),
+                            review.getVehicleComment(),
+                            passenger
+                    );
+            reviewDTOS.add(new RideReviewDTO(vehicleReview, driverReview));
+        }
+        return reviewDTOS;
+    }
+
 
     private void setPassengers(Ride ride) {
         Set<UserDTO> passengers = new HashSet<>();
@@ -83,6 +110,13 @@ public class PassengerRideDTO {
 
     }
 
+    public Set<RideReviewDTO> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(Set<RideReviewDTO> reviews) {
+        this.reviews = reviews;
+    }
 
     public Long getId() {
         return id;
