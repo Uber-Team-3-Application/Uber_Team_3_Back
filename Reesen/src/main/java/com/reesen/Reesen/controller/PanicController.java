@@ -27,7 +27,7 @@ public class PanicController {
         this.panicService = panicService;
     }
 
-    @GetMapping(consumes = "application/json",  produces="application/json")
+    @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Paginated<PanicDTO>> getPanicNotifications(
     ){

@@ -103,7 +103,7 @@ insert into Ride_Review (ride_id, review_id) values (1, 1);
 insert into Ride_Review (ride_id, review_id) values (1, 2);
 
 insert into Panic(time_of_press, reason, ride_id, user_id)
-values(TO_DATE('15/11/2022 09:10', 'dd/MM/yyyy HH:mm'), 'Rider went of course', 1, 3);
+values(TO_DATE('15/11/2022 11:52', 'dd/MM/yyyy HH:mm'), 'Rider went of course', 1, 3);
 
 
 
