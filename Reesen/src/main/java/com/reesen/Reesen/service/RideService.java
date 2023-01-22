@@ -116,7 +116,7 @@ public class RideService implements IRideService {
 
 
 		ride.setLocations(locations);
-		ride.setVehicleType(this.vehicleTypeRepository.findByName(VehicleName.valueOf(rideDTO.getVehicleType())));
+		ride.setVehicleType(this.vehicleTypeRepository.findByName(VehicleName.getVehicleName(rideDTO.getVehicleType())));
 		ride.setBabyAccessible(rideDTO.isBabyTransport());
 		ride.setPetAccessible(rideDTO.isPetTransport());
 		Set<UserDTO> passengersDTOs = rideDTO.getPassengers();
