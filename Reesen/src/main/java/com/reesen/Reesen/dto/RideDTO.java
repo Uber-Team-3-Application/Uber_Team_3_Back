@@ -9,13 +9,7 @@ import java.util.Set;
 import com.reesen.Reesen.Enums.RideStatus;
 import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.model.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
 public class RideDTO {
 
 	private Long id;
@@ -32,6 +26,10 @@ public class RideDTO {
  	private boolean petTransport;
  	private RideStatus status;
 	 private LocalDateTime scheduledTime;
+
+    public RideDTO(){
+
+    }
 
 	public RideDTO(Ride ride) {
 		this.id = ride.getId();
@@ -75,5 +73,115 @@ public class RideDTO {
 			this.vehicleType = VehicleTypeDTO.STANDARD;
 	}
 
+	public DeductionDTO getRejection() {
+		return rejection;
+	}
 
+	public void setRejection(DeductionDTO rejection) {
+		this.rejection = rejection;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public LinkedHashSet<RouteDTO> getLocations() {
+		return locations;
+	}
+
+	public void setLocations(LinkedHashSet<RouteDTO> locations) {
+		this.locations = locations;
+	}
+
+	public Date getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(Date startTime) {
+		this.startTime = startTime;
+	}
+
+	public Date getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(Date endTime) {
+		this.endTime = endTime;
+	}
+
+	public double getTotalCost() {
+		return totalCost;
+	}
+
+	public void setTotalCost(double totalCost) {
+		this.totalCost = totalCost;
+	}
+
+	public UserDTO getDriver() {
+		return driver;
+	}
+
+	public void setDriver(UserDTO driver) {
+		this.driver = driver;
+	}
+
+	public Set<UserDTO> getPassengers() {
+		return passengers;
+	}
+
+	public void setPassengers(Set<UserDTO> passengers) {
+		this.passengers = passengers;
+	}
+
+	public double getEstimatedTimeInMinutes() {
+		return estimatedTimeInMinutes;
+	}
+
+	public void setEstimatedTimeInMinutes(double estimatedTimeInMinutes) {
+		this.estimatedTimeInMinutes = estimatedTimeInMinutes;
+	}
+
+	public VehicleTypeDTO getVehicleType() {
+		return vehicleType;
+	}
+
+	public void setVehicleType(VehicleTypeDTO vehicleType) {
+		this.vehicleType = vehicleType;
+	}
+
+	public boolean isBabyTransport() {
+		return babyTransport;
+	}
+
+	public void setBabyTransport(boolean babyTransport) {
+		this.babyTransport = babyTransport;
+	}
+
+	public boolean isPetTransport() {
+		return petTransport;
+	}
+
+	public void setPetTransport(boolean petTransport) {
+		this.petTransport = petTransport;
+	}
+
+	public RideStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(RideStatus status) {
+		this.status = status;
+	}
+
+	public LocalDateTime getScheduledTime() {
+		return scheduledTime;
+	}
+
+	public void setScheduledTime(LocalDateTime scheduledTime) {
+		this.scheduledTime = scheduledTime;
+	}
 }

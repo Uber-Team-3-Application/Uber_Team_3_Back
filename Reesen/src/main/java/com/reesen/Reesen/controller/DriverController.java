@@ -267,7 +267,7 @@ public class DriverController {
     @PostMapping(value = "/{id}/documents")
     @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN')")
     public ResponseEntity<DocumentDTO> addDocument(
-            @Valid @RequestBody DocumentDTO documentDTO,
+            @Valid @RequestBody DocumentDTOPost documentDTO,
             @PathVariable("id") Long driverId,
             @RequestHeader Map<String, String> headers
 
