@@ -5,6 +5,8 @@ import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.Enums.TypeOfReport;
 import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.dto.*;
+import com.reesen.Reesen.dto.FavoriteRideDTO;
+import com.reesen.Reesen.handlers.RideHandler;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.repository.*;
@@ -14,7 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.reesen.Reesen.service.interfaces.IRideService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.socket.WebSocketSession;
 
 
 import java.text.ParseException;
@@ -42,7 +47,9 @@ public class RideService implements IRideService {
 	private final DeductionRepository deductionRepository;
 	private final ReviewRepository reviewRepository;
 	private final ScheduledExecutorService executor;
-	private PassengerService passengerService;
+	private final PassengerService passengerService;
+	@Autowired
+	private SimpMessagingTemplate simpMessagingTemplate;
 
 	@Autowired
     public RideService(RideRepository rideRepository, RouteRepository routeRepository, FavoriteRouteRepository favoriteRouteRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, UserRepository userRepository, DriverRepository driverRepository, IWorkingHoursService workingHoursService, ILocationService locationService, DeductionRepository deductionRepository, ReviewRepository reviewRepository, PassengerService passengerService){
@@ -146,33 +153,54 @@ public class RideService implements IRideService {
 //			calendar.set(Calendar.SECOND, 0);
 //		} else {}
 
-			Object[] result = this.findSuitableDriver(ride);
-			if (result[0] == null) {
-				ride.setStatus(RideStatus.REJECTED);
-			} else {
-				ride.setDriver((Driver) result[0]);
-				ride.setEstimatedTime((Double) result[1]);
-				ride.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(ride.getLocations()), this.locationService.getLastLocation(ride.getLocations())) * ride.getVehicleType().getPricePerKm());
+		Object[] result = this.findSuitableDriver(ride);
+		if (result[0] == null) {
+			ride.setStatus(RideStatus.REJECTED);
+		} else {
+			ride.setDriver((Driver) result[0]);
+			ride.setEstimatedTime((Double) result[1]);
+			ride.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(ride.getLocations()), this.locationService.getLastLocation(ride.getLocations())) * ride.getVehicleType().getPricePerKm());
+		}
+		ride.setScheduledTime(rideDTO.getScheduleTime());
+Ride newRide = this.rideRepository.save(ride);
+		ride.setId(newRide.getId());
+		for (Passenger passenger : ride.getPassengers()) {
+			// must do this because of LAZY
+			Set<Ride> passengersRides = this.passengerRepository.getPassengerRides(passenger.getId());
+			passengersRides.add(newRide);
+			passenger.setRides(passengersRides);
+			this.passengerRepository.save(passenger);
+		}
+		if (ride.getDriver() != null) {
+			// must do this because of LAZY
+			Driver driver = ride.getDriver();
+			Set<Ride> driversRides = this.driverRepository.getDriverRides(driver.getId());
+			driversRides.add(newRide);
+			driver.setRides(driversRides);
+			this.driverRepository.save(driver);
+			WebSocketSession session = RideHandler.driverSessions.get(ride.getDriver().getId().toString());
+			if(session != null) {
+				RideHandler.notifyChosenDriver(session, new RideDTO(ride));
 			}
-			ride.setScheduledTime(rideDTO.getScheduleTime());
-			Ride newRide = this.rideRepository.save(ride);
-			Optional<Driver> driver = this.driverRepository.findDriverByRidesContaining(newRide);
-			if(driver.isPresent())
-				newRide.setDriver(driver.get());
-			else
-				newRide.setDriver(this.driverRepository.findByEmail("mirko@gmail.com"));
-			Set<Passenger> ridePassengers = this.passengerRepository.findPassengersByRidesContaining(ride);
-			newRide.setPassengers(ridePassengers);
-			Long vehicleTypeId = this.rideRepository.getVehicleTypeId(ride.getId());
-			VehicleType type = this.vehicleTypeRepository.findById(vehicleTypeId).get();
-			newRide.setVehicleType(type);
-			LinkedHashSet<Route> newLocations = this.rideRepository.getLocationsByRide(ride.getId());
-			for(Route route: newLocations){
-				route.setDeparture(this.routeRepository.getDepartureByRoute(route).get());
-				route.setDestination(this.routeRepository.getDestinationByRoute(route).get());
+			else {
+				this.notifySuitableDrviver(new RideDTO(ride));
 			}
-			newRide.setLocations(newLocations);
-		return new RideDTO(newRide);
+		} else {
+			for(Passenger passenger: ride.getPassengers())
+				this.notifyAboutNoSuitableDriver(passenger.getId());
+		}
+
+		return new RideDTO(ride);
+	}
+
+	@CrossOrigin(origins = "http://localhost:4200")
+	private void notifyAboutNoSuitableDriver(Long id) {
+		simpMessagingTemplate.convertAndSend("/topic/passenger/ride/" + id, "No suitable driver found!");
+	}
+
+	@CrossOrigin(origins = "http://localhost:4200")
+	public void notifySuitableDrviver(RideDTO ride) {
+		simpMessagingTemplate.convertAndSend("/topic/driver/ride/" + ride.getDriver().getId(), ride);
 	}
 
 	private Object[] findSuitableDriver(Ride ride) {
