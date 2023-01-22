@@ -1,7 +1,5 @@
 package com.reesen.Reesen.dto;
 
-import com.reesen.Reesen.model.FavoriteRoute;
-
 import java.util.Set;
 
 public class FavoriteRouteDTO {

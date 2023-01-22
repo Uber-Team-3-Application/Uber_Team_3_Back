@@ -15,6 +15,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.List;
 
 
 @Configuration
@@ -30,20 +33,28 @@ public class WebSecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.setAllowedHeaders(List.of("X-Auth-Token", "skip", "refreshToken", "Cache-Control", "Content-Type"));
+        corsConfiguration.setAllowedOrigins(List.of("http://localhost:4200","http://localhost:8082"));
+        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PUT","OPTIONS","PATCH", "DELETE"));
+        corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.setExposedHeaders(List.of("X-Auth-Token"));
         http.headers().frameOptions().disable();
                  http.csrf().disable()
                 .authorizeRequests()
                          .antMatchers("/api/user/login").permitAll()
                          .antMatchers(HttpMethod.GET, "/api/user/{id}/resetPassword").permitAll()
                          .antMatchers(HttpMethod.PUT, "/api/user/{id}/resetPassword").permitAll()
-                         .antMatchers("/api/unregisteredUser/**").permitAll()
+                         .antMatchers("/api/vehicle/vehicle-locations").permitAll()
+                         .antMatchers("/api/vehicle/types").permitAll()
+                         .antMatchers("/api/unregisteredUser/").permitAll()
                          .antMatchers("/api/**").authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                                  .and()
                                          .exceptionHandling().authenticationEntryPoint(entryPoint);
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-
+        http.cors().configurationSource(request -> corsConfiguration);
         return http.build();
     }
 

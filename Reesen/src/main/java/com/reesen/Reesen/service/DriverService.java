@@ -119,12 +119,11 @@ public class DriverService implements IDriverService {
 
     @Override
     public Driver findDriverByRidesContaining(Ride ride) {
+
         Optional<Driver> driver =  this.driverRepository.findDriverByRidesContaining(ride);
         if(driver.isPresent()) return driver.get();
         return null;
-
     }
-
     @Override
     public int getTotalEditRequests() {
         return this.driverEditBasicInfoRepository.countTotal() + this.driverEditVehicleInfoRepository.countTotal();
@@ -196,6 +195,11 @@ public class DriverService implements IDriverService {
         vehicle.setBabyAccessible(driverEditVehicle.isVIsBabyAccessible());
         vehicle.setPetAccessible(driverEditVehicle.isVIsPetAccessible());
         return vehicle;
+    }
+
+    @Override
+    public Set<Ride> getDriverRides(Long id) {
+        return this.driverRepository.getDriverRides(id);
     }
 
     @Override
