@@ -4,10 +4,7 @@ import com.reesen.Reesen.model.Passenger;
 import com.reesen.Reesen.model.Review;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.Route;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -17,6 +14,8 @@ import java.util.Set;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
+@Getter
+@Setter
 public class PassengerRideDTO {
     private  Long id;
     private Date startTime;
@@ -110,108 +109,5 @@ public class PassengerRideDTO {
 
     }
 
-    public Set<RideReviewDTO> getReviews() {
-        return reviews;
-    }
-
-    public void setReviews(Set<RideReviewDTO> reviews) {
-        this.reviews = reviews;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    public Date getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
-
-    public double getTotalCost() {
-        return totalCost;
-    }
-
-    public void setTotalCost(double totalCost) {
-        this.totalCost = totalCost;
-    }
-
-    public UserDTO getDriver() {
-        return driver;
-    }
-
-    public void setDriver(UserDTO driver) {
-        this.driver = driver;
-    }
-
-    public Set<UserDTO> getPassengers() {
-        return passengers;
-    }
-
-    public void setPassengers(Set<UserDTO> passengers) {
-        this.passengers = passengers;
-    }
-
-    public double getEstimatedTimeInMinutes() {
-        return estimatedTimeInMinutes;
-    }
-
-    public void setEstimatedTimeInMinutes(double estimatedTimeInMinutes) {
-        this.estimatedTimeInMinutes = estimatedTimeInMinutes;
-    }
-
-    public String getVehicleType() {
-        return vehicleType;
-    }
-
-    public void setVehicleType(String vehicleType) {
-        this.vehicleType = vehicleType;
-    }
-
-    public boolean isBabyTransport() {
-        return babyTransport;
-    }
-
-    public void setBabyTransport(boolean babyTransport) {
-        this.babyTransport = babyTransport;
-    }
-
-    public boolean isPetTransport() {
-        return petTransport;
-    }
-
-    public void setPetTransport(boolean petTransport) {
-        this.petTransport = petTransport;
-    }
-
-    public DeductionDTO getRejection() {
-        return rejection;
-    }
-
-    public void setRejection(DeductionDTO rejection) {
-        this.rejection = rejection;
-    }
-
-    public Set<RouteDTO> getLocations() {
-        return locations;
-    }
-
-    public void setLocations(Set<RouteDTO> locations) {
-        this.locations = locations;
-    }
 
 }

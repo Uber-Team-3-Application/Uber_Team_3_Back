@@ -1,15 +1,20 @@
 package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.model.Location;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CurrentLocationDTO {
 
     private String address;
     private double latitude;
     private double longitude;
-
-    public CurrentLocationDTO() {
-    }
 
     public CurrentLocationDTO(Location location) {
         this.address = location.getAddress();
@@ -17,27 +22,4 @@ public class CurrentLocationDTO {
         this.longitude = location.getLongitude();
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
 }

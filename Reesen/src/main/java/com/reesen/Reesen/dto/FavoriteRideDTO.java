@@ -2,11 +2,17 @@ package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.model.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+@NoArgsConstructor
+@Getter
+@Setter
 public class FavoriteRideDTO {
 
     private Long id;
@@ -16,9 +22,6 @@ public class FavoriteRideDTO {
     private boolean petTransport;
     private VehicleTypeDTO vehicleType;
     private Set<RouteDTO> locations;
-
-    public FavoriteRideDTO() {
-    }
 
     public FavoriteRideDTO(Long id, String favoriteName, Set<UserDTO> passengers, boolean babyTransport, boolean petTransport, VehicleTypeDTO vehicleType, Set<RouteDTO> locations) {
         this.id = id;
@@ -40,49 +43,6 @@ public class FavoriteRideDTO {
         setLocations(ride);
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFavoriteName() {
-        return favoriteName;
-    }
-
-    public void setFavoriteName(String favoriteName) {
-        this.favoriteName = favoriteName;
-    }
-
-    public Set<UserDTO> getPassengers() {
-        return passengers;
-    }
-
-    public boolean isBabyTransport() {
-        return babyTransport;
-    }
-
-    public void setBabyTransport(boolean babyTransport) {
-        this.babyTransport = babyTransport;
-    }
-
-    public boolean isPetTransport() {
-        return petTransport;
-    }
-
-    public void setPetTransport(boolean petTransport) {
-        this.petTransport = petTransport;
-    }
-
-    public VehicleTypeDTO getVehicleType() {
-        return vehicleType;
-    }
-
-    public Set<RouteDTO> getLocations() {
-        return locations;
-    }
 
     private void setLocations(FavoriteRide ride) {
         locations = new LinkedHashSet<>();
