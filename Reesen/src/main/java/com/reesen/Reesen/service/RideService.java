@@ -6,6 +6,7 @@ import com.reesen.Reesen.Enums.TypeOfReport;
 import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.dto.FavoriteRideDTO;
+import com.reesen.Reesen.handlers.RideHandler;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.repository.*;
@@ -15,7 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.reesen.Reesen.service.interfaces.IRideService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.socket.WebSocketSession;
 
 
 import java.text.ParseException;
@@ -44,6 +48,8 @@ public class RideService implements IRideService {
 	private final ReviewRepository reviewRepository;
 	private final ScheduledExecutorService executor;
 	private final PassengerService passengerService;
+	@Autowired
+	private SimpMessagingTemplate simpMessagingTemplate;
 
 	@Autowired
 	public RideService(RideRepository rideRepository, RouteRepository routeRepository, FavoriteRouteRepository favoriteRouteRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, UserRepository userRepository, DriverRepository driverRepository, IWorkingHoursService workingHoursService, ILocationService locationService, DeductionRepository deductionRepository, ReviewRepository reviewRepository, PassengerService passengerService) {
@@ -162,15 +168,6 @@ public class RideService implements IRideService {
 			ride.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(ride.getLocations()), this.locationService.getLastLocation(ride.getLocations())) * ride.getVehicleType().getPricePerKm());
 		}
 		ride.setScheduledTime(rideDTO.getScheduleTime());
-		result = this.findSuitableDriver(ride);
-		if (result[0] == null) {
-			ride.setStatus(RideStatus.REJECTED);
-		} else {
-			ride.setDriver((Driver) result[0]);
-			ride.setEstimatedTime((Double) result[1]);
-			ride.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(ride.getLocations()), this.locationService.getLastLocation(ride.getLocations())) * ride.getVehicleType().getPricePerKm());
-		}
-		ride.setScheduledTime(rideDTO.getScheduleTime());
 		Ride newRide = this.rideRepository.save(ride);
 		ride.setId(newRide.getId());
 		for (Passenger passenger : ride.getPassengers()) {
@@ -181,14 +178,35 @@ public class RideService implements IRideService {
 			this.passengerRepository.save(passenger);
 		}
 		if (ride.getDriver() != null) {
-			// must do this because of LAZY
 			Driver driver = ride.getDriver();
 			Set<Ride> driversRides = this.driverRepository.getDriverRides(driver.getId());
 			driversRides.add(newRide);
 			driver.setRides(driversRides);
 			this.driverRepository.save(driver);
+			WebSocketSession session = RideHandler.driverSessions.get(ride.getDriver().getId().toString());
+			if(session != null) {
+
+				RideHandler.notifyChosenDriver(session, new RideDTO(ride));
+			}
+			else {
+				this.notifySuitableDrviver(new RideDTO(ride));
+			}
+		} else {
+			for(Passenger passenger: ride.getPassengers())
+				this.notifyAboutNoSuitableDriver(passenger.getId());
 		}
+
 		return new RideDTO(ride);
+	}
+
+	@CrossOrigin(origins = "http://localhost:4200")
+	private void notifyAboutNoSuitableDriver(Long id) {
+		simpMessagingTemplate.convertAndSend("/topic/passenger/ride/" + id, "No suitable driver found!");
+	}
+
+	@CrossOrigin(origins = "http://localhost:4200")
+	public void notifySuitableDrviver(RideDTO ride) {
+		simpMessagingTemplate.convertAndSend("/topic/driver/ride/" + ride.getDriver().getId(), ride);
 	}
 
 	private Object[] findSuitableDriver(Ride ride) {
@@ -348,6 +366,18 @@ public class RideService implements IRideService {
 		Ride ride = this.findOne(id);
 		ride.setStatus(RideStatus.ACCEPTED);
 		rideRepository.save(ride);
+		List<WebSocketSession> sessions = new ArrayList<>();
+		for(Passenger passenger: ride.getPassengers()){
+			WebSocketSession webSocketSession = RideHandler.passengerSessions.get(passenger.getId().toString());
+			if(webSocketSession != null){
+				sessions.add(webSocketSession);
+			}
+			simpMessagingTemplate.convertAndSend("/topic/passenger/ride/"+passenger.getId(), new RideDTO(ride));
+		}
+		if(!sessions.isEmpty()) {
+			RideHandler.notifyPassengerAboutAcceptedRide(sessions, new RideDTO(ride));
+		}
+
 		return new RideDTO(ride);
 
 
