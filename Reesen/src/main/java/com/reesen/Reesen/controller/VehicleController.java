@@ -31,7 +31,6 @@ public class VehicleController {
     }
 
     @PutMapping(value = "/{vehicleId}/location")
-    @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<VehicleLocationSimulationDTO> updateLocation(@RequestBody @Valid LocationDTO locationDTO, @PathVariable Long vehicleId){
 
         if(this.vehicleService.findOne(vehicleId).isEmpty()) {
@@ -48,7 +47,7 @@ public class VehicleController {
     }
 
     @GetMapping(value="/{vehicleId}/location")
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<LocationDTO> getVehicleLocation(@PathVariable("vehicleId") Long vehicleId){
 
         Optional<Vehicle> vehicle = this.vehicleService.findOne(vehicleId);

@@ -48,6 +48,7 @@ public class WebSecurityConfiguration {
                          .antMatchers("/api/vehicle/vehicle-locations").permitAll()
                          .antMatchers("/api/vehicle/types").permitAll()
                          .antMatchers("/api/unregisteredUser/").permitAll()
+                         .antMatchers("api/vehicle/{vehicleId}/location").permitAll()
                          .antMatchers("/api/**").authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
