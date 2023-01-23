@@ -366,6 +366,18 @@ public class RideService implements IRideService {
 		Ride ride = this.findOne(id);
 		ride.setStatus(RideStatus.ACCEPTED);
 		rideRepository.save(ride);
+		List<WebSocketSession> sessions = new ArrayList<>();
+		for(Passenger passenger: ride.getPassengers()){
+			WebSocketSession webSocketSession = RideHandler.passengerSessions.get(passenger.getId().toString());
+			if(webSocketSession != null){
+				sessions.add(webSocketSession);
+			}
+			simpMessagingTemplate.convertAndSend("/topic/passenger/ride/"+passenger.getId(), new RideDTO(ride));
+		}
+		if(!sessions.isEmpty()) {
+			RideHandler.notifyPassengerAboutAcceptedRide(sessions, new RideDTO(ride));
+		}
+
 		return new RideDTO(ride);
 
 

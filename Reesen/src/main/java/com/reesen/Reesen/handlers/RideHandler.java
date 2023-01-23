@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.socket.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class RideHandler implements WebSocketHandler {
@@ -45,6 +46,19 @@ public class RideHandler implements WebSocketHandler {
         try {
             TextMessage textMessage = new TextMessage(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rideDTO));
             session.sendMessage(textMessage);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void notifyPassengerAboutAcceptedRide(List<WebSocketSession> sessions, RideDTO rideDTO) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JSR310Module());
+        try {
+            TextMessage textMessage = new TextMessage(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rideDTO));
+            for(WebSocketSession webSocketSession:sessions){
+                webSocketSession.sendMessage(textMessage);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
