@@ -26,7 +26,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new RideHandler(), "/websocket");
+        registry.addHandler(new RideHandler(), "/socket");
         //registry.addHandler(new VehicleSimulation(), "/simulation");
     }
 }

@@ -178,7 +178,6 @@ public class RideService implements IRideService {
 			this.passengerRepository.save(passenger);
 		}
 		if (ride.getDriver() != null) {
-			// must do this because of LAZY
 			Driver driver = ride.getDriver();
 			Set<Ride> driversRides = this.driverRepository.getDriverRides(driver.getId());
 			driversRides.add(newRide);
@@ -186,6 +185,7 @@ public class RideService implements IRideService {
 			this.driverRepository.save(driver);
 			WebSocketSession session = RideHandler.driverSessions.get(ride.getDriver().getId().toString());
 			if(session != null) {
+
 				RideHandler.notifyChosenDriver(session, new RideDTO(ride));
 			}
 			else {

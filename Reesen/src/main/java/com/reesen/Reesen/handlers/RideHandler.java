@@ -18,7 +18,8 @@ public class RideHandler implements WebSocketHandler {
         HttpHeaders headers = session.getHandshakeHeaders();
         String id = headers.get("id").get(0);
         String role = headers.get("role").get(0);
-
+        System.out.println("ALO");
+        System.out.println(role);
         if (role.equals("DRIVER")) {
             driverSessions.put(id, session);
         } else if (role.equals("PASSENGER")) {
