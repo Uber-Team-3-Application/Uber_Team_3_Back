@@ -194,6 +194,7 @@ public class RideService implements IRideService {
 		} else {
 			for(Passenger passenger: ride.getPassengers())
 				this.notifyAboutNoSuitableDriver(passenger.getId());
+			return null;
 		}
 
 		return new RideDTO(ride);
@@ -314,7 +315,7 @@ public class RideService implements IRideService {
 		if (driver.isPresent())
 			newRide.setDriver(driver.get());
 		else
-			newRide.setDriver(this.driverRepository.findByEmail("mirko@gmail.com"));
+			newRide.setDriver(null);
 		Set<Passenger> ridePassengers = this.passengerRepository.findPassengersByRidesContaining(ride);
 		newRide.setPassengers(ridePassengers);
 		Long vehicleTypeId = this.rideRepository.getVehicleTypeId(ride.getId());
@@ -337,10 +338,22 @@ public class RideService implements IRideService {
 			return null;
 		}
 		Ride ride = this.findOne(id);
+		ride.setStatus(RideStatus.REJECTED);
 		rideRepository.updateRideStatus(ride.getId(), RideStatus.REJECTED);
 		Deduction deduction = deductionRepository.save(new Deduction(ride, ride.getDriver(), reason, LocalDateTime.now()));
 		ride.setDeduction(deduction);
 		rideRepository.save(ride);
+		List<WebSocketSession> sessions = new ArrayList<>();
+		for(Passenger passenger: ride.getPassengers()){
+			WebSocketSession webSocketSession = RideHandler.passengerSessions.get(passenger.getId().toString());
+			if(webSocketSession != null){
+				sessions.add(webSocketSession);
+			}
+			simpMessagingTemplate.convertAndSend("/topic/passenger/ride/"+passenger.getId(), new RideDTO(ride));
+		}
+		if(!sessions.isEmpty()) {
+			RideHandler.notifyPassengerAboutDeclinedRide(sessions, new RideDTO(ride));
+		}
 		return new RideDTO(ride);
 	}
 

@@ -63,6 +63,18 @@ public class RideHandler implements WebSocketHandler {
             throw new RuntimeException(e);
         }
     }
+    public static void notifyPassengerAboutDeclinedRide(List<WebSocketSession> sessions, RideDTO rideDTO) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JSR310Module());
+        try {
+            TextMessage textMessage = new TextMessage(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rideDTO));
+            for(WebSocketSession webSocketSession:sessions){
+                webSocketSession.sendMessage(textMessage);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {

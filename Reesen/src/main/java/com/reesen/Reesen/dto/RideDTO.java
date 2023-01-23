@@ -40,7 +40,9 @@ public class RideDTO {
 		this.babyTransport = ride.isBabyAccessible();
 		this.petTransport = ride.isPetAccessible();
 		this.status = ride.getStatus();
-		this.driver = new UserDTO(ride.getDriver().getId(), ride.getDriver().getEmail());
+		if(ride.getDriver() != null) {
+			this.driver = new UserDTO(ride.getDriver().getId(), ride.getDriver().getEmail());
+		}
 		setPassengers(ride);
 		setVehicleType(ride);
 		setLocations(ride);
