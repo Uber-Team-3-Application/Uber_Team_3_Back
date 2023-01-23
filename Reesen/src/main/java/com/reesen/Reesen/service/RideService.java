@@ -349,10 +349,12 @@ public class RideService implements IRideService {
 			if(webSocketSession != null){
 				sessions.add(webSocketSession);
 			}
-			simpMessagingTemplate.convertAndSend("/topic/passenger/ride/"+passenger.getId(), new RideDTO(ride));
 		}
 		if(!sessions.isEmpty()) {
 			RideHandler.notifyPassengerAboutDeclinedRide(sessions, new RideDTO(ride));
+		}
+		for(Passenger p: ride.getPassengers()){
+			simpMessagingTemplate.convertAndSend("/topic/passenger/ride/"+p.getId(), new RideDTO(ride));
 		}
 		return new RideDTO(ride);
 	}
