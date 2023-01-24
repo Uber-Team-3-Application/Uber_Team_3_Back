@@ -1,7 +1,6 @@
 package com.reesen.Reesen.config;
 
 import com.reesen.Reesen.handlers.RideHandler;
-import com.reesen.Reesen.handlers.VehicleSimulation;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.*;
@@ -15,7 +14,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
         registry.enableSimpleBroker("/topic/driver/ride",
                 "/topic/passenger/ride",
                 "/topic/admin/panic",
-                "/map-updates");
+                "/topic/map-updates");
     }
 
     @Override

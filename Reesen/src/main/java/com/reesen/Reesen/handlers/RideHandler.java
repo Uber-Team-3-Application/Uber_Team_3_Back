@@ -3,6 +3,7 @@ package com.reesen.Reesen.handlers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.reesen.Reesen.dto.RideDTO;
+import com.reesen.Reesen.model.Location;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.socket.*;
 
@@ -91,7 +92,19 @@ public class RideHandler implements WebSocketHandler {
         }
     }
 
+    public static void notifyUsersAboutVehicleLocations(List<WebSocketSession> sessions, Location location){
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JSR310Module());
+        try {
+            TextMessage textMessage = new TextMessage(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(location));
+            for(WebSocketSession webSocketSession:sessions){
+                webSocketSession.sendMessage(textMessage);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
+    }
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         addSession(session);
