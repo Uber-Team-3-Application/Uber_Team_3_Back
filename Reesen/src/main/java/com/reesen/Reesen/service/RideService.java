@@ -28,6 +28,7 @@ import java.util.*;
 import java.time.LocalDateTime;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -48,6 +49,8 @@ public class RideService implements IRideService {
 	private final PassengerService passengerService;
 	@Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
+	private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
+	private ScheduledFuture scheduledFuture;
 
 	@Autowired
 	public RideService(RideRepository rideRepository, RouteRepository routeRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, UserRepository userRepository, DriverRepository driverRepository, IWorkingHoursService workingHoursService, ILocationService locationService, DeductionRepository deductionRepository, ReviewRepository reviewRepository, PassengerService passengerService) {
@@ -405,19 +408,40 @@ public class RideService implements IRideService {
 		Ride ride = this.findOne(id);
 		ride.setStatus(RideStatus.ACCEPTED);
 		rideRepository.save(ride);
-		List<WebSocketSession> sessions = new ArrayList<>();
-		for(Passenger passenger: ride.getPassengers()){
-			WebSocketSession webSocketSession = RideHandler.passengerSessions.get(passenger.getId().toString());
-			if(webSocketSession != null){
-				sessions.add(webSocketSession);
+		if(ride.getScheduledTime() == null) {
+			List<WebSocketSession> sessions = new ArrayList<>();
+			for (Passenger passenger : ride.getPassengers()) {
+				WebSocketSession webSocketSession = RideHandler.passengerSessions.get(passenger.getId().toString());
+				if (webSocketSession != null) {
+					sessions.add(webSocketSession);
+				}
 			}
+			if (!sessions.isEmpty()) {
+				RideHandler.notifyPassengerAboutAcceptedRide(sessions, new RideDTO(ride));
+			}
+			for (Passenger p : ride.getPassengers()) {
+				simpMessagingTemplate.convertAndSend("/topic/passenger/ride/" + p.getId(), new RideDTO(ride));
+			}
+		} else {
+			scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {
+				List<WebSocketSession> sessions = new ArrayList<>();
+				for (Passenger passenger : ride.getPassengers()) {
+					WebSocketSession webSocketSession = RideHandler.passengerSessions.get(passenger.getId().toString());
+					if (webSocketSession != null) {
+						sessions.add(webSocketSession);
+					}
+				}
+				if (!sessions.isEmpty()) {
+					RideHandler.notifyPassengerAboutAcceptedRide(sessions, new RideDTO(ride));
+				}
+				for (Passenger p : ride.getPassengers()) {
+					simpMessagingTemplate.convertAndSend("/topic/passenger/ride/" + p.getId(), "You have a scheduled ride!");
+				}
+				if(ride.getScheduledTime().before(new Date()))
+					scheduledFuture.cancel(false);
+			}, 0, 5, TimeUnit.MINUTES);
 		}
-		if(!sessions.isEmpty()) {
-			RideHandler.notifyPassengerAboutAcceptedRide(sessions, new RideDTO(ride));
-		}
-		for(Passenger p: ride.getPassengers()){
-			simpMessagingTemplate.convertAndSend("/topic/passenger/ride/"+p.getId(), new RideDTO(ride));
-		}
+
 
 		return new RideDTO(ride);
 
