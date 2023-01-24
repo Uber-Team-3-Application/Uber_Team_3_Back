@@ -13,6 +13,8 @@ import com.reesen.Reesen.repository.VehicleTypeRepository;
 import com.reesen.Reesen.service.interfaces.IRideService;
 import com.reesen.Reesen.service.interfaces.IVehicleService;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -166,7 +168,7 @@ public class VehicleService implements IVehicleService {
     @Override
     public List<LocationDTO> getRouteFromOpenRoute(String start, String end) {
         String base = "https://api.openrouteservice.org/v2/directions/driving-car";
-        String key = "5b3ce3597851110001cf624865f18297bb26459a9f779c015d573b96";
+        String key = "5b3ce3597851110001cf6248e686109bcf5e46dfa129805f14ec1f16";
         String url = base + "?api_key=" + key + "&start="+start+"&end="+end;
 
         RestTemplate restTemplate = new RestTemplate();
@@ -181,11 +183,11 @@ public class VehicleService implements IVehicleService {
                 url, HttpMethod.GET, request, String.class);
 
         String responseString = response.getBody();
-//        JSONObject json = new JSONObject(responseString);
-//        JSONArray features = json.getJSONArray("features");
-//        JSONObject firstFeature = features.getJSONObject(0);
-//        JSONObject geometry = firstFeature.getJSONObject("geometry");
-//        JSONArray coordinates = geometry.getJSONArray("coordinates");
+        JSONObject json = new JSONObject(responseString);
+        JSONArray features = json.getJSONArray("features");
+        JSONObject firstFeature = features.getJSONObject(0);
+        JSONObject geometry = firstFeature.getJSONObject("geometry");
+        JSONArray coordinates = geometry.getJSONArray("coordinates");
         List<LocationDTO> route = new ArrayList<>();
 //        for (int i = 0; i < coordinates.length(); i++) {
 //            JSONArray coord = coordinates.getJSONArray(i);
