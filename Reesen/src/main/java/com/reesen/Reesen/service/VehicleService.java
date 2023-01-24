@@ -186,7 +186,7 @@ public class VehicleService implements IVehicleService {
 
                 }else timer.cancel();
             }
-        }, 1000, 500);
+        }, 1000, 4000);
     }
 
     private void saveLocationForCurrentRide(Location location, List<LocationDTO> route, int totalPoints, Vehicle vehicle) {
