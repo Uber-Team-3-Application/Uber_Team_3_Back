@@ -3,6 +3,7 @@ package com.reesen.Reesen.service;
 import com.reesen.Reesen.Enums.RideStatus;
 import com.reesen.Reesen.dto.LocationDTO;
 import com.reesen.Reesen.Enums.VehicleName;
+import com.reesen.Reesen.dto.RideDTO;
 import com.reesen.Reesen.dto.VehicleDTO;
 import com.reesen.Reesen.dto.VehicleLocationWithAvailabilityDTO;
 import com.reesen.Reesen.handlers.RideHandler;
@@ -22,6 +23,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.WebSocketSession;
@@ -35,13 +37,15 @@ public class VehicleService implements IVehicleService {
     private final VehicleTypeRepository vehicleTypeRepository;
     private final LocationRepository locationRepository;
     private final IRideService rideService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
-    public VehicleService(VehicleRepository vehicleRepository, VehicleTypeRepository vehicleTypeRepository, LocationRepository locationRepository, IRideService rideService){
+    public VehicleService(VehicleRepository vehicleRepository, VehicleTypeRepository vehicleTypeRepository, LocationRepository locationRepository, IRideService rideService, SimpMessagingTemplate simpMessagingTemplate){
         this.vehicleRepository = vehicleRepository;
         this.vehicleTypeRepository = vehicleTypeRepository;
         this.locationRepository = locationRepository;
         this.rideService = rideService;
+        this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
     @Override
@@ -155,7 +159,7 @@ public class VehicleService implements IVehicleService {
                 end = route.getDeparture().getLongitude() + "," + route.getDeparture().getLatitude();
                 break;
             }
-        }else if(ride.getStatus() == RideStatus.ACTIVE){
+        }else if(ride.getStatus() == RideStatus.ACTIVE || ride.getStatus() == RideStatus.STARTED){
             for(Route route : ride.getLocations()){
                 start = route.getDeparture().getLongitude() + "," + route.getDeparture().getLatitude();
                 end = route.getDestination().getLongitude() + "," + route.getDestination().getLatitude();
@@ -174,19 +178,25 @@ public class VehicleService implements IVehicleService {
                 if(totalPoints < route.size()){
                     Location location = vehicle.getCurrentLocation();
                     saveLocationForCurrentRide(location, route, totalPoints, vehicle);
-
+                    System.out.println(totalPoints);
                     List<WebSocketSession> sessions = new ArrayList<>();
                     addPassengerSession(sessions, ride);
                     WebSocketSession driverSession = RideHandler.driverSessions.get(ride.getDriver().getId().toString());
                     if(driverSession != null) sessions.add(driverSession);
                     WebSocketSession adminSession = RideHandler.adminSessions.get(Long.toString(6));
                     if(adminSession != null) sessions.add(adminSession);
-                    RideSimulationHandler.notifyUsersAboutVehicleLocations(sessions, location);
+                    if(!sessions.isEmpty()) {
+                        RideSimulationHandler.notifyUsersAboutVehicleLocations(sessions, location);
+                    }
+                    VehicleLocationWithAvailabilityDTO vehicleLocationWithAvailabilityDTO = new VehicleLocationWithAvailabilityDTO(vehicle.getId(),
+                            true, location.getAddress(), location.getLongitude(), location.getLatitude());
+                    simpMessagingTemplate.convertAndSend("/topic/map-updates", vehicleLocationWithAvailabilityDTO);
+
                     totalPoints++;
 
                 }else timer.cancel();
             }
-        }, 1000, 4000);
+        }, 1000, 2000);
     }
 
     private void saveLocationForCurrentRide(Location location, List<LocationDTO> route, int totalPoints, Vehicle vehicle) {

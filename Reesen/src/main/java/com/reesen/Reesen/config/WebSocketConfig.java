@@ -14,14 +14,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/topic/driver/ride",
                 "/topic/passenger/ride",
+                "/topic/passenger/accept-ride",
+                "/topic/driver/accept-ride",
                 "/topic/admin/panic",
-                "/topic/map-updates",
-                "/topic/vehicle-simulation");
+                "/topic/map-updates");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/socket")
+        registry.addEndpoint("/socket", "/vehicle-simulation")
                 .setAllowedOrigins("http://localhost:4200", "http://localhost:8082")
                 .withSockJS();
     }
