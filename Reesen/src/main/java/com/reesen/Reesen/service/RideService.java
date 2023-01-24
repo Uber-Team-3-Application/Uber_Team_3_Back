@@ -675,16 +675,16 @@ public class RideService implements IRideService {
 
 	@Override
 	public boolean checkForPendingRide(Long passengerId) {
-		if (this.rideRepository.findAllRidesByPassengerIdAndRideStatus(passengerId, RideStatus.PENDING).isEmpty())
-			return false;
-		if(this.rideRepository.findAllRidesByPassengerIdAndRideStatus(passengerId, RideStatus.ACCEPTED).isEmpty())
-			return false;
-		if(this.rideRepository.findAllRidesByPassengerIdAndRideStatus(passengerId, RideStatus.STARTED).isEmpty())
-			return false;
-		if(this.rideRepository.findAllRidesByPassengerIdAndRideStatus(passengerId, RideStatus.ACTIVE).isEmpty())
-			return false;
+		if (!this.rideRepository.findAllRidesByPassengerIdAndRideStatus(passengerId, RideStatus.PENDING).isEmpty())
+			return true;
+		if(!this.rideRepository.findAllRidesByPassengerIdAndRideStatus(passengerId, RideStatus.ACCEPTED).isEmpty())
+			return true;
+		if(!this.rideRepository.findAllRidesByPassengerIdAndRideStatus(passengerId, RideStatus.STARTED).isEmpty())
+			return true;
+		if(!this.rideRepository.findAllRidesByPassengerIdAndRideStatus(passengerId, RideStatus.ACTIVE).isEmpty())
+			return true;
 
-		return true;
+		return false;
 	}
 
 	@Override
