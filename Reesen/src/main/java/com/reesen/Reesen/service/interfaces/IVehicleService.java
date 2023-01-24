@@ -37,4 +37,6 @@ public interface IVehicleService {
     LocationDTO getCurrentLocation(Long vehicleId);
 
     Vehicle findVehicleByDriverId(Long id);
+
+    void simulateVehicleByRideId(Long rideId);
 }

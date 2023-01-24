@@ -6,11 +6,13 @@ import com.reesen.Reesen.dto.VehicleDTO;
 import com.reesen.Reesen.dto.VehicleLocationWithAvailabilityDTO;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Location;
+import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.model.VehicleType;
 import com.reesen.Reesen.repository.LocationRepository;
 import com.reesen.Reesen.repository.VehicleRepository;
 import com.reesen.Reesen.repository.VehicleTypeRepository;
+import com.reesen.Reesen.service.interfaces.IRideService;
 import com.reesen.Reesen.service.interfaces.IVehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,12 +27,14 @@ public class VehicleService implements IVehicleService {
     private final VehicleRepository vehicleRepository;
     private final VehicleTypeRepository vehicleTypeRepository;
     private final LocationRepository locationRepository;
+    private final IRideService rideService;
 
     @Autowired
-    public VehicleService(VehicleRepository vehicleRepository, VehicleTypeRepository vehicleTypeRepository, LocationRepository locationRepository){
+    public VehicleService(VehicleRepository vehicleRepository, VehicleTypeRepository vehicleTypeRepository, LocationRepository locationRepository, IRideService rideService){
         this.vehicleRepository = vehicleRepository;
         this.vehicleTypeRepository = vehicleTypeRepository;
         this.locationRepository = locationRepository;
+        this.rideService = rideService;
     }
 
     @Override
@@ -130,6 +134,11 @@ public class VehicleService implements IVehicleService {
     @Override
     public Vehicle findVehicleByDriverId(Long id) {
         return this.vehicleRepository.findVehicleByDriverId(id);
+    }
+
+    @Override
+    public void simulateVehicleByRideId(Long rideId) {
+        Ride ride = this.rideService.findOne(rideId); 
     }
 
     @Override
