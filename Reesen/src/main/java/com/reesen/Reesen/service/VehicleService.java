@@ -6,6 +6,7 @@ import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.dto.VehicleDTO;
 import com.reesen.Reesen.dto.VehicleLocationWithAvailabilityDTO;
 import com.reesen.Reesen.handlers.RideHandler;
+import com.reesen.Reesen.handlers.RideSimulationHandler;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.repository.LocationRepository;
@@ -180,7 +181,7 @@ public class VehicleService implements IVehicleService {
                     if(driverSession != null) sessions.add(driverSession);
                     WebSocketSession adminSession = RideHandler.adminSessions.get(Long.toString(6));
                     if(adminSession != null) sessions.add(adminSession);
-                    RideHandler.notifyUsersAboutVehicleLocations(sessions, location);
+                    RideSimulationHandler.notifyUsersAboutVehicleLocations(sessions, location);
                     totalPoints++;
 
                 }else timer.cancel();
