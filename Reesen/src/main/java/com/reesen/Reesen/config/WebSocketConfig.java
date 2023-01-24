@@ -1,7 +1,7 @@
 package com.reesen.Reesen.config;
 
 import com.reesen.Reesen.handlers.RideHandler;
-import com.reesen.Reesen.handlers.VehicleSimulation;
+import com.reesen.Reesen.handlers.RideSimulationHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.*;
@@ -14,13 +14,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/topic/driver/ride",
                 "/topic/passenger/ride",
+                "/topic/passenger/accept-ride",
+                "/topic/driver/accept-ride",
                 "/topic/admin/panic",
-                "/map-updates");
+                "/topic/map-updates");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/socket")
+        registry.addEndpoint("/socket", "/vehicle-simulation")
                 .setAllowedOrigins("http://localhost:4200", "http://localhost:8082")
                 .withSockJS();
     }
@@ -28,6 +30,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(new RideHandler(), "/socket");
-        //registry.addHandler(new VehicleSimulation(), "/simulation");
+        registry.addHandler(new RideSimulationHandler(), "/vehicle-simulation");
     }
 }

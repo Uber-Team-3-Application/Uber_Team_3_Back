@@ -3,6 +3,7 @@ package com.reesen.Reesen.controller;
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.model.VehicleType;
+import com.reesen.Reesen.service.interfaces.IRideService;
 import com.reesen.Reesen.service.interfaces.IVehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ public class VehicleController {
     private final IVehicleService vehicleService;
     private final SimpMessagingTemplate simpMessagingTemplate;
 
+
     @Autowired
     public VehicleController(IVehicleService vehicleService,
                              SimpMessagingTemplate simpMessagingTemplate){
@@ -30,6 +32,11 @@ public class VehicleController {
         this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
+    @PutMapping(value = "/simulation/{id}")
+    public ResponseEntity<String> simulateVehicleMovement(@PathVariable("id") Long rideId){
+        this.vehicleService.simulateVehicleByRideId(rideId);
+        return new ResponseEntity<>("Simulation", HttpStatus.OK);
+    }
     @PutMapping(value = "/{vehicleId}/location")
     public ResponseEntity<VehicleLocationSimulationDTO> updateLocation(@RequestBody @Valid LocationDTO locationDTO, @PathVariable Long vehicleId){
 
