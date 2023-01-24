@@ -131,7 +131,7 @@ public class RideService implements IRideService {
 		ride.setPassengers(passengers);
 		ride.setStatus(RideStatus.PENDING);
 
-		if (rideDTO.getScheduleTime() == null) {
+		if (rideDTO.getScheduledTime() == null) {
 			Object[] result = this.findSuitableDriver(ride);
 			if (result[0] == null) {
 				ride.setStatus(RideStatus.REJECTED);
@@ -143,7 +143,8 @@ public class RideService implements IRideService {
 		} else {
 			ride.setStatus(RideStatus.SCHEDULED);
 		}
-		ride.setScheduledTime(rideDTO.getScheduleTime());
+
+		ride.setScheduledTime(rideDTO.getScheduledTime());
 		Ride newRide = this.rideRepository.save(ride);
 		ride.setId(newRide.getId());
 		for (Passenger passenger : ride.getPassengers()) {
@@ -167,7 +168,7 @@ public class RideService implements IRideService {
 			else {
 				simpMessagingTemplate.convertAndSend("/topic/driver/ride/" + ride.getDriver().getId(), new RideDTO(ride));
 			}
-		} else if (rideDTO.getScheduleTime() == null) {
+		} else if (rideDTO.getScheduledTime() == null) {
 			for(Passenger passenger: ride.getPassengers())
 				simpMessagingTemplate.convertAndSend("/topic/passenger/ride/" + passenger.getId(), "No suitable driver found!");
 			return null;
@@ -179,10 +180,10 @@ public class RideService implements IRideService {
 	@Scheduled(cron = "0 15 * * * *")  // schedule to run every minute at 15th second
 	public void scheduleRide() {
 		Set<Ride> rides = rideRepository.findAllByScheduledTimeIsNotNullAndStatus(RideStatus.SCHEDULED);
-		LocalDateTime now = LocalDateTime.now();
+		Date now = new Date();
 		for(Ride ride : rides){
-			LocalDateTime scheduledTimeMinus15 = ride.getScheduledTime().minusMinutes(15);
-			if (scheduledTimeMinus15.isBefore(now)) {
+			Date scheduledTimeMinus15 = new Date(ride.getScheduledTime().getTime() - 15 * 60);
+			if (scheduledTimeMinus15.before(now)) {
 				Ride rideFull = findOne(ride.getId());
 				Object[] result = this.findSuitableDriver(rideFull);
 				if (result[0] == null) {

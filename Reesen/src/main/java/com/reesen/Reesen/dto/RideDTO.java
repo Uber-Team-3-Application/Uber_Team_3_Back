@@ -25,7 +25,7 @@ public class RideDTO {
  	private boolean babyTransport;
  	private boolean petTransport;
  	private RideStatus status;
-	 private LocalDateTime scheduledTime;
+	 private Date scheduledTime;
 
     public RideDTO(){
 
@@ -179,11 +179,11 @@ public class RideDTO {
 		this.status = status;
 	}
 
-	public LocalDateTime getScheduledTime() {
+	public Date getScheduledTime() {
 		return scheduledTime;
 	}
 
-	public void setScheduledTime(LocalDateTime scheduledTime) {
+	public void setScheduledTime(Date scheduledTime) {
 		this.scheduledTime = scheduledTime;
 	}
 }

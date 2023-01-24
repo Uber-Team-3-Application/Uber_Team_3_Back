@@ -2,7 +2,7 @@ package com.reesen.Reesen.dto;
 
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -19,6 +19,6 @@ public class CreateRideDTO {
     private String vehicleType;
     private boolean babyTransport;
     private boolean petTransport;
-    private LocalDateTime scheduleTime;
+    private Date scheduledTime;
 
 }
