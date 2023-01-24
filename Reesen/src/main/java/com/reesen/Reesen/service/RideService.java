@@ -328,6 +328,15 @@ public class RideService implements IRideService {
 		}
 		newRide.setLocations(newLocations);
 		this.panicRepository.save(new Panic(new Date(), reason, newRide, passengerRepository.findById(passengerId).get()));
+
+		Long adminId = this.userRepository.findAdmin(Role.ADMIN);
+		WebSocketSession webSocketSession = RideHandler.adminSessions.get(adminId.toString());
+		if(webSocketSession != null) {
+			RideHandler.notifyAdminAboutPanic(webSocketSession, new RideDTO(ride));
+		}
+		simpMessagingTemplate.convertAndSend("/topic/admin/panic/"+ adminId, new RideDTO(ride));
+
+
 		return new RideDTO(newRide);
 	}
 

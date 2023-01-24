@@ -15,16 +15,18 @@ public class RideHandler implements WebSocketHandler {
     public static final ConcurrentHashMap<String, WebSocketSession> driverSessions = new ConcurrentHashMap<>();
     public static final ConcurrentHashMap<String, WebSocketSession> passengerSessions = new ConcurrentHashMap<>();
 
+    public static final ConcurrentHashMap<String, WebSocketSession> adminSessions = new ConcurrentHashMap<>();
+
     public static void addSession(WebSocketSession session) {
         HttpHeaders headers = session.getHandshakeHeaders();
         String id = headers.get("id").get(0);
         String role = headers.get("role").get(0);
-        System.out.println("ALO");
-        System.out.println(role);
         if (role.equals("DRIVER")) {
             driverSessions.put(id, session);
         } else if (role.equals("PASSENGER")) {
             passengerSessions.put(id, session);
+        }else{
+            adminSessions.put(id, session);
         }
     }
 
@@ -37,6 +39,8 @@ public class RideHandler implements WebSocketHandler {
             driverSessions.remove(id);
         } else if (role.equals("PASSENGER")) {
             passengerSessions.remove(id);
+        }else{
+            adminSessions.remove(id);
         }
     }
 
@@ -75,6 +79,18 @@ public class RideHandler implements WebSocketHandler {
             throw new RuntimeException(e);
         }
     }
+    public static void notifyAdminAboutPanic(WebSocketSession sessions, RideDTO rideDTO) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JSR310Module());
+        try {
+            TextMessage textMessage = new TextMessage(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rideDTO));
+            sessions.sendMessage(textMessage);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
