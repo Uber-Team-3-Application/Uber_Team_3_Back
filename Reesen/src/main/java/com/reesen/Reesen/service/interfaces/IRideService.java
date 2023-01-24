@@ -52,14 +52,11 @@ public interface IRideService {
 	PassengerRideDTO getFilteredRide(Ride ride, Long driverId);
 
 	ReportSumAverageDTO getReport(ReportRequestDTO reportRequestDTO);
-	//TODO: ----> VUGA
 
-
-	//TODO: JELENA
 	Ride findPassengerActiveRide(Long passengerId);
 
 	LinkedHashSet<Route> getLocationsByRide (Long rideId);
-	//TODO: --->JELENA
+	//TODO: ----> VUGA
 
 
 	//TODO: VEKSON
