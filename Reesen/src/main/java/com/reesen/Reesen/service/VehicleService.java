@@ -5,6 +5,7 @@ import com.reesen.Reesen.dto.LocationDTO;
 import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.dto.VehicleDTO;
 import com.reesen.Reesen.dto.VehicleLocationWithAvailabilityDTO;
+import com.reesen.Reesen.handlers.RideHandler;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.repository.LocationRepository;
@@ -22,10 +23,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.socket.WebSocketSession;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class VehicleService implements IVehicleService {
@@ -163,6 +163,44 @@ public class VehicleService implements IVehicleService {
         }else return;
 
         List<LocationDTO> route = this.getRouteFromOpenRoute(start, end);
+
+        Timer timer = new Timer();
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+            int totalPoints = 0;
+            @Override
+            public void run() {
+                if(totalPoints < route.size()){
+                    Location location = vehicle.getCurrentLocation();
+                    saveLocationForCurrentRide(location, route, totalPoints, vehicle);
+
+                    List<WebSocketSession> sessions = new ArrayList<>();
+                    addPassengerSession(sessions, ride);
+                    WebSocketSession driverSession = RideHandler.driverSessions.get(ride.getDriver().getId().toString());
+                    if(driverSession != null) sessions.add(driverSession);
+                    WebSocketSession adminSession = RideHandler.adminSessions.get(Long.toString(6));
+                    if(adminSession != null) sessions.add(adminSession);
+                    RideHandler.notifyUsersAboutVehicleLocations(sessions, location);
+                    totalPoints++;
+
+                }else timer.cancel();
+            }
+        }, 1000, 500);
+    }
+
+    private void saveLocationForCurrentRide(Location location, List<LocationDTO> route, int totalPoints, Vehicle vehicle) {
+        location.setLongitude(route.get(totalPoints).getLongitude());
+        location.setLatitude(route.get(totalPoints).getLatitude());
+        location = locationRepository.save(location);
+        vehicle.setCurrentLocation(location);
+        vehicleRepository.save(vehicle);
+    }
+
+    private void addPassengerSession(List<WebSocketSession> sessions, Ride ride) {
+        for(Passenger passenger: ride.getPassengers()){
+            WebSocketSession passengerSession = RideHandler.passengerSessions.get(passenger.getId().toString());
+            if(passengerSession != null) sessions.add(passengerSession);
+        }
     }
 
     @Override
@@ -185,20 +223,20 @@ public class VehicleService implements IVehicleService {
         String responseString = response.getBody();
         JSONObject json = new JSONObject(responseString);
         JSONArray features = json.getJSONArray("features");
-        JSONObject firstFeature = features.getJSONObject(0);
-        JSONObject geometry = firstFeature.getJSONObject("geometry");
-        JSONArray coordinates = geometry.getJSONArray("coordinates");
+        JSONObject ff = features.getJSONObject(0);
+        JSONObject geometry = ff.getJSONObject("geometry");
+        JSONArray coords = geometry.getJSONArray("coordinates");
         List<LocationDTO> route = new ArrayList<>();
-//        for (int i = 0; i < coordinates.length(); i++) {
-//            JSONArray coord = coordinates.getJSONArray(i);
-//
-//            double lon = coord.getDouble(0);
-//            double lat = coord.getDouble(1);
-//            LocationDTO location = new LocationDTO();
-//            location.setLongitude(Double.valueOf(lon).floatValue());
-//            location.setLatitude(Double.valueOf(lat).floatValue());
-//            routePoints.add(location);
-//        }
+        for (int i = 0; i < coords.length(); i++) {
+            JSONArray coord = coords.getJSONArray(i);
+            double longitude = coord.getDouble(0);
+            double latitude = coord.getDouble(1);
+
+            LocationDTO location = new LocationDTO();
+            location.setLongitude(longitude);
+            location.setLatitude(latitude);
+            route.add(location);
+        }
         return route;
     }
 
