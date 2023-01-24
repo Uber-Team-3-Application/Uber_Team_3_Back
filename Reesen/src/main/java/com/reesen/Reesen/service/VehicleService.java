@@ -1,21 +1,25 @@
 package com.reesen.Reesen.service;
 
+import com.reesen.Reesen.Enums.RideStatus;
 import com.reesen.Reesen.dto.LocationDTO;
 import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.dto.VehicleDTO;
 import com.reesen.Reesen.dto.VehicleLocationWithAvailabilityDTO;
+import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.Driver.Driver;
-import com.reesen.Reesen.model.Location;
-import com.reesen.Reesen.model.Ride;
-import com.reesen.Reesen.model.Vehicle;
-import com.reesen.Reesen.model.VehicleType;
 import com.reesen.Reesen.repository.LocationRepository;
 import com.reesen.Reesen.repository.VehicleRepository;
 import com.reesen.Reesen.repository.VehicleTypeRepository;
 import com.reesen.Reesen.service.interfaces.IRideService;
 import com.reesen.Reesen.service.interfaces.IVehicleService;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -138,7 +142,62 @@ public class VehicleService implements IVehicleService {
 
     @Override
     public void simulateVehicleByRideId(Long rideId) {
-        Ride ride = this.rideService.findOne(rideId); 
+        Ride ride = this.rideService.findOne(rideId);
+        Vehicle vehicle = this.vehicleRepository.findVehicleByDriverId(ride.getDriver().getId());
+        vehicle.setCurrentLocation(this.locationRepository.findById(vehicle.getCurrentLocation().getId()).get());
+        String start = "", end = "";
+        if(ride.getStatus() == RideStatus.ACCEPTED){
+            start = vehicle.getCurrentLocation().getLongitude() + "," + vehicle.getCurrentLocation().getLatitude();
+            for(Route route : ride.getLocations()){
+                end = route.getDeparture().getLongitude() + "," + route.getDeparture().getLatitude();
+                break;
+            }
+        }else if(ride.getStatus() == RideStatus.ACTIVE){
+            for(Route route : ride.getLocations()){
+                start = route.getDeparture().getLongitude() + "," + route.getDeparture().getLatitude();
+                end = route.getDestination().getLongitude() + "," + route.getDestination().getLatitude();
+                break;
+            }
+        }else return;
+
+        List<LocationDTO> route = this.getRouteFromOpenRoute(start, end);
+    }
+
+    @Override
+    public List<LocationDTO> getRouteFromOpenRoute(String start, String end) {
+        String base = "https://api.openrouteservice.org/v2/directions/driving-car";
+        String key = "5b3ce3597851110001cf624865f18297bb26459a9f779c015d573b96";
+        String url = base + "?api_key=" + key + "&start="+start+"&end="+end;
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+
+        HttpEntity<String> request = new HttpEntity<>(headers);
+
+
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                url, HttpMethod.GET, request, String.class);
+
+        String responseString = response.getBody();
+//        JSONObject json = new JSONObject(responseString);
+//        JSONArray features = json.getJSONArray("features");
+//        JSONObject firstFeature = features.getJSONObject(0);
+//        JSONObject geometry = firstFeature.getJSONObject("geometry");
+//        JSONArray coordinates = geometry.getJSONArray("coordinates");
+        List<LocationDTO> route = new ArrayList<>();
+//        for (int i = 0; i < coordinates.length(); i++) {
+//            JSONArray coord = coordinates.getJSONArray(i);
+//
+//            double lon = coord.getDouble(0);
+//            double lat = coord.getDouble(1);
+//            LocationDTO location = new LocationDTO();
+//            location.setLongitude(Double.valueOf(lon).floatValue());
+//            location.setLatitude(Double.valueOf(lat).floatValue());
+//            routePoints.add(location);
+//        }
+        return route;
     }
 
     @Override

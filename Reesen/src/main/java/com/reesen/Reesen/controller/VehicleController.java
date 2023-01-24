@@ -33,8 +33,9 @@ public class VehicleController {
     }
 
     @PutMapping(value = "/simulation/{id}")
-    public ResponseEntity<String> simulateVehicleMovement(@PathVariable("id") Long rideId){
+    public ResponseEntity simulateVehicleMovement(@PathVariable("id") Long rideId){
         this.vehicleService.simulateVehicleByRideId(rideId);
+        return new ResponseEntity(HttpStatus.OK);
     }
     @PutMapping(value = "/{vehicleId}/location")
     public ResponseEntity<VehicleLocationSimulationDTO> updateLocation(@RequestBody @Valid LocationDTO locationDTO, @PathVariable Long vehicleId){

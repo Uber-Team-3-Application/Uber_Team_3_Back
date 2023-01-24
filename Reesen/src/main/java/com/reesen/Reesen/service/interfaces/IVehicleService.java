@@ -39,4 +39,6 @@ public interface IVehicleService {
     Vehicle findVehicleByDriverId(Long id);
 
     void simulateVehicleByRideId(Long rideId);
+
+    List<LocationDTO> getRouteFromOpenRoute(String start, String end);
 }
