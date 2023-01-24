@@ -131,7 +131,7 @@ public class RideService implements IRideService {
 		ride.setPassengers(passengers);
 		ride.setStatus(RideStatus.PENDING);
 
-		if (rideDTO.getScheduleTime() != null) {
+		if (rideDTO.getScheduleTime() == null) {
 			Object[] result = this.findSuitableDriver(ride);
 			if (result[0] == null) {
 				ride.setStatus(RideStatus.REJECTED);
@@ -167,7 +167,7 @@ public class RideService implements IRideService {
 			else {
 				simpMessagingTemplate.convertAndSend("/topic/driver/ride/" + ride.getDriver().getId(), new RideDTO(ride));
 			}
-		} else if (ride.getScheduledTime() == null) {
+		} else if (rideDTO.getScheduleTime() == null) {
 			for(Passenger passenger: ride.getPassengers())
 				simpMessagingTemplate.convertAndSend("/topic/passenger/ride/" + passenger.getId(), "No suitable driver found!");
 			return null;
