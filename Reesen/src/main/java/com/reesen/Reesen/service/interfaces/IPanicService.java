@@ -9,4 +9,6 @@ public interface IPanicService {
 
 
     List<Panic> findAll();
+
+    Panic findOne(Long id);
 }
