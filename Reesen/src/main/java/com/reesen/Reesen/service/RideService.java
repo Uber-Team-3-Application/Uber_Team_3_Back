@@ -333,9 +333,9 @@ public class RideService implements IRideService {
 		WebSocketSession webSocketSession = RideHandler.adminSessions.get(adminId.toString());
 		if(webSocketSession != null) {
 			RideHandler.notifyAdminAboutPanic(webSocketSession, new RideDTO(ride));
+		}else {
+			simpMessagingTemplate.convertAndSend("/topic/admin/panic/" + adminId, new RideDTO(ride));
 		}
-		simpMessagingTemplate.convertAndSend("/topic/admin/panic/"+ adminId, new RideDTO(ride));
-
 
 		return new RideDTO(newRide);
 	}
