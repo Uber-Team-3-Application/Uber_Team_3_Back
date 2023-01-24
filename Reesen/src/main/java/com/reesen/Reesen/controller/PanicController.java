@@ -40,4 +40,12 @@ public class PanicController {
 
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PanicDTO> getPanicById(@PathVariable("id") Long id){
+        Panic panic = this.panicService.findOne(id);
+        PanicDTO panicDTO = new PanicDTO(panic);
+        return new ResponseEntity<>(panicDTO, HttpStatus.OK);
+    }
+
 }

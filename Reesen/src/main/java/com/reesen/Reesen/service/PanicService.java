@@ -49,6 +49,15 @@ public class PanicService implements IPanicService {
         return panics;
     }
 
+    @Override
+    public Panic findOne(Long id) {
+        List<Panic> panic = this.panicRepository.findLatestPanicByRideId(id);
+        Panic lastPanic = panic.get(0);
+        setUser(lastPanic);
+        setRide(lastPanic);
+        return lastPanic;
+    }
+
     private void setUser(Panic panic) {
         Long userId = this.panicRepository.getUserWhoPressedPanic(panic.getId());
         Optional<User> user = this.userRepository.findById(userId);
