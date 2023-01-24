@@ -85,6 +85,12 @@ public class RideService implements IRideService {
 				route.setDestination(destination);
 			}
 			ride.setLocations(routes);
+			if(ride.getScheduledTime() != null){
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(ride.getScheduledTime());
+				calendar.add(Calendar.MINUTE, -60);
+				ride.setScheduledTime(calendar.getTime());
+			}
 			return ride;
 		}
 		return null;
@@ -177,12 +183,16 @@ public class RideService implements IRideService {
 		return new RideDTO(ride);
 	}
 
-	@Scheduled(cron = "0 15 * * * *")  // schedule to run every minute at 15th second
+	@Scheduled(fixedDelay = 5000)  // schedule to run every minute at 15th second
 	public void scheduleRide() {
 		Set<Ride> rides = rideRepository.findAllByScheduledTimeIsNotNullAndStatus(RideStatus.SCHEDULED);
 		Date now = new Date();
 		for(Ride ride : rides){
-			Date scheduledTimeMinus15 = new Date(ride.getScheduledTime().getTime() - 15 * 60);
+
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(ride.getScheduledTime());
+			calendar.add(Calendar.MINUTE, -75);
+			Date scheduledTimeMinus15 = calendar.getTime();
 			if (scheduledTimeMinus15.before(now)) {
 				Ride rideFull = findOne(ride.getId());
 				Object[] result = this.findSuitableDriver(rideFull);

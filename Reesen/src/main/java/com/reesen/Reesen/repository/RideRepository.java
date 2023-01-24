@@ -234,6 +234,7 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "order by r.timeOfStart asc")
     List<ReportDTO<Double>> getTotalCostPerDayForSpecificPassenger(Date from, Date to, long passengerId);
 
+    @Query("select r from Ride r where r.status=:status")
     Set<Ride> findAllByScheduledTimeIsNotNullAndStatus(RideStatus status);
 
 
