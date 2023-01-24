@@ -5,7 +5,6 @@ import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.Enums.TypeOfReport;
 import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.dto.*;
-import com.reesen.Reesen.dto.FavoriteRideDTO;
 import com.reesen.Reesen.handlers.RideHandler;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.Driver.Driver;
@@ -17,8 +16,8 @@ import com.reesen.Reesen.service.interfaces.IRideService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.socket.WebSocketSession;
 
 
@@ -36,7 +35,6 @@ public class RideService implements IRideService {
 
 	private final RideRepository rideRepository;
 	private final RouteRepository routeRepository;
-	private final FavoriteRouteRepository favoriteRouteRepository;
 	private final PassengerRepository passengerRepository;
 	private final VehicleTypeRepository vehicleTypeRepository;
 	private final PanicRepository panicRepository;
@@ -52,10 +50,9 @@ public class RideService implements IRideService {
 	private SimpMessagingTemplate simpMessagingTemplate;
 
 	@Autowired
-	public RideService(RideRepository rideRepository, RouteRepository routeRepository, FavoriteRouteRepository favoriteRouteRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, UserRepository userRepository, DriverRepository driverRepository, IWorkingHoursService workingHoursService, ILocationService locationService, DeductionRepository deductionRepository, ReviewRepository reviewRepository, PassengerService passengerService) {
+	public RideService(RideRepository rideRepository, RouteRepository routeRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, UserRepository userRepository, DriverRepository driverRepository, IWorkingHoursService workingHoursService, ILocationService locationService, DeductionRepository deductionRepository, ReviewRepository reviewRepository, PassengerService passengerService) {
 		this.rideRepository = rideRepository;
 		this.routeRepository = routeRepository;
-		this.favoriteRouteRepository = favoriteRouteRepository;
 		this.passengerRepository = passengerRepository;
 		this.vehicleTypeRepository = vehicleTypeRepository;
 		this.panicRepository = panicRepository;
@@ -117,9 +114,7 @@ public class RideService implements IRideService {
 			route.setDeparture(departure);
 			route.setDestination(destination);
 			locations.add(route);
-
 		}
-
 
 		ride.setLocations(locations);
 		ride.setVehicleType(this.vehicleTypeRepository.findByName(VehicleName.getVehicleName(rideDTO.getVehicleType())));
@@ -136,36 +131,17 @@ public class RideService implements IRideService {
 		ride.setPassengers(passengers);
 		ride.setStatus(RideStatus.PENDING);
 
-//		if(ride.getScheduledTime() != null){
-//			Runnable task = () -> {
-//				Object[] result = this.findSuitableDriver(ride);
-//				if (result[0] == null) {
-//					ride.setStatus(RideStatus.REJECTED);
-//					this.rideRepository.save(ride);
-//					throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No active drivers at the moment!");
-//				}
-//				ride.setDriver((Driver) result[0]);
-//				ride.setEstimatedTime((Double) result[1]);
-//				ride.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(ride.getLocations()), this.locationService.getLastLocation(ride.getLocations())) * ride.getVehicleType().getPricePerKm());
-//				this.rideRepository.save(ride);
-//			};
-//			Calendar calendar = Calendar.getInstance();
-//			LocalDateTime dateTime = ride.getScheduledTime().minusMinutes(15);
-//			calendar.set(Calendar.YEAR, dateTime.getYear());
-//			calendar.set(Calendar.MONTH, dateTime.getMonth().getValue());
-//			calendar.set(Calendar.DAY_OF_MONTH, dateTime.getDayOfMonth());
-//			calendar.set(Calendar.HOUR_OF_DAY, dateTime.getHour());
-//			calendar.set(Calendar.MINUTE, dateTime.getMinute());
-//			calendar.set(Calendar.SECOND, 0);
-//		} else {}
-
-		Object[] result = this.findSuitableDriver(ride);
-		if (result[0] == null) {
-			ride.setStatus(RideStatus.REJECTED);
+		if (rideDTO.getScheduleTime() != null) {
+			Object[] result = this.findSuitableDriver(ride);
+			if (result[0] == null) {
+				ride.setStatus(RideStatus.REJECTED);
+			} else {
+				ride.setDriver((Driver) result[0]);
+				ride.setEstimatedTime((Double) result[1]);
+				ride.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(ride.getLocations()), this.locationService.getLastLocation(ride.getLocations())) * ride.getVehicleType().getPricePerKm());
+			}
 		} else {
-			ride.setDriver((Driver) result[0]);
-			ride.setEstimatedTime((Double) result[1]);
-			ride.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(ride.getLocations()), this.locationService.getLastLocation(ride.getLocations())) * ride.getVehicleType().getPricePerKm());
+			ride.setStatus(RideStatus.SCHEDULED);
 		}
 		ride.setScheduledTime(rideDTO.getScheduleTime());
 		Ride newRide = this.rideRepository.save(ride);
@@ -189,25 +165,53 @@ public class RideService implements IRideService {
 				RideHandler.notifyChosenDriver(session, new RideDTO(ride));
 			}
 			else {
-				this.notifySuitableDrviver(new RideDTO(ride));
+				simpMessagingTemplate.convertAndSend("/topic/driver/ride/" + ride.getDriver().getId(), new RideDTO(ride));
 			}
-		} else {
+		} else if (ride.getScheduledTime() == null) {
 			for(Passenger passenger: ride.getPassengers())
-				this.notifyAboutNoSuitableDriver(passenger.getId());
+				simpMessagingTemplate.convertAndSend("/topic/passenger/ride/" + passenger.getId(), "No suitable driver found!");
 			return null;
 		}
 
 		return new RideDTO(ride);
 	}
 
-	@CrossOrigin(origins = "http://localhost:4200")
-	private void notifyAboutNoSuitableDriver(Long id) {
-		simpMessagingTemplate.convertAndSend("/topic/passenger/ride/" + id, "No suitable driver found!");
-	}
+	@Scheduled(cron = "0 15 * * * *")  // schedule to run every minute at 15th second
+	public void scheduleRide() {
+		Set<Ride> rides = rideRepository.findAllByScheduledTimeIsNotNullAndStatus(RideStatus.SCHEDULED);
+		LocalDateTime now = LocalDateTime.now();
+		for(Ride ride : rides){
+			LocalDateTime scheduledTimeMinus15 = ride.getScheduledTime().minusMinutes(15);
+			if (scheduledTimeMinus15.isBefore(now)) {
+				Ride rideFull = findOne(ride.getId());
+				Object[] result = this.findSuitableDriver(rideFull);
+				if (result[0] == null) {
+					rideFull.setStatus(RideStatus.REJECTED);
+				} else {
+					rideFull.setDriver((Driver) result[0]);
+					rideFull.setEstimatedTime((Double) result[1]);
+					rideFull.setTotalPrice(this.calculateDistance(this.locationService.getFirstLocation(rideFull.getLocations()), this.locationService.getLastLocation(rideFull.getLocations())) * rideFull.getVehicleType().getPricePerKm());
+				}
+				if (rideFull.getDriver() != null) {
+					Driver driver = rideFull.getDriver();
+					Set<Ride> driversRides = this.driverRepository.getDriverRides(driver.getId());
+					driversRides.add(rideFull);
+					driver.setRides(driversRides);
+					this.driverRepository.save(driver);
+					WebSocketSession session = RideHandler.driverSessions.get(rideFull.getDriver().getId().toString());
+					if(session != null) {
 
-	@CrossOrigin(origins = "http://localhost:4200")
-	public void notifySuitableDrviver(RideDTO ride) {
-		simpMessagingTemplate.convertAndSend("/topic/driver/ride/" + ride.getDriver().getId(), ride);
+						RideHandler.notifyChosenDriver(session, new RideDTO(rideFull));
+					}
+					else {
+						simpMessagingTemplate.convertAndSend("/topic/driver/ride/" + rideFull.getDriver().getId(), new RideDTO(rideFull));
+					}
+				} else  {
+					for(Passenger passenger: rideFull.getPassengers())
+						simpMessagingTemplate.convertAndSend("/topic/passenger/ride/" + passenger.getId(), "No suitable driver found!");
+				}
+			}
+		}
 	}
 
 	private Object[] findSuitableDriver(Ride ride) {
