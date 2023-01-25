@@ -55,7 +55,27 @@ public class FavoriteRideService implements IFavoriteRideService {
 
 
 	@Override
-	public void deleteFavouriteRides(Long id, Long passId) {
+	public void deleteFavouriteRides(Long id, Long passengerId) {
+		Passenger passenger = this.passengerService.findOne(passengerId).get();
+		Set<FavoriteRide> allRides = passenger.getFavouriteRoutes();
+		FavoriteRide removeRide = null;
+		for(FavoriteRide ride: allRides)
+		{
+			if(ride.getId() == id) removeRide = ride;
+			ride.setPassengers(this.favoriteRouteRepository.findPassengerByRideId(ride.getId()));
+			LinkedHashSet<Route> routes = this.favoriteRouteRepository.getLocationsByRide(ride.getId());
+			for(Route route: routes)
+			{
+				Location departure = this.routeRepository.getDepartureByRoute(route).get();
+				Location destination = this.routeRepository.getDestinationByRoute(route).get();
+				route.setDeparture(departure);
+				route.setDestination(destination);
+			}
+			ride.setLocations(routes);
+		}
+		allRides.remove(removeRide);
+		passenger.setFavouriteRoutes(allRides);
+		passengerService.save(passenger);
 		this.favoriteRouteRepository.deleteById(id);
 	}
 
