@@ -440,7 +440,7 @@ public class DriverController {
      *
      * **/
     @GetMapping(value = "/{id}/vehicle")
-    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER', 'PASSENGER')")
     public ResponseEntity<VehicleDTO> getVehicle(
             @PathVariable("id") Long id,
             @RequestHeader Map<String, String> headers) {

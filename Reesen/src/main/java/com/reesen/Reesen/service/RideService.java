@@ -445,6 +445,7 @@ public class RideService implements IRideService {
 			for (Passenger p : ride.getPassengers()) {
 				simpMessagingTemplate.convertAndSend("/topic/passenger/ride/" + p.getId(), new RideDTO(ride));
 			}
+
 		} else {
 			scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {
 				List<WebSocketSession> sessions = new ArrayList<>();
