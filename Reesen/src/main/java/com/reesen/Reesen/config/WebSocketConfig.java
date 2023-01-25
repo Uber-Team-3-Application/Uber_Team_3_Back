@@ -14,6 +14,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/topic/driver/ride",
                 "/topic/passenger/ride",
+                "/topic/map-updates-regular/",
                 "/topic/passenger/accept-ride",
                 "/topic/driver/accept-ride",
                 "/topic/admin/panic",

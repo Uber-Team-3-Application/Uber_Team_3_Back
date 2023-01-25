@@ -48,7 +48,7 @@ public class VehicleController {
         vehicle = this.vehicleService.setCurrentLocation(vehicle, locationDTO);
         this.vehicleService.save(vehicle);
         VehicleLocationSimulationDTO returnVehicleDTO = new VehicleLocationSimulationDTO(vehicle);
-        this.simpMessagingTemplate.convertAndSend("/map-updates/update-vehicle-position", returnVehicleDTO);
+        this.simpMessagingTemplate.convertAndSend("/topic/map-updates-regular", returnVehicleDTO);
 
         return new ResponseEntity<>(returnVehicleDTO, HttpStatus.OK);
     }
