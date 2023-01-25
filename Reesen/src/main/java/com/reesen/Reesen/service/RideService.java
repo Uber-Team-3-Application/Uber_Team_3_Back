@@ -408,8 +408,9 @@ public class RideService implements IRideService {
 			RideHandler.notifyPassengersAboutEndRide(sessions, new RideDTO(ride));
 		}
 		WebSocketSession driverSession = RideHandler.driverSessions.get(ride.getDriver().getId().toString());
-		RideHandler.notifyDriverAboutEndRide(driverSession, new RideDTO(ride));
-
+		if(driverSession != null) {
+			RideHandler.notifyDriverAboutEndRide(driverSession, new RideDTO(ride));
+		}
 		sessions.add(RideHandler.driverSessions.get(ride.getDriver().getId().toString()));
 
 		for(Passenger p: ride.getPassengers()){
