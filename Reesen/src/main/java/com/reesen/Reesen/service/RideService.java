@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.reesen.Reesen.service.interfaces.IRideService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -820,6 +821,11 @@ public class RideService implements IRideService {
 		}
 
 		return null;
+	}
+
+	@Override
+	public List<RideWithVehicleDTO> getALlActiveRides() {
+		return this.rideRepository.getAllActiveRides(RideStatus.ACTIVE, RideStatus.STARTED);
 	}
 
 

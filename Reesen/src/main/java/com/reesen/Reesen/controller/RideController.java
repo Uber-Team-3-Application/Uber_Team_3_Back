@@ -10,6 +10,7 @@ import com.reesen.Reesen.service.interfaces.IDriverService;
 import com.reesen.Reesen.service.interfaces.IFavoriteRideService;
 import com.reesen.Reesen.service.interfaces.IRideService;
 import com.reesen.Reesen.validation.UserRequestValidation;
+import org.json.HTTP;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
@@ -17,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -213,6 +215,11 @@ public class RideController {
             return new ResponseEntity("Favorite location does not exist!", HttpStatus.NOT_FOUND);
         this.favoriteRideService.deleteFavouriteRides(id, this.userRequestValidation.getIdFromToken(headers));
         return new ResponseEntity<>("Successful deletion of favorite location!",HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping(value = "/all-active-rides")
+    public ResponseEntity<List<RideWithVehicleDTO>> getAllRides(){
+        return new ResponseEntity<>(this.rideService.getALlActiveRides(), HttpStatus.OK);
     }
 
 
