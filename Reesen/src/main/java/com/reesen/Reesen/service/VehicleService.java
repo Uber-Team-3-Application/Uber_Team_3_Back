@@ -163,6 +163,8 @@ public class VehicleService implements IVehicleService {
             for(Route route : ride.getLocations()){
                 start = route.getDeparture().getLongitude() + "," + route.getDeparture().getLatitude();
                 end = route.getDestination().getLongitude() + "," + route.getDestination().getLatitude();
+                vehicle.setCurrentLocation(this.locationRepository.findById(route.getDeparture().getId()).get());
+
                 break;
             }
         }else return;

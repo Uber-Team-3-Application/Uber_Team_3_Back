@@ -396,6 +396,28 @@ public class RideService implements IRideService {
 		ride.setStatus(RideStatus.FINISHED);
 		ride.setTimeOfEnd(new Date());
 		rideRepository.save(ride);
+
+		List<WebSocketSession> sessions = new ArrayList<>();
+		for(Passenger passenger: ride.getPassengers()){
+			WebSocketSession webSocketSession = RideHandler.passengerSessions.get(passenger.getId().toString());
+			if(webSocketSession != null){
+				sessions.add(webSocketSession);
+			}
+		}
+		if(!sessions.isEmpty()) {
+			RideHandler.notifyPassengersAboutEndRide(sessions, new RideDTO(ride));
+		}
+		WebSocketSession driverSession = RideHandler.driverSessions.get(ride.getDriver().getId().toString());
+		RideHandler.notifyDriverAboutEndRide(driverSession, new RideDTO(ride));
+
+		sessions.add(RideHandler.driverSessions.get(ride.getDriver().getId().toString()));
+
+		for(Passenger p: ride.getPassengers()){
+			simpMessagingTemplate.convertAndSend("/topic/passenger/end-ride/"+p.getId(), new RideDTO(ride));
+		}
+		simpMessagingTemplate.convertAndSend("/topic/driver/end-ride/"+ride.getDriver().getId(), new RideDTO(ride));
+
+
 		return new RideDTO(ride);
 	}
 
@@ -753,14 +775,14 @@ public class RideService implements IRideService {
 			}
 		}
 		if(!sessions.isEmpty()) {
-			RideHandler.notifyPassengerAboutAcceptedRide(sessions, new RideDTO(ride));
-
+			RideHandler.notifyPassengersAboutStartRide(sessions, new RideDTO(ride));
 		}
 		sessions.add(RideHandler.driverSessions.get(ride.getDriver().getId().toString()));
+
 		for(Passenger p: ride.getPassengers()){
-			simpMessagingTemplate.convertAndSend("/topic/passenger/accept-ride/"+p.getId(), new RideDTO(ride));
+			simpMessagingTemplate.convertAndSend("/topic/passenger/start-ride/"+p.getId(), new RideDTO(ride));
 		}
-		simpMessagingTemplate.convertAndSend("/topic/driver/accept-ride/"+ride.getDriver().getId(), new RideDTO(ride));
+		simpMessagingTemplate.convertAndSend("/topic/driver/start-ride/"+ride.getDriver().getId(), new RideDTO(ride));
 
 		return new RideDTO(ride);
 
