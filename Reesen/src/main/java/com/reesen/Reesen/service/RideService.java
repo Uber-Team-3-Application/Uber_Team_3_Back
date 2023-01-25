@@ -346,7 +346,7 @@ public class RideService implements IRideService {
 			route.setDestination(this.routeRepository.getDestinationByRoute(route).get());
 		}
 		newRide.setLocations(newLocations);
-		this.panicRepository.save(new Panic(new Date(), reason, newRide, passengerRepository.findById(passengerId).get()));
+		this.panicRepository.save(new Panic(new Date(), reason, newRide, userRepository.findById(passengerId).get()));
 
 		Long adminId = this.userRepository.findAdmin(Role.ADMIN);
 		WebSocketSession webSocketSession = RideHandler.adminSessions.get(adminId.toString());
