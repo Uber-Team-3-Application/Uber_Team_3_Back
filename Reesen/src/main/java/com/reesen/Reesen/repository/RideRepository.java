@@ -243,8 +243,8 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "on r.driver.id = d.id inner join Vehicle v " +
             "on d.vehicle.id = v.id inner join Location  l " +
             "on v.currentLocation.id = l.id " +
-            "where r.status=:status")
-    List<RideWithVehicleDTO> getAllActiveRides(RideStatus status);
+            "where r.status=:status or r.status=:started")
+    List<RideWithVehicleDTO> getAllActiveRides(RideStatus status, RideStatus started);
 
 
     // TODO: ---: JELENA

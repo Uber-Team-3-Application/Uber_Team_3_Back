@@ -825,7 +825,7 @@ public class RideService implements IRideService {
 
 	@Override
 	public List<RideWithVehicleDTO> getALlActiveRides() {
-		return this.rideRepository.getAllActiveRides(RideStatus.ACTIVE);
+		return this.rideRepository.getAllActiveRides(RideStatus.ACTIVE, RideStatus.STARTED);
 	}
 
 
