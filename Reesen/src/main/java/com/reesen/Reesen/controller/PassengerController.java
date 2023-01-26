@@ -2,7 +2,6 @@ package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.PassengerDTO;
 import com.reesen.Reesen.dto.PassengerRideDTO;
-import com.reesen.Reesen.dto.UserDTO;
 import com.reesen.Reesen.dto.UserFullDTO;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.paginated.Paginated;
@@ -19,11 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import com.reesen.Reesen.security.jwt.JwtTokenUtil;
 
 import javax.validation.Valid;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @CrossOrigin
@@ -38,9 +35,10 @@ public class PassengerController {
     private final IRouteService routeService;
     private final UserRequestValidation userRequestValidation;
     private final JwtTokenUtil tokens;
+    private IReviewService reviewService;
 
     @Autowired
-    public PassengerController(IPassengerService passengerService, IRideService rideService, IDriverService driverService, IDeductionService deductionService, IRouteService routeService, UserRequestValidation userRequestValidation, JwtTokenUtil tokens) {
+    public PassengerController(IPassengerService passengerService, IRideService rideService, IDriverService driverService, IDeductionService deductionService, IRouteService routeService, UserRequestValidation userRequestValidation, JwtTokenUtil tokens, IReviewService reviewService) {
         this.passengerService = passengerService;
         this.rideService = rideService;
         this.driverService = driverService;
@@ -48,6 +46,7 @@ public class PassengerController {
         this.routeService = routeService;
         this.userRequestValidation = userRequestValidation;
         this.tokens = tokens;
+        this.reviewService = reviewService;
     }
 
     @PostMapping
@@ -140,6 +139,7 @@ public class PassengerController {
                 location.setDestination(this.routeService.getDestinationByRoute(location).get());
                 location.setDeparture(this.routeService.getDepartureByRoute(location).get());
             }
+            ride.setReview(this.reviewService.findReviewsByRide(ride));
             ride.setLocations(locations);
             rideDTOs.add(new PassengerRideDTO(ride));
         }

@@ -193,6 +193,7 @@ public class RideController {
     @PreAuthorize("hasAnyRole('PASSENGER')")
     public ResponseEntity<FavoriteRideDTO> addFavouriteRide(@Valid @Nullable @RequestBody CreateFavoriteRideDTO  favouriteRide, @RequestHeader Map<String, String> headers){
         if(favouriteRide == null || this.favoriteRideService.validateRideDTO(favouriteRide))  return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(this.favoriteRideService.checkForName(favouriteRide.getFavoriteName(), userRequestValidation.getIdFromToken(headers))) return new ResponseEntity("You already have a ride with this name!", HttpStatus.BAD_REQUEST);
         FavoriteRideDTO response = this.favoriteRideService.addFavouriteRide(favouriteRide, this.userRequestValidation.getIdFromToken(headers));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

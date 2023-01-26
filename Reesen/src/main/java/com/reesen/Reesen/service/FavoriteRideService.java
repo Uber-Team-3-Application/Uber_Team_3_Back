@@ -173,4 +173,15 @@ public class FavoriteRideService implements IFavoriteRideService {
 		return false;
 	}
 
+	@Override
+	public boolean checkForName(String favoriteName, Long id) {
+		Set<FavoriteRideDTO> response = this.getFavouriteRides(id);
+		for(FavoriteRideDTO ride: response)
+		{
+			if(ride.getFavoriteName() == favoriteName)
+				return true;
+		}
+		return false;
+	}
+
 }

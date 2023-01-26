@@ -30,7 +30,6 @@ public class PassengerRideDTO {
     private  DeductionDTO rejection;
     private  Set<RouteDTO> locations;
 
-    private Set<RideReviewDTO> reviews;
 
     public PassengerRideDTO(Ride ride) {
         this.id = ride.getId();
@@ -45,8 +44,6 @@ public class PassengerRideDTO {
         setPassengers(ride);
         this.rejection = new DeductionDTO(ride.getDeduction().getReason(), ride.getDeduction().getDeductionTime());
         this.locations = setLocations(ride);
-        this.reviews = setRideReviews(ride.getReview());
-
     }
 
 
@@ -64,7 +61,6 @@ public class PassengerRideDTO {
              this.rejection = new DeductionDTO(ride.getDeduction().getReason(), ride.getDeduction().getDeductionTime());
         else this.rejection = null;
         this.locations = setLocations(ride);
-        this.reviews = setRideReviews(ride.getReview());
         return this;
     }
 

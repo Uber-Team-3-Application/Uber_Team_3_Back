@@ -18,4 +18,6 @@ public interface IFavoriteRideService {
     Set<FavoriteRideDTO> getFavouriteRides(Long idFromToken);
 
     boolean validateRideDTO(CreateFavoriteRideDTO favouriteRide);
+
+    boolean checkForName(String favoriteName, Long idFromToken);
 }
