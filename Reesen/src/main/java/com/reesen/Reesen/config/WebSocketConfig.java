@@ -28,7 +28,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/socket", "/vehicle-simulation")
-                .setAllowedOrigins("http://localhost:4200", "http://localhost:8082")
+                .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
 
