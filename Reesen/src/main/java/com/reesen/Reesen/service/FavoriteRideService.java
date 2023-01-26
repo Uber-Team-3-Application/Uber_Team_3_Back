@@ -83,7 +83,7 @@ public class FavoriteRideService implements IFavoriteRideService {
 	public FavoriteRideDTO addFavouriteRide(CreateFavoriteRideDTO favouriteRide, Long passengerId) {
 		FavoriteRide ride = new FavoriteRide();
 		ride.setBabyAccessible(favouriteRide.isBabyTransport());
-		ride.setPetAccessible(favouriteRide.isBabyTransport());
+		ride.setPetAccessible(favouriteRide.isPetTransport());
 		ride.setVehicleType(this.vehicleTypeRepository.findByName(VehicleName.getVehicleName(favouriteRide.getVehicleType())));
 		ride.setFavoriteName(favouriteRide.getFavoriteName());
 
