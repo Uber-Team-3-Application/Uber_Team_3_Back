@@ -12,17 +12,11 @@ import org.springframework.test.context.ActiveProfiles;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
 public class RideRepositoryTest {
 
     @Autowired
     private RideRepository rideRepository;
-
-    @Test
-    public void print(){
-        assertEquals(1, 1);
-    }
 
 
 }

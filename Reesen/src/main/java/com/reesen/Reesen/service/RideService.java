@@ -48,13 +48,13 @@ public class RideService implements IRideService {
 	private final ReviewRepository reviewRepository;
 	private final ScheduledExecutorService executor;
 	private final PassengerService passengerService;
-	@Autowired
+
 	private SimpMessagingTemplate simpMessagingTemplate;
 	private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
 	private ScheduledFuture scheduledFuture;
 
 	@Autowired
-	public RideService(RideRepository rideRepository, RouteRepository routeRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, UserRepository userRepository, DriverRepository driverRepository, IWorkingHoursService workingHoursService, ILocationService locationService, DeductionRepository deductionRepository, ReviewRepository reviewRepository, PassengerService passengerService) {
+	public RideService(RideRepository rideRepository, RouteRepository routeRepository, PassengerRepository passengerRepository, VehicleTypeRepository vehicleTypeRepository, PanicRepository panicRepository, UserRepository userRepository, DriverRepository driverRepository, IWorkingHoursService workingHoursService, ILocationService locationService, DeductionRepository deductionRepository, ReviewRepository reviewRepository, PassengerService passengerService, SimpMessagingTemplate simpMessagingTemplate) {
 		this.rideRepository = rideRepository;
 		this.routeRepository = routeRepository;
 		this.passengerRepository = passengerRepository;
@@ -67,6 +67,7 @@ public class RideService implements IRideService {
 		this.deductionRepository = deductionRepository;
 		this.reviewRepository = reviewRepository;
 		this.passengerService = passengerService;
+		this.simpMessagingTemplate = simpMessagingTemplate;
 		this.executor = Executors.newScheduledThreadPool(1);
 	}
 
