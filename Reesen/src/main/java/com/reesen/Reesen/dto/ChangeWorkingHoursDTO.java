@@ -13,6 +13,5 @@ import java.time.LocalDateTime;
 @ToString
 public class ChangeWorkingHoursDTO {
 
-    @NotNull
     private LocalDateTime end;
 }

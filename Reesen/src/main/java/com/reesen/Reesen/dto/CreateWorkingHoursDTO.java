@@ -13,6 +13,5 @@ import java.time.LocalDateTime;
 @ToString
 public class CreateWorkingHoursDTO {
 
-    @NotNull(message = "{required}")
     private LocalDateTime start;
 }
