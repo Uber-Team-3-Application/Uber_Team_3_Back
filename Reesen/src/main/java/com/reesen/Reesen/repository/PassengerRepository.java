@@ -46,4 +46,8 @@ public interface PassengerRepository extends JpaRepository<Passenger, Long> {
 
     @Query("select r from Ride r, Passenger p where p.id=:id and p member of r.passengers")
     Set<Ride> getPassengerRides(Long id);
+
+    @Query("select r from FavoriteRide r, Passenger p " +
+            "where p.id=:id and r member of p.favouriteRoutes")
+    Set<FavoriteRide> getPassengerFavoriteRides(Long id);
 }
