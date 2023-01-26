@@ -4,6 +4,7 @@ import com.reesen.Reesen.Enums.RideStatus;
 
 import com.reesen.Reesen.dto.ReportDTO;
 import com.reesen.Reesen.dto.RideLocationWithTimeDTO;
+import com.reesen.Reesen.dto.RideWithVehicleDTO;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Passenger;
 import com.reesen.Reesen.model.Review;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 import com.reesen.Reesen.model.Ride;
@@ -236,6 +238,13 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
 
     @Query("select r from Ride r where r.status=:status")
     Set<Ride> findAllByScheduledTimeIsNotNullAndStatus(RideStatus status);
+
+    @Query("select new com.reesen.Reesen.dto.RideWithVehicleDTO(r.id, v.id, l.latitude, l.longitude, l.address) from Ride r inner join Driver d " +
+            "on r.driver.id = d.id inner join Vehicle v " +
+            "on d.vehicle.id = v.id inner join Location  l " +
+            "on v.currentLocation.id = l.id " +
+            "where r.status=:status or r.status=:started")
+    List<RideWithVehicleDTO> getAllActiveRides(RideStatus status, RideStatus started);
 
 
     // TODO: ---: JELENA

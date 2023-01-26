@@ -8,6 +8,7 @@ import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.Route;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 
 import java.util.*;
 
@@ -79,6 +80,8 @@ public interface IRideService {
 	RideDTO startRide(Long id);
 
     ReportSumAverageDTO getReportForPassenger(ReportRequestDTO reportRequestDTO);
+
+    List<RideWithVehicleDTO> getALlActiveRides();
     // TODO: -----> JELENA
 
 
