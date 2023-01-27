@@ -14,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 import com.reesen.Reesen.model.Ride;
@@ -145,12 +144,8 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "order by r.timeOfStart asc")
     List<ReportDTO<Double>> getTotalCostPerDayForSpecificDriver(Date from, Date to, Long driverId);
 
-    @Query("select count(r) from Ride r where r.driver.id=:driverId and r.status=:status and r.timeOfStart >= :date")
-    int acceptedRides(Long driverId, RideStatus status, LocalDateTime date);
-
-    @Query("select sum(r.totalPrice) from Ride r where r.driver.id=:driverId and r.status=:status and r.timeOfStart >= :date")
-    double income(Long driverId, RideStatus status, LocalDateTime date);
-
+    @Query("select r from Ride r where r.driver.id=:driverId and r.timeOfStart >= :date")
+    Set<Ride> getRides(Long driverId, Date date);
 
     // TODO: ---->: VEKSON
 
