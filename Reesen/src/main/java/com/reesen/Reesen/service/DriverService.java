@@ -25,10 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class DriverService implements IDriverService {
@@ -222,24 +219,66 @@ public class DriverService implements IDriverService {
     public Set<DriverStatisticsDTO> getStatistics(Long driverId) {
         Set<DriverStatisticsDTO> response = new HashSet<>();
         DriverStatisticsDTO today = new DriverStatisticsDTO();
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -1);
+        Date date = cal.getTime();
         today.setType(1);
-        today.setAccepted(this.rideRepository.acceptedRides(driverId, RideStatus.FINISHED, LocalDateTime.now().minusDays(1)));
-        today.setRejected(this.rideRepository.acceptedRides(driverId, RideStatus.REJECTED, LocalDateTime.now().minusDays(7)));
-        today.setIncome(this.rideRepository.income(driverId, RideStatus.FINISHED, LocalDateTime.now().minusDays(1)));
         today.setHours((int) this.workingHoursService.getTotalHoursWorkedInLastDay(driverId).toHours());
+        today.setIncome(0);
+        today.setAccepted(0);
+        today.setRejected(0);
+        if(this.rideRepository.getRides(driverId, date) != null)
+            for(Ride ride: this.rideRepository.getRides(driverId, date))
+            {
+                if(ride.getStatus() == RideStatus.FINISHED)
+                {
+                    today.setAccepted(today.getAccepted()+1);
+                    today.setIncome(today.getIncome()+ride.getTotalPrice());
+                }
+                else if (ride.getStatus() == RideStatus.REJECTED)
+                    today.setRejected(today.getRejected()+1);
+            }
 
+        cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -7);
+        date = cal.getTime();
         DriverStatisticsDTO week = new DriverStatisticsDTO();
         week.setType(7);
-        week.setAccepted(this.rideRepository.acceptedRides(driverId, RideStatus.FINISHED, LocalDateTime.now().minusDays(7)));
-        week.setAccepted(this.rideRepository.acceptedRides(driverId, RideStatus.REJECTED, LocalDateTime.now().minusDays(7)));
-        week.setIncome(this.rideRepository.income(driverId, RideStatus.FINISHED, LocalDateTime.now().minusDays(7)));
+        week.setIncome(0);
+        week.setAccepted(0);
+        week.setRejected(0);
+        if(this.rideRepository.getRides(driverId, date) != null)
+            for(Ride ride: this.rideRepository.getRides(driverId, date))
+            {
+                if(ride.getStatus() == RideStatus.FINISHED)
+                {
+                    week.setAccepted(week.getAccepted()+1);
+                    week.setIncome(week.getIncome()+ride.getTotalPrice());
+                }
+                else if (ride.getStatus() == RideStatus.REJECTED)
+                    week.setRejected(week.getRejected()+1);
+            }
         week.setHours((int) this.workingHoursService.getTotalHoursWorkedInLastWeek(driverId).toHours());
 
+        cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -31);
+        date = cal.getTime();
         DriverStatisticsDTO month = new DriverStatisticsDTO();
         month.setType(30);
-        month.setAccepted(this.rideRepository.acceptedRides(driverId, RideStatus.FINISHED, LocalDateTime.now().minusMonths(1)));
-        month.setAccepted(this.rideRepository.acceptedRides(driverId, RideStatus.REJECTED, LocalDateTime.now().minusMonths(1)));
-        month.setIncome(this.rideRepository.income(driverId, RideStatus.FINISHED, LocalDateTime.now().minusMonths(1)));
+        month.setIncome(0);
+        month.setAccepted(0);
+        month.setRejected(0);
+        if(this.rideRepository.getRides(driverId, date) != null)
+            for(Ride ride: this.rideRepository.getRides(driverId, date))
+            {
+                if(ride.getStatus() == RideStatus.FINISHED)
+                {
+                    month.setAccepted(month.getAccepted()+1);
+                    month.setIncome(month.getIncome()+ride.getTotalPrice());
+                }
+                else if (ride.getStatus() == RideStatus.REJECTED)
+                    month.setRejected(month.getRejected()+1);
+            }
         month.setHours((int) this.workingHoursService.getTotalHoursWorkedInLastMonth(driverId).toHours());
 
         response.add(today);
