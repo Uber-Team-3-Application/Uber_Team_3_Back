@@ -11,6 +11,7 @@ import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.repository.*;
 import com.reesen.Reesen.service.interfaces.ILocationService;
 import com.reesen.Reesen.service.interfaces.IWorkingHoursService;
+import com.sun.xml.bind.v2.runtime.output.SAXOutput;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.reesen.Reesen.service.interfaces.IRideService;
 import org.springframework.data.domain.Page;
@@ -176,6 +177,8 @@ public class RideService implements IRideService {
 				RideHandler.notifyChosenDriver(session, new RideDTO(ride));
 			}
 			else {
+				System.out.println(ride.getDriver().getId());
+
 				simpMessagingTemplate.convertAndSend("/topic/driver/ride/" + ride.getDriver().getId(), new RideDTO(ride));
 			}
 		} else if (rideDTO.getScheduledTime() == null) {
