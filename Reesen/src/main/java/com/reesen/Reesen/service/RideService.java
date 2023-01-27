@@ -369,8 +369,8 @@ public class RideService implements IRideService {
 			return null;
 		}
 		Ride ride = this.findOne(id);
-		ride.setStatus(RideStatus.REJECTED);
-		rideRepository.updateRideStatus(ride.getId(), RideStatus.REJECTED);
+		ride.setStatus(RideStatus.CANCELED);
+		rideRepository.updateRideStatus(ride.getId(), RideStatus.CANCELED);
 		Deduction deduction = deductionRepository.save(new Deduction(ride, ride.getDriver(), reason, LocalDateTime.now()));
 		ride.setDeduction(deduction);
 		rideRepository.save(ride);
