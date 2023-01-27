@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
@@ -32,8 +33,13 @@ public class WorkingHoursService implements IWorkingHoursService {
     public WorkingHours createWorkingHours(CreateWorkingHoursDTO workingHoursDTO, Driver driver){
         WorkingHours workingHours = new WorkingHours();
         workingHours.setDriver(driver);
-        workingHours.setStartTime(workingHoursDTO.getStart());
-        workingHours.setEndTime(workingHoursDTO.getStart());
+        if(workingHoursDTO.getStart() != null) {
+            workingHours.setStartTime(workingHoursDTO.getStart());
+            workingHours.setEndTime(workingHoursDTO.getStart());
+        }else{
+            workingHours.setStartTime(LocalDateTime.now());
+            workingHours.setEndTime(LocalDateTime.now());
+        }
         return workingHours;
     }
 
@@ -46,7 +52,12 @@ public class WorkingHoursService implements IWorkingHoursService {
     public WorkingHours editWorkingHours(WorkingHours workingHours, ChangeWorkingHoursDTO workingHoursDTO){
         workingHours.setId(workingHours.getId());
         workingHours.setStartTime(workingHours.getStartTime());
-        workingHours.setEndTime(workingHoursDTO.getEnd());
+        if(workingHoursDTO.getEnd() != null) {
+            workingHours.setEndTime(workingHoursDTO.getEnd());
+        }else{
+            workingHours.setEndTime(LocalDateTime.now());
+
+        }
         return workingHours;
     }
     @Override

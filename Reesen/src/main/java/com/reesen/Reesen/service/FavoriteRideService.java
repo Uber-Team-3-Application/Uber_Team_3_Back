@@ -57,7 +57,7 @@ public class FavoriteRideService implements IFavoriteRideService {
 	@Override
 	public void deleteFavouriteRides(Long id, Long passengerId) {
 		Passenger passenger = this.passengerService.findOne(passengerId).get();
-		Set<FavoriteRide> allRides = passenger.getFavouriteRoutes();
+		Set<FavoriteRide> allRides = this.passengerService.getFavoriteRides(passenger.getId());
 		FavoriteRide removeRide = null;
 		for(FavoriteRide ride: allRides)
 		{
@@ -83,7 +83,7 @@ public class FavoriteRideService implements IFavoriteRideService {
 	public FavoriteRideDTO addFavouriteRide(CreateFavoriteRideDTO favouriteRide, Long passengerId) {
 		FavoriteRide ride = new FavoriteRide();
 		ride.setBabyAccessible(favouriteRide.isBabyTransport());
-		ride.setPetAccessible(favouriteRide.isBabyTransport());
+		ride.setPetAccessible(favouriteRide.isPetTransport());
 		ride.setVehicleType(this.vehicleTypeRepository.findByName(VehicleName.getVehicleName(favouriteRide.getVehicleType())));
 		ride.setFavoriteName(favouriteRide.getFavoriteName());
 

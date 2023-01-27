@@ -2,6 +2,7 @@ package com.reesen.Reesen.service;
 
 import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.PassengerDTO;
+import com.reesen.Reesen.model.FavoriteRide;
 import com.reesen.Reesen.model.Passenger;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.VerificationToken;
@@ -104,6 +105,11 @@ public class PassengerService implements IPassengerService {
     @Override
     public VerificationToken findByUrl(String url) {
         return this.verificationTokenRepository.findByUrl(url);
+    }
+
+    @Override
+    public Set<FavoriteRide> getFavoriteRides(Long id) {
+        return this.passengerRepository.getPassengerFavoriteRides(id);
     }
 
     @Override

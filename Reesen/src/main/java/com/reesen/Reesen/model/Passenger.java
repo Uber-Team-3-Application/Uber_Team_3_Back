@@ -1,5 +1,7 @@
 package com.reesen.Reesen.model;
 
+import com.reesen.Reesen.Enums.Role;
+
 import javax.persistence.*;
 
 import java.io.Serializable;
@@ -25,6 +27,14 @@ public class Passenger extends User implements Serializable{
 
     public Passenger(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, Set<Ride> rides, Set<FavoriteRide> favouriteRoutes, boolean isConfirmedMail, double amountOfMoney) {
         super(name, surname, profilePicture, telephoneNumber, email, password);
+        this.rides = rides;
+        this.favouriteRoutes = favouriteRoutes;
+        this.isConfirmedMail = isConfirmedMail;
+        this.amountOfMoney = amountOfMoney;
+    }
+
+    public Passenger(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, boolean isBlocked, boolean isActive, String address, Role role, Set<Ride> rides, Set<FavoriteRide> favouriteRoutes, boolean isConfirmedMail, double amountOfMoney) {
+        super(name, surname, profilePicture, telephoneNumber, email, password, isBlocked, isActive, address, role);
         this.rides = rides;
         this.favouriteRoutes = favouriteRoutes;
         this.isConfirmedMail = isConfirmedMail;
