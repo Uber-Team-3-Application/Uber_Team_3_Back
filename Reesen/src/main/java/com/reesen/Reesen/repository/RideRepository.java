@@ -144,6 +144,14 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "group by r.timeOfStart " +
             "order by r.timeOfStart asc")
     List<ReportDTO<Double>> getTotalCostPerDayForSpecificDriver(Date from, Date to, Long driverId);
+
+    @Query("select count(r) from Ride r where r.driver.id=:driverId and r.status=:status and r.timeOfStart >= :date")
+    int acceptedRides(Long driverId, RideStatus status, LocalDateTime date);
+
+    @Query("select sum(r.totalPrice) from Ride r where r.driver.id=:driverId and r.status=:status and r.timeOfStart >= :date")
+    double income(Long driverId, RideStatus status, LocalDateTime date);
+
+
     // TODO: ---->: VEKSON
 
     // TODO: VUGA
@@ -245,7 +253,6 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "on v.currentLocation.id = l.id " +
             "where r.status=:status or r.status=:started")
     List<RideWithVehicleDTO> getAllActiveRides(RideStatus status, RideStatus started);
-
 
     // TODO: ---: JELENA
 
