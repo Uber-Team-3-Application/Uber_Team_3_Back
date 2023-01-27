@@ -114,7 +114,10 @@ public class VehicleService implements IVehicleService {
 
     @Override
     public Vehicle setCurrentLocation(Vehicle vehicle, LocationDTO locationDTO) {
-        Location location = new Location(locationDTO.getLatitude(), locationDTO.getLongitude(), locationDTO.getAddress());
+        Location location = this.vehicleRepository.getLocation(vehicle.getId());
+        location.setLongitude(locationDTO.getLongitude());
+        location.setLatitude(locationDTO.getLatitude());
+        location.setAddress(locationDTO.getAddress());
         location = this.locationRepository.save(location);
         vehicle.setCurrentLocation(location);
         return vehicle;
