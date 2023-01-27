@@ -714,4 +714,11 @@ public class DriverController {
         return new ResponseEntity<>("Deleted request.", HttpStatus.OK);
 
     }
+
+    @GetMapping(value = "/{id}/statistics")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Set<DriverStatisticsDTO>> getStatistics(@PathVariable("id") Long driverId) {
+        Set<DriverStatisticsDTO> response = this.driverService.getStatistics(driverId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
