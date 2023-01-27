@@ -716,7 +716,7 @@ public class DriverController {
     }
 
     @GetMapping(value = "/{id}/statistics")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<Set<DriverStatisticsDTO>> getStatistics(@PathVariable("id") Long driverId) {
         Set<DriverStatisticsDTO> response = this.driverService.getStatistics(driverId);
         return new ResponseEntity<>(response, HttpStatus.OK);
