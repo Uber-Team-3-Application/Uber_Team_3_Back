@@ -346,7 +346,8 @@ public class RideService implements IRideService {
 			route.setDestination(this.routeRepository.getDestinationByRoute(route).get());
 		}
 		newRide.setLocations(newLocations);
-		this.panicRepository.save(new Panic(new Date(), reason, newRide, userRepository.findById(passengerId).get()));
+		User user = userRepository.findById(passengerId).get();
+		this.panicRepository.save(new Panic(new Date(), reason, newRide, user));
 
 		Long adminId = this.userRepository.findAdmin(Role.ADMIN);
 		WebSocketSession webSocketSession = RideHandler.adminSessions.get(adminId.toString());
@@ -355,6 +356,22 @@ public class RideService implements IRideService {
 		}else {
 			simpMessagingTemplate.convertAndSend("/topic/admin/panic/" + adminId, new RideDTO(ride));
 		}
+		if(user.getRole() == Role.DRIVER) {
+			WebSocketSession driverSession = RideHandler.driverSessions.get(adminId.toString());
+			if (driverSession != null) {
+				RideHandler.notifyAdminAboutPanic(driverSession, new RideDTO(ride));
+			} else {
+				simpMessagingTemplate.convertAndSend("/topic/panic/" + user.getId(), new RideDTO(ride));
+			}
+		}else{
+			WebSocketSession passengerSession = RideHandler.passengerSessions.get(adminId.toString());
+			if (passengerSession != null) {
+				RideHandler.notifyAdminAboutPanic(passengerSession, new RideDTO(ride));
+			} else {
+				simpMessagingTemplate.convertAndSend("/topic/panic/" + user.getId(), new RideDTO(ride));
+			}
+		}
+
 
 		return new RideDTO(newRide);
 	}
