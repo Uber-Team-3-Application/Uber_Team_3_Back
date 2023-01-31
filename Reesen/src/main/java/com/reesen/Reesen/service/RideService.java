@@ -147,7 +147,7 @@ public class RideService implements IRideService {
 				ride.setStatus(RideStatus.REJECTED);
 				for(Passenger passenger: ride.getPassengers())
 					simpMessagingTemplate.convertAndSend("/topic/passenger/ride/" + passenger.getId(), "No suitable driver found!");
-				
+
 			} else {
 				ride.setDriver((Driver) result[0]);
 				ride.setEstimatedTime((Double) result[1]);
