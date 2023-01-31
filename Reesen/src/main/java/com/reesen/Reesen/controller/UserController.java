@@ -378,7 +378,6 @@ public class UserController {
     }
 
     @GetMapping("/email")
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<UserFullDTO> getUserByEmail(@RequestParam("email") String email) {
         return new ResponseEntity<>( new UserFullDTO(this.userService.findByEmail(email).get()), HttpStatus.OK);
     }
