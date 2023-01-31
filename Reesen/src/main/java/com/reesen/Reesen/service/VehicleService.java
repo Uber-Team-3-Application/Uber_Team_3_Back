@@ -181,7 +181,14 @@ public class VehicleService implements IVehicleService {
             @Override
             public void run() {
                 if(ride.getStatus()== RideStatus.FINISHED || ride.getStatus() == RideStatus.CANCELED){
-                    return;
+                    for (Route route: ride.getLocations()){
+                        Location location = route.getDestination();
+                        location = locationRepository.save(location);
+                        vehicle.setCurrentLocation(location);
+                        vehicleRepository.save(vehicle);
+                        break;
+                    }
+                    totalPoints= route.size();
                 }
                 if(totalPoints < route.size()){
                     Location location = vehicle.getCurrentLocation();
