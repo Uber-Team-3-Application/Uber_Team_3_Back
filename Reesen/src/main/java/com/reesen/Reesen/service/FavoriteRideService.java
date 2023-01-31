@@ -87,6 +87,7 @@ public class FavoriteRideService implements IFavoriteRideService {
 		ride.setVehicleType(this.vehicleTypeRepository.findByName(VehicleName.getVehicleName(favouriteRide.getVehicleType())));
 		ride.setFavoriteName(favouriteRide.getFavoriteName());
 
+
 		ride.setPassengers(new LinkedHashSet<>());
 		for(UserDTO user: favouriteRide.getPassengers()){
 			Optional<Passenger> passenger = passengerRepository.findById(user.getId());
@@ -179,7 +180,7 @@ public class FavoriteRideService implements IFavoriteRideService {
 		Set<FavoriteRideDTO> response = this.getFavouriteRides(id);
 		for(FavoriteRideDTO ride: response)
 		{
-			if(ride.getFavoriteName() == favoriteName)
+			if(ride.getFavoriteName().equalsIgnoreCase(favoriteName.toLowerCase()))
 				return true;
 		}
 		return false;
