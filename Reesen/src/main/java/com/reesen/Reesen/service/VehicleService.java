@@ -180,6 +180,9 @@ public class VehicleService implements IVehicleService {
             int totalPoints = 0;
             @Override
             public void run() {
+                if(ride.getStatus()== RideStatus.FINISHED || ride.getStatus() == RideStatus.CANCELED){
+                    return;
+                }
                 if(totalPoints < route.size()){
                     Location location = vehicle.getCurrentLocation();
                     saveLocationForCurrentRide(location, route, totalPoints, vehicle);
