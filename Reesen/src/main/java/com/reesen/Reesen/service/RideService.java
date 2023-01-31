@@ -435,6 +435,12 @@ public class RideService implements IRideService {
 			simpMessagingTemplate.convertAndSend("/topic/passenger/end-ride/"+p.getId(), new RideDTO(ride));
 		}
 		simpMessagingTemplate.convertAndSend("/topic/driver/end-ride/"+ride.getDriver().getId(), new RideDTO(ride));
+		Long adminId = this.userRepository.findAdmin(Role.ADMIN);
+		WebSocketSession adminSession = RideHandler.driverSessions.get(adminId.toString());
+		if(adminSession != null){
+			RideHandler.notifyAdminAboutEndRide(adminSession, new RideDTO(ride));
+		}
+		simpMessagingTemplate.convertAndSend("/topic/admin/end-ride/"+adminId, new RideDTO(ride));
 
 
 		return new RideDTO(ride);
