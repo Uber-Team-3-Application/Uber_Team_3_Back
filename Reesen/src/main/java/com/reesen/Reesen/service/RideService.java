@@ -146,6 +146,9 @@ public class RideService implements IRideService {
 			Object[] result = this.findSuitableDriver(ride);
 			if (result[0] == null) {
 				ride.setStatus(RideStatus.REJECTED);
+				for(Passenger passenger: ride.getPassengers())
+					simpMessagingTemplate.convertAndSend("/topic/passenger/ride/" + passenger.getId(), "No suitable driver found!");
+
 			} else {
 				ride.setDriver((Driver) result[0]);
 				ride.setEstimatedTime((Double) result[1]);
@@ -438,6 +441,12 @@ public class RideService implements IRideService {
 			simpMessagingTemplate.convertAndSend("/topic/passenger/end-ride/"+p.getId(), new RideDTO(ride));
 		}
 		simpMessagingTemplate.convertAndSend("/topic/driver/end-ride/"+ride.getDriver().getId(), new RideDTO(ride));
+		Long adminId = this.userRepository.findAdmin(Role.ADMIN);
+		WebSocketSession adminSession = RideHandler.driverSessions.get(adminId.toString());
+		if(adminSession != null){
+			RideHandler.notifyAdminAboutEndRide(adminSession, new RideDTO(ride));
+		}
+		simpMessagingTemplate.convertAndSend("/topic/admin/end-ride/"+adminId, new RideDTO(ride));
 
 
 		return new RideDTO(ride);
@@ -466,6 +475,13 @@ public class RideService implements IRideService {
 			for (Passenger p : ride.getPassengers()) {
 				simpMessagingTemplate.convertAndSend("/topic/passenger/ride/" + p.getId(), new RideDTO(ride));
 			}
+			WebSocketSession session = RideHandler.driverSessions.get(ride.getDriver().getId().toString());
+			if(session != null){
+				RideHandler.notifyDriverAboutAcceptedRide(session, new RideDTO(ride));
+
+			}
+			simpMessagingTemplate.convertAndSend("/topic/driver/ride/" + ride.getDriver().getId(), new RideDTO(ride));
+
 
 		} else {
 			scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {

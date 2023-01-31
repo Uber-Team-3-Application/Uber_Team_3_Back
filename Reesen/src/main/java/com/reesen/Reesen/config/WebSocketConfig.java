@@ -23,7 +23,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
                 "/topic/driver/start-ride",
                 "/topic/passenger/start-ride",
                 "/topic/passenger/end-ride",
-                "/topic/driver/end-ride");
+                "/topic/driver/end-ride",
+                "/topic/admin/end-ride");
     }
 
     @Override
