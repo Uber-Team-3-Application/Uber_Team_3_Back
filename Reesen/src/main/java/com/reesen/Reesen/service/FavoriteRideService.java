@@ -90,7 +90,7 @@ public class FavoriteRideService implements IFavoriteRideService {
 		ride.setPassengers(new LinkedHashSet<>());
 		for(UserDTO user: favouriteRide.getPassengers()){
 			Optional<Passenger> passenger = passengerRepository.findById(user.getId());
-			if(passenger.isPresent())
+			if(passenger.isPresent() && passenger.get().getId() != passengerId)
 				ride.getPassengers().add(passenger.get());
 		}
 		ride.getPassengers().add(this.passengerService.findOne(passengerId).get());
