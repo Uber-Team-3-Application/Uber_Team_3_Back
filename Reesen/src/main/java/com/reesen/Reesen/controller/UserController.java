@@ -350,7 +350,9 @@ public class UserController {
 
         ResetPasswordToken resetPasswordToken = new ResetPasswordToken(id);
         this.userService.saveResetPasswordToken(resetPasswordToken);
-        return new ResponseEntity<>("Email with reset code has been sent!", HttpStatus.NO_CONTENT);
+        System.out.println("\n\n" + resetPasswordToken.toString() + "\n\n");
+        System.out.println("\n\n" + resetPasswordToken.getCode() + "\n\n");
+        return new ResponseEntity<>(resetPasswordToken.getCode(), HttpStatus.OK);
     }
 
     @PutMapping("/{id}/resetPassword")
