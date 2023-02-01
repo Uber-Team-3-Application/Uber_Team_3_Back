@@ -331,14 +331,14 @@ public class UserController {
     }
 
     @PostMapping("/mail")
-    public ResponseEntity<?> sendEmail(@RequestBody EmailDTO email) throws MessagingException {
+    public ResponseEntity<String> sendEmail(@RequestBody EmailDTO email) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setTo(email.getTo());
         helper.setSubject(email.getSubject());
         helper.setText(email.getMessage(),true);
         mailSender.send(message);
-        return new ResponseEntity<>("Email sent successfuly", HttpStatus.OK);
+        return new ResponseEntity<>("Email sent successfully", HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/{id}/resetPassword")
@@ -350,7 +350,9 @@ public class UserController {
 
         ResetPasswordToken resetPasswordToken = new ResetPasswordToken(id);
         this.userService.saveResetPasswordToken(resetPasswordToken);
-        return new ResponseEntity<>("Email with reset code has been sent!", HttpStatus.NO_CONTENT);
+        System.out.println("\n\n" + resetPasswordToken.toString() + "\n\n");
+        System.out.println("\n\n" + resetPasswordToken.getCode() + "\n\n");
+        return new ResponseEntity<>(resetPasswordToken.getCode(), HttpStatus.OK);
     }
 
     @PutMapping("/{id}/resetPassword")
@@ -378,7 +380,6 @@ public class UserController {
     }
 
     @GetMapping("/email")
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<UserFullDTO> getUserByEmail(@RequestParam("email") String email) {
         return new ResponseEntity<>( new UserFullDTO(this.userService.findByEmail(email).get()), HttpStatus.OK);
     }

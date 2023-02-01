@@ -15,10 +15,8 @@ import java.util.Set;
 @Repository
 public interface FavoriteRouteRepository extends JpaRepository<FavoriteRide, Long> {
 
-    @Query("select r from FavoriteRide r, Passenger p  " +
-            "where p.id=:passengerId " +
-            "and " +
-            "p member of r.passengers")
+    @Query("select r from FavoriteRide r inner join Passenger p  on r member of p.favouriteRoutes " +
+            "where p.id=:passengerId")
     Set<FavoriteRide> findAllByPassengerId(Long passengerId);
 
     @Query("select r.locations from FavoriteRide r where r.id=:id")

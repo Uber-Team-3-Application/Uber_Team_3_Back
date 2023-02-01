@@ -51,7 +51,7 @@ public class RideController {
     @GetMapping(value = "/driver/{driverId}/active")
     @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN')")
     public ResponseEntity<RideDTO> getDriverActiveRide(@PathVariable("driverId") Long driverId, @RequestHeader Map<String, String> headers){
-       if(driverId < 1)
+        if(driverId < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         Ride ride = this.rideService.findDriverActiveRide(driverId);
         if(ride == null)
@@ -131,7 +131,7 @@ public class RideController {
         if(this.rideService.findOne(id) == null)
             return new ResponseEntity("Ride does not exist!", HttpStatus.NOT_FOUND);
         if(!role.equalsIgnoreCase("driver"))// ||
-               // !(this.driverService.findDriverByRidesContaining(this.rideService.findOne(id)).getId() == this.userRequestValidation.getIdFromToken(headers)) )
+            // !(this.driverService.findDriverByRidesContaining(this.rideService.findOne(id)).getId() == this.userRequestValidation.getIdFromToken(headers)) )
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         RideDTO startedRide = this.rideService.startRide(id);
         return new ResponseEntity<>(startedRide, HttpStatus.OK);
@@ -160,7 +160,7 @@ public class RideController {
         if(this.rideService.findOne(id) == null)
             return new ResponseEntity("Ride does not exist!", HttpStatus.NOT_FOUND);
         if(!role.equalsIgnoreCase("driver"))
-              //  !(this.driverService.findDriverByRidesContaining(this.rideService.findOne(id)).getId() == this.userRequestValidation.getIdFromToken(headers)) )
+            //  !(this.driverService.findDriverByRidesContaining(this.rideService.findOne(id)).getId() == this.userRequestValidation.getIdFromToken(headers)) )
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         if(reason == null)
             return new ResponseEntity("Must give a reason!", HttpStatus.BAD_REQUEST);

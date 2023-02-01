@@ -14,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 import com.reesen.Reesen.model.Ride;
@@ -144,6 +143,10 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "group by r.timeOfStart " +
             "order by r.timeOfStart asc")
     List<ReportDTO<Double>> getTotalCostPerDayForSpecificDriver(Date from, Date to, Long driverId);
+
+    @Query("select r from Ride r where r.driver.id=:driverId and r.timeOfStart >= :date")
+    Set<Ride> getRides(Long driverId, Date date);
+
     // TODO: ---->: VEKSON
 
     // TODO: VUGA
@@ -245,7 +248,6 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "on v.currentLocation.id = l.id " +
             "where r.status=:status or r.status=:started")
     List<RideWithVehicleDTO> getAllActiveRides(RideStatus status, RideStatus started);
-
 
     // TODO: ---: JELENA
 
