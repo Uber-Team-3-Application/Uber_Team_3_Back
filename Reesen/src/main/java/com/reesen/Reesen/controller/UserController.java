@@ -331,14 +331,14 @@ public class UserController {
     }
 
     @PostMapping("/mail")
-    public ResponseEntity<?> sendEmail(@RequestBody EmailDTO email) throws MessagingException {
+    public ResponseEntity<String> sendEmail(@RequestBody EmailDTO email) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setTo(email.getTo());
         helper.setSubject(email.getSubject());
         helper.setText(email.getMessage(),true);
         mailSender.send(message);
-        return new ResponseEntity<>("Email sent successfuly", HttpStatus.OK);
+        return new ResponseEntity<>("Email sent successfully", HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/{id}/resetPassword")
