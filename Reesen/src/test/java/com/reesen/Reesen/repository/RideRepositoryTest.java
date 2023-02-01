@@ -218,5 +218,15 @@ public class RideRepositoryTest {
         assertEquals(0, reports.size());
     }
 
+    @Test
+    public void getVehicleTypeId_fromRideId_withValidRideId(){
+        Long rideId = 1L;
+
+        Long vehicleId = this.rideRepository.getVehicleTypeId(rideId);
+        assertThat(vehicleId).isNotNull();
+        assertThat(vehicleId).isLessThan(4L);
+
+    }
+
 
 }

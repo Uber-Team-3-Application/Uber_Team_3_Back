@@ -1,25 +1,25 @@
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
-values('Mirko', 'Preradovic', 'profilna', false, false, 'Rajfajzenova 12, Novi Sad', 'DRIVER');
+values('Mirko', 'Preradovic', 'profilna', '12421421','mirko@gmail.com', 'Mirko123', false, false, 'Rajfajzenova 12, Novi Sad', 'DRIVER');
 
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
 
-values('Marko', 'Kraljevic', 'profilna', true, true, 'Mirkova 14, Novi Sad', 'DRIVER');
+values('Marko', 'Kraljevic', 'profilna', '1242146', 'marko@gmail.com', 'Marko123', true, true, 'Mirkova 14, Novi Sad', 'DRIVER');
 
 
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
-values('Nemanja', 'Stefanovic', 'profilna', '+38121521', 'nemus@gmail.com', '$2a$12$gc0oiaMyVWDtpvu.JOhjOOja9GZc4.W4xH07LFpxgxakH5BwzmNa2', false, false , 'Radnicka 20, Novi Sad', 'PASSENGER');
+values('Nemanja', 'Stefanovic', 'profilna', '+38121521', 'nemus@gmail.com', 'Nemanja123',  false, false , 'Radnicka 20, Novi Sad', 'PASSENGER');
 
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
-values('Marko', 'Preradovic', 'profilna', '+38121521', 'markopreradovic@gmail.com',
+values('Marko', 'Preradovic', 'profilna', '+38121521', 'markopreradovic@gmail.com', 'Marko123',
        '$2a$12$Gj4ckCgOFRuVUGIDq9arFeyHNjUFB/.guwMPE4PsqDQD2xvQ65FSW', false, false , 'Kurtijeva 12, Novi Sad', 'PASSENGER');
 
 
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
-values('Nebojsa', 'Vuga', 'profilna', false, false , 'Radnicka 19, Novi Sad', 'PASSENGER');
+values('Nebojsa', 'Vuga', 'profilna', '1243124', 'nebojsavuga@gmail.com', 'Nebojsa123', false, false , 'Radnicka 19, Novi Sad', 'PASSENGER');
 
 
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
-values('Nikolaj', 'Velimirovic', 'profilna', false, false, 'Radnicka 19, Novi Sad', 'ADMIN');
+values('Nikolaj', 'Velimirovic', 'profilna', '124124214', 'nikolaj@gmail.com', 'Nikolaj123', false, false, 'Radnicka 19, Novi Sad', 'ADMIN');
 
 
 insert into Passenger(id, is_confirmed_mail, amount_of_money) values(3, true, 1000);
