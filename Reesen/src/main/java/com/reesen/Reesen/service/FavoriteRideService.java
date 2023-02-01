@@ -87,10 +87,12 @@ public class FavoriteRideService implements IFavoriteRideService {
 		ride.setVehicleType(this.vehicleTypeRepository.findByName(VehicleName.getVehicleName(favouriteRide.getVehicleType())));
 		ride.setFavoriteName(favouriteRide.getFavoriteName());
 
+
 		ride.setPassengers(new LinkedHashSet<>());
 		for(UserDTO user: favouriteRide.getPassengers()){
 			Optional<Passenger> passenger = passengerRepository.findById(user.getId());
-			passenger.ifPresent(value -> ride.getPassengers().add(value));
+			if(passenger.isPresent() && passenger.get().getId() != passengerId)
+				ride.getPassengers().add(passenger.get());
 		}
 		ride.getPassengers().add(this.passengerService.findOne(passengerId).get());
 
@@ -118,12 +120,12 @@ public class FavoriteRideService implements IFavoriteRideService {
 
 		}
 
-		FavoriteRide newFavoriteRide = favoriteRouteRepository.save(ride);
+		ride = favoriteRouteRepository.save(ride);
 
 		Passenger passenger = this.passengerService.findOne(passengerId).get();
 		Set<FavoriteRide> passengerFavoriteRides =this.passengerRepository.getFavoriteRides(passengerId);
 		passenger.setFavouriteRoutes(passengerFavoriteRides);
-		passenger.getFavouriteRoutes().add(newFavoriteRide);
+		passenger.getFavouriteRoutes().add(ride);
 		this.passengerRepository.save(passenger);
 
 
@@ -178,7 +180,7 @@ public class FavoriteRideService implements IFavoriteRideService {
 		Set<FavoriteRideDTO> response = this.getFavouriteRides(id);
 		for(FavoriteRideDTO ride: response)
 		{
-			if(ride.getFavoriteName() == favoriteName)
+			if(ride.getFavoriteName().equalsIgnoreCase(favoriteName.toLowerCase()))
 				return true;
 		}
 		return false;

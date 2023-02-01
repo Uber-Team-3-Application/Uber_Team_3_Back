@@ -18,7 +18,7 @@ public class CurrentLocationDTO {
 
     public CurrentLocationDTO(Location location) {
         this.address = location.getAddress();
-        this.latitude = location.getLongitude();
+        this.latitude = location.getLatitude();
         this.longitude = location.getLongitude();
     }
 

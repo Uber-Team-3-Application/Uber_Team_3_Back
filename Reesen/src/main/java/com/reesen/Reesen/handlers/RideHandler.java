@@ -68,6 +68,18 @@ public class RideHandler implements WebSocketHandler {
             throw new RuntimeException(e);
         }
     }
+
+    public static void notifyDriverAboutAcceptedRide(WebSocketSession sessions, RideDTO rideDTO) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JSR310Module());
+        try {
+            TextMessage textMessage = new TextMessage(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rideDTO));
+            sessions.sendMessage(textMessage);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static void notifyPassengerAboutDeclinedRide(List<WebSocketSession> sessions, RideDTO rideDTO) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JSR310Module());
@@ -119,6 +131,18 @@ public class RideHandler implements WebSocketHandler {
     }
 
     public static void notifyDriverAboutEndRide(WebSocketSession sessions, RideDTO rideDTO) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JSR310Module());
+        try {
+            TextMessage textMessage = new TextMessage(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rideDTO));
+            sessions.sendMessage(textMessage);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void notifyAdminAboutEndRide(WebSocketSession sessions, RideDTO rideDTO) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JSR310Module());
         try {
