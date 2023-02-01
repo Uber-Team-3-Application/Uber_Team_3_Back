@@ -281,12 +281,6 @@ public class RideService implements IRideService {
 		return result;
 	}
 
-	private boolean getRejectedRidesForDriver(Long driverId, Long passengerId) {
-		Set<Ride> rejectedRides = this.rideRepository.findAllRidesByDriverIdAndPassengerIdAndScheduledTimeBeforeAndStatus(driverId, passengerId, LocalDateTime.now().minusMinutes(15), RideStatus.REJECTED);
-		if (rejectedRides.isEmpty()) return true;
-		return false;
-	}
-
 	private Optional<Ride> findDriverScheduledRide(Long driverId) {
 		return this.rideRepository.findRideByDriverIdAndStatus(driverId, RideStatus.ACCEPTED);
 	}
