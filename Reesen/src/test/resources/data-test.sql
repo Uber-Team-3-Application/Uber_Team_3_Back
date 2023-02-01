@@ -10,8 +10,7 @@ insert into Users(name, surname, profile_picture, telephone_number, email, passw
 values('Nemanja', 'Stefanovic', 'profilna', '+38121521', 'nemus@gmail.com', 'Nemanja123',  false, false , 'Radnicka 20, Novi Sad', 'PASSENGER');
 
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
-values('Marko', 'Preradovic', 'profilna', '+38121521', 'markopreradovic@gmail.com', 'Marko123',
-       '$2a$12$Gj4ckCgOFRuVUGIDq9arFeyHNjUFB/.guwMPE4PsqDQD2xvQ65FSW', false, false , 'Kurtijeva 12, Novi Sad', 'PASSENGER');
+values('Marko', 'Preradovic', 'profilna', '+38121521', 'markopreradovic@gmail.com', 'Marko123', false, false , 'Kurtijeva 12, Novi Sad', 'PASSENGER');
 
 
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
