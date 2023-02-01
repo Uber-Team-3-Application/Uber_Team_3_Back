@@ -28,14 +28,12 @@ import java.util.Set;
 public class RideController {
 
     private final IRideService rideService;
-    private final IFavoriteRideService favoriteRideService;
-    private final IDriverService driverService;
+    private final IFavoriteRideService favoriteRideService;;
     private final UserRequestValidation userRequestValidation;
 
-    public RideController(IRideService rideService, IFavoriteRideService favoriteRideService, IDriverService driverService, UserRequestValidation userRequestValidation) {
+    public RideController(IRideService rideService, IFavoriteRideService favoriteRideService, UserRequestValidation userRequestValidation) {
         this.rideService = rideService;
         this.favoriteRideService = favoriteRideService;
-        this.driverService = driverService;
         this.userRequestValidation = userRequestValidation;
     }
 

@@ -2,14 +2,17 @@ package com.reesen.Reesen.controller;
 
 import com.reesen.Reesen.dto.LoginDTO;
 import com.reesen.Reesen.dto.TokenDTO;
+import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.service.interfaces.IRideService;
 import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -28,8 +31,6 @@ public class RideControllerTest {
     private final String PASSENGER_PASSWORD = "Marko123";
 
 
-    @Autowired
-    private RideController rideController;
     @Autowired
     private TestRestTemplate restTemplate;
 
@@ -51,10 +52,12 @@ public class RideControllerTest {
         passengerToken = passengerResponse.getBody();
     }
 
+
     @Test
-    public void print(){
-        System.out.println(driverToken.getToken());
-        System.out.println(passengerToken.getToken());
+    @DisplayName("Should accept created ride")
+    public void test_accept(){
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Auth-Token", passengerToken.getToken());
     }
 
 }
