@@ -1,3 +1,5 @@
+
+
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
 values('Mirko', 'Preradovic', 'profilna', '12421421','mirko@gmail.com', 'Mirko123', false, false, 'Rajfajzenova 12, Novi Sad', 'DRIVER');
 
