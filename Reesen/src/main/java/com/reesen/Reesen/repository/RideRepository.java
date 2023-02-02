@@ -197,11 +197,6 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "and r.status=:rideStatus")
     Set<Ride> findAllRidesByPassengerIdAndRideStatus(Long passengerId, RideStatus rideStatus);
 
-    @Transactional
-    @Modifying
-    @Query("update Ride p set p.status=:rideStatus where p.id=:id")
-    void updateRideStatus(Long id, RideStatus rideStatus);
-
     @Query("select new com.reesen.Reesen.dto.ReportDTO(r.timeOfStart, count(r)) " +
             "from Ride r inner join Passenger p on p member of r.passengers " +
             "where p.id=:passengerId and " +
