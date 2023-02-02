@@ -1,3 +1,11 @@
+drop ALIAS if exists TO_DATE;
+CREATE ALIAS TO_DATE as '
+import java.text.*;
+@CODE
+java.util.Date toDate(String originalDate, String dateFormat) throws Exception {
+    return new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(originalDate);
+}
+';
 
 
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
