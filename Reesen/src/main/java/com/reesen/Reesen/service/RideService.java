@@ -109,6 +109,13 @@ public class RideService implements IRideService {
 
 	@Override
 	public RideDTO createRideDTO(CreateRideDTO rideDTO, Long passengerId) {
+
+		if (rideDTO.getScheduledTime() != null) {
+			Calendar calendar = Calendar.getInstance();
+			calendar.add(Calendar.HOUR, 5);
+			if (rideDTO.getScheduledTime().after(calendar.getTime()))
+				return null;
+		}
 		Ride ride = new Ride();
 		Set<RouteDTO> locationsDTOs = rideDTO.getLocations();
 		LinkedHashSet<Route> locations = new LinkedHashSet<>();
