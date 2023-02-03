@@ -2,6 +2,7 @@ package com.reesen.Reesen.service.interfaces;
 
 import com.reesen.Reesen.dto.CreatedDriverDTO;
 import com.reesen.Reesen.dto.DriverDTO;
+import com.reesen.Reesen.dto.DriverStatisticsDTO;
 import com.reesen.Reesen.dto.UpdateDriverDTO;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Driver.DriverEditBasicInformation;
@@ -55,7 +56,11 @@ public interface IDriverService {
 
     Vehicle updateVehicleBasedOnEditRequest(Driver driver, DriverEditVehicle driverEditVehicle);
 
+    Set<Ride> getDriverRides(Long id);
+
+
     Optional<Driver> findDriverWithRide(Ride ride);
     Set<Review> getAllReviews(Long driverId);
 
+    Set<DriverStatisticsDTO> getStatistics(Long driverId);
 }

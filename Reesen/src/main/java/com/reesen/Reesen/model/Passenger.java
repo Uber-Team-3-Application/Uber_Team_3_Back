@@ -1,6 +1,7 @@
 package com.reesen.Reesen.model;
 
 import com.reesen.Reesen.Enums.Role;
+
 import javax.persistence.*;
 
 import java.io.Serializable;
@@ -13,7 +14,7 @@ public class Passenger extends User implements Serializable{
     private Set<Ride> rides;
 
     @OneToMany(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
-    private Set<FavoriteRoute> favouriteRoutes;
+    private Set<FavoriteRide> favouriteRoutes;
 
     @Column
     private boolean isConfirmedMail;
@@ -24,7 +25,7 @@ public class Passenger extends User implements Serializable{
     public Passenger() {
     }
 
-    public Passenger(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, Set<Ride> rides, Set<FavoriteRoute> favouriteRoutes, boolean isConfirmedMail, double amountOfMoney) {
+    public Passenger(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, Set<Ride> rides, Set<FavoriteRide> favouriteRoutes, boolean isConfirmedMail, double amountOfMoney) {
         super(name, surname, profilePicture, telephoneNumber, email, password);
         this.rides = rides;
         this.favouriteRoutes = favouriteRoutes;
@@ -32,7 +33,15 @@ public class Passenger extends User implements Serializable{
         this.amountOfMoney = amountOfMoney;
     }
 
-    public Passenger(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, boolean isBlocked, boolean isActive, String address, Set<Ride> rides, Set<FavoriteRoute> favouriteRoutes, boolean isConfirmedMail, double amountOfMoney) {
+    public Passenger(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, boolean isBlocked, boolean isActive, String address, Role role, Set<Ride> rides, Set<FavoriteRide> favouriteRoutes, boolean isConfirmedMail, double amountOfMoney) {
+        super(name, surname, profilePicture, telephoneNumber, email, password, isBlocked, isActive, address, role);
+        this.rides = rides;
+        this.favouriteRoutes = favouriteRoutes;
+        this.isConfirmedMail = isConfirmedMail;
+        this.amountOfMoney = amountOfMoney;
+    }
+
+    public Passenger(String name, String surname, String profilePicture, String telephoneNumber, String email, String password, boolean isBlocked, boolean isActive, String address, Set<Ride> rides, Set<FavoriteRide> favouriteRoutes, boolean isConfirmedMail, double amountOfMoney) {
         super(name, surname, profilePicture, telephoneNumber, email, password, isBlocked, isActive, address);
         this.rides = rides;
         this.favouriteRoutes = favouriteRoutes;
@@ -48,11 +57,11 @@ public class Passenger extends User implements Serializable{
         this.rides = rides;
     }
 
-    public Set<FavoriteRoute> getFavouriteRoutes() {
+    public Set<FavoriteRide> getFavouriteRoutes() {
         return favouriteRoutes;
     }
 
-    public void setFavouriteRoutes(Set<FavoriteRoute> favouriteRoutes) {
+    public void setFavouriteRoutes(Set<FavoriteRide> favouriteRoutes) {
         this.favouriteRoutes = favouriteRoutes;
     }
 

@@ -1,9 +1,11 @@
 package com.reesen.Reesen.service;
 
+import com.reesen.Reesen.Enums.RideStatus;
 import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.dto.CreatedDriverDTO;
 import com.reesen.Reesen.dto.DriverDTO;
+import com.reesen.Reesen.dto.DriverStatisticsDTO;
 import com.reesen.Reesen.dto.UpdateDriverDTO;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Driver.DriverEditBasicInformation;
@@ -13,20 +15,17 @@ import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.Vehicle;
 import com.reesen.Reesen.model.VehicleType;
 import com.reesen.Reesen.model.paginated.Paginated;
-import com.reesen.Reesen.repository.DriverEditBasicInfoRepository;
-import com.reesen.Reesen.repository.DriverEditVehicleInfoRepository;
-import com.reesen.Reesen.repository.DriverRepository;
-import com.reesen.Reesen.repository.VehicleTypeRepository;
+import com.reesen.Reesen.repository.*;
 import com.reesen.Reesen.service.interfaces.IDriverService;
+import com.reesen.Reesen.service.interfaces.IWorkingHoursService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class DriverService implements IDriverService {
@@ -35,14 +34,18 @@ public class DriverService implements IDriverService {
     private final DriverEditBasicInfoRepository driverEditBasicInfoRepository;
     private final DriverEditVehicleInfoRepository driverEditVehicleInfoRepository;
     private final VehicleTypeRepository vehicleTypeRepository;
+    private RideRepository rideRepository;
+    private IWorkingHoursService workingHoursService;
 
     @Autowired
-    public DriverService(DriverRepository driverRepository, PasswordEncoder passwordEncoder, DriverEditBasicInfoRepository driverEditBasicInfoRepository, DriverEditVehicleInfoRepository driverEditVehicleInfoRepository, VehicleTypeRepository vehicleTypeRepository){
+    public DriverService(DriverRepository driverRepository, PasswordEncoder passwordEncoder, DriverEditBasicInfoRepository driverEditBasicInfoRepository, DriverEditVehicleInfoRepository driverEditVehicleInfoRepository, VehicleTypeRepository vehicleTypeRepository, RideRepository rideRepository, IWorkingHoursService workingHoursService){
         this.driverRepository = driverRepository;
         this.passwordEncoder = passwordEncoder;
         this.driverEditBasicInfoRepository = driverEditBasicInfoRepository;
         this.driverEditVehicleInfoRepository = driverEditVehicleInfoRepository;
         this.vehicleTypeRepository = vehicleTypeRepository;
+        this.rideRepository = rideRepository;
+        this.workingHoursService = workingHoursService;
     }
 
     @Override
@@ -119,12 +122,11 @@ public class DriverService implements IDriverService {
 
     @Override
     public Driver findDriverByRidesContaining(Ride ride) {
+
         Optional<Driver> driver =  this.driverRepository.findDriverByRidesContaining(ride);
         if(driver.isPresent()) return driver.get();
         return null;
-
     }
-
     @Override
     public int getTotalEditRequests() {
         return this.driverEditBasicInfoRepository.countTotal() + this.driverEditVehicleInfoRepository.countTotal();
@@ -199,6 +201,11 @@ public class DriverService implements IDriverService {
     }
 
     @Override
+    public Set<Ride> getDriverRides(Long id) {
+        return this.driverRepository.getDriverRides(id);
+    }
+
+    @Override
     public Optional<Driver> findDriverWithRide(Ride ride) {
         return this.driverRepository.findDriverByRidesContaining(ride);
     }
@@ -206,6 +213,78 @@ public class DriverService implements IDriverService {
     @Override
     public Set<Review> getAllReviews(Long driverId) {
         return this.driverRepository.getAllReviews(driverId);
+    }
+
+    @Override
+    public Set<DriverStatisticsDTO> getStatistics(Long driverId) {
+        Set<DriverStatisticsDTO> response = new HashSet<>();
+        DriverStatisticsDTO today = new DriverStatisticsDTO();
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -1);
+        Date date = cal.getTime();
+        today.setType(1);
+        today.setHours((int) this.workingHoursService.getTotalHoursWorkedInLastDay(driverId).toHours());
+        today.setIncome(0);
+        today.setAccepted(0);
+        today.setRejected(0);
+        if(this.rideRepository.getRides(driverId, date) != null)
+            for(Ride ride: this.rideRepository.getRides(driverId, date))
+            {
+                if(ride.getStatus() == RideStatus.FINISHED)
+                {
+                    today.setAccepted(today.getAccepted()+1);
+                    today.setIncome(today.getIncome()+ride.getTotalPrice());
+                }
+                else if (ride.getStatus() == RideStatus.REJECTED)
+                    today.setRejected(today.getRejected()+1);
+            }
+
+        cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -7);
+        date = cal.getTime();
+        DriverStatisticsDTO week = new DriverStatisticsDTO();
+        week.setType(7);
+        week.setIncome(0);
+        week.setAccepted(0);
+        week.setRejected(0);
+        if(this.rideRepository.getRides(driverId, date) != null)
+            for(Ride ride: this.rideRepository.getRides(driverId, date))
+            {
+                if(ride.getStatus() == RideStatus.FINISHED)
+                {
+                    week.setAccepted(week.getAccepted()+1);
+                    week.setIncome(week.getIncome()+ride.getTotalPrice());
+                }
+                else if (ride.getStatus() == RideStatus.REJECTED)
+                    week.setRejected(week.getRejected()+1);
+            }
+        week.setHours((int) this.workingHoursService.getTotalHoursWorkedInLastWeek(driverId).toHours());
+
+        cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -31);
+        date = cal.getTime();
+        DriverStatisticsDTO month = new DriverStatisticsDTO();
+        month.setType(30);
+        month.setIncome(0);
+        month.setAccepted(0);
+        month.setRejected(0);
+        if(this.rideRepository.getRides(driverId, date) != null)
+            for(Ride ride: this.rideRepository.getRides(driverId, date))
+            {
+                if(ride.getStatus() == RideStatus.FINISHED)
+                {
+                    month.setAccepted(month.getAccepted()+1);
+                    month.setIncome(month.getIncome()+ride.getTotalPrice());
+                }
+                else if (ride.getStatus() == RideStatus.REJECTED)
+                    month.setRejected(month.getRejected()+1);
+            }
+        month.setHours((int) this.workingHoursService.getTotalHoursWorkedInLastMonth(driverId).toHours());
+
+        response.add(today);
+        response.add(month);
+        response.add(week);
+        return response;
     }
 
     public VehicleType findVehicleTypeByName(VehicleName name){

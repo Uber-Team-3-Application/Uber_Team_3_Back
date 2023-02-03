@@ -25,6 +25,7 @@ public interface IVehicleService {
     VehicleType findType(Long id);
     Location findLocation(Long id);
 
+
     Vehicle setCurrentLocation(Vehicle vehicle, LocationDTO locationDTO);
 
     List<VehicleType> getVehicleTypes();
@@ -34,4 +35,10 @@ public interface IVehicleService {
     List<VehicleLocationWithAvailabilityDTO> getAllLocationsWithAvailability();
 
     LocationDTO getCurrentLocation(Long vehicleId);
+
+    Vehicle findVehicleByDriverId(Long id);
+
+    void simulateVehicleByRideId(Long rideId);
+
+    List<LocationDTO> getRouteFromOpenRoute(String start, String end);
 }

@@ -1,5 +1,10 @@
 package com.reesen.Reesen.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class EstimatedTimeDTO {
     private int estimatedTimeInMinutes;
     private int estimatedCost;
@@ -9,19 +14,4 @@ public class EstimatedTimeDTO {
         this.estimatedCost = estimatedCost;
     }
 
-    public int getEstimatedTimeInMinutes() {
-        return estimatedTimeInMinutes;
-    }
-
-    public void setEstimatedTimeInMinutes(int estimatedTimeInMinutes) {
-        this.estimatedTimeInMinutes = estimatedTimeInMinutes;
-    }
-
-    public int getEstimatedCost() {
-        return estimatedCost;
-    }
-
-    public void setEstimatedCost(int estimatedCost) {
-        this.estimatedCost = estimatedCost;
-    }
 }

@@ -6,7 +6,6 @@ import com.reesen.Reesen.model.Driver.Driver;
 import javax.persistence.*;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -62,14 +61,14 @@ public class Ride implements Serializable {
     @ManyToMany(cascade = {CascadeType.REFRESH}, fetch = FetchType.LAZY)
     private Set<Route> locations;
 
-    private LocalDateTime scheduledTime;
+    private Date scheduledTime;
 
     public Ride() {
     }
 
     public Ride(Date timeOfStart, Date timeOfEnd, double totalPrice, Driver driver, Set<Passenger> passengers,
                 double estimatedTime, Set<Review> review, RideStatus status, Deduction deduction,
-                boolean isPanicPressed, boolean isBabyAccessible, boolean isPetAccessible, VehicleType vehicleType, Set<Route> locations, LocalDateTime scheduledTime) {
+                boolean isPanicPressed, boolean isBabyAccessible, boolean isPetAccessible, VehicleType vehicleType, Set<Route> locations, Date scheduledTime) {
         this.scheduledTime = scheduledTime;
         {
             this.timeOfStart = timeOfStart;
@@ -211,11 +210,11 @@ public class Ride implements Serializable {
         this.locations = locations;
     }
 
-    public LocalDateTime getScheduledTime() {
+    public Date getScheduledTime() {
         return scheduledTime;
     }
 
-    public void setScheduledTime(LocalDateTime scheduledTime) {
+    public void setScheduledTime(Date scheduledTime) {
         this.scheduledTime = scheduledTime;
     }
 

@@ -1,17 +1,20 @@
 package com.reesen.Reesen.dto;
 
-import com.reesen.Reesen.model.FavoriteRoute;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Set;
 
+@NoArgsConstructor
+@Getter
+@Setter
 public class FavoriteRouteDTO {
 	
 	private Long id;
 	private Set<LocationDTO> locations;
 	private String favoriteName;
 
-	public FavoriteRouteDTO() {
-	}
 
 	public FavoriteRouteDTO(Set<LocationDTO> locations, String favoriteName) {
 		this.locations = locations;
@@ -24,27 +27,4 @@ public class FavoriteRouteDTO {
 		this.favoriteName = favoriteName;
 	}
 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public Set<LocationDTO> getLocations() {
-		return locations;
-	}
-
-	public void setLocations(Set<LocationDTO> locations) {
-		this.locations = locations;
-	}
-
-	public String getFavoriteName() {
-		return favoriteName;
-	}
-
-	public void setFavoriteName(String favoriteName) {
-		this.favoriteName = favoriteName;
-	}
 }

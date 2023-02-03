@@ -1,23 +1,34 @@
 package com.reesen.Reesen.service;
 
+import com.reesen.Reesen.Enums.RideStatus;
 import com.reesen.Reesen.dto.LocationDTO;
 import com.reesen.Reesen.Enums.VehicleName;
+import com.reesen.Reesen.dto.RideDTO;
 import com.reesen.Reesen.dto.VehicleDTO;
 import com.reesen.Reesen.dto.VehicleLocationWithAvailabilityDTO;
+import com.reesen.Reesen.handlers.RideHandler;
+import com.reesen.Reesen.handlers.RideSimulationHandler;
+import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.Driver.Driver;
-import com.reesen.Reesen.model.Location;
-import com.reesen.Reesen.model.Vehicle;
-import com.reesen.Reesen.model.VehicleType;
 import com.reesen.Reesen.repository.LocationRepository;
 import com.reesen.Reesen.repository.VehicleRepository;
 import com.reesen.Reesen.repository.VehicleTypeRepository;
+import com.reesen.Reesen.service.interfaces.IRideService;
 import com.reesen.Reesen.service.interfaces.IVehicleService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.socket.WebSocketSession;
+
+import java.util.*;
 
 @Service
 public class VehicleService implements IVehicleService {
@@ -25,12 +36,16 @@ public class VehicleService implements IVehicleService {
     private final VehicleRepository vehicleRepository;
     private final VehicleTypeRepository vehicleTypeRepository;
     private final LocationRepository locationRepository;
+    private final IRideService rideService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
-    public VehicleService(VehicleRepository vehicleRepository, VehicleTypeRepository vehicleTypeRepository, LocationRepository locationRepository){
+    public VehicleService(VehicleRepository vehicleRepository, VehicleTypeRepository vehicleTypeRepository, LocationRepository locationRepository, IRideService rideService, SimpMessagingTemplate simpMessagingTemplate){
         this.vehicleRepository = vehicleRepository;
         this.vehicleTypeRepository = vehicleTypeRepository;
         this.locationRepository = locationRepository;
+        this.rideService = rideService;
+        this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
     @Override
@@ -96,9 +111,13 @@ public class VehicleService implements IVehicleService {
         return this.vehicleRepository.getLocation(id);
     }
 
+
     @Override
     public Vehicle setCurrentLocation(Vehicle vehicle, LocationDTO locationDTO) {
-        Location location = new Location(locationDTO.getLatitude(), locationDTO.getLongitude(), locationDTO.getAddress());
+        Location location = this.vehicleRepository.getLocation(vehicle.getId());
+        location.setLongitude(locationDTO.getLongitude());
+        location.setLatitude(locationDTO.getLatitude());
+        location.setAddress(locationDTO.getAddress());
         location = this.locationRepository.save(location);
         vehicle.setCurrentLocation(location);
         return vehicle;
@@ -124,6 +143,127 @@ public class VehicleService implements IVehicleService {
     public LocationDTO getCurrentLocation(Long vehicleId) {
         Location location = this.vehicleRepository.getLocation(vehicleId);
         return new LocationDTO(location);
+    }
+
+    @Override
+    public Vehicle findVehicleByDriverId(Long id) {
+        return this.vehicleRepository.findVehicleByDriverId(id);
+    }
+
+    @Override
+    public void simulateVehicleByRideId(Long rideId) {
+        Ride ride = this.rideService.findOne(rideId);
+        Vehicle vehicle = this.vehicleRepository.findVehicleByDriverId(ride.getDriver().getId());
+        vehicle.setCurrentLocation(this.locationRepository.findById(vehicle.getCurrentLocation().getId()).get());
+        String start = "", end = "";
+        if(ride.getStatus() == RideStatus.ACCEPTED){
+            start = vehicle.getCurrentLocation().getLongitude() + "," + vehicle.getCurrentLocation().getLatitude();
+            for(Route route : ride.getLocations()){
+                end = route.getDeparture().getLongitude() + "," + route.getDeparture().getLatitude();
+                break;
+            }
+        }else if(ride.getStatus() == RideStatus.ACTIVE || ride.getStatus() == RideStatus.STARTED){
+            for(Route route : ride.getLocations()){
+                start = route.getDeparture().getLongitude() + "," + route.getDeparture().getLatitude();
+                end = route.getDestination().getLongitude() + "," + route.getDestination().getLatitude();
+                vehicle.setCurrentLocation(this.locationRepository.findById(route.getDeparture().getId()).get());
+
+                break;
+            }
+        }else return;
+
+        List<LocationDTO> route = this.getRouteFromOpenRoute(start, end);
+
+        Timer timer = new Timer();
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+            int totalPoints = 0;
+            @Override
+            public void run() {
+                if(ride.getStatus()== RideStatus.FINISHED || ride.getStatus() == RideStatus.CANCELED){
+                    for (Route route: ride.getLocations()){
+                        Location location = route.getDestination();
+                        location = locationRepository.save(location);
+                        vehicle.setCurrentLocation(location);
+                        vehicleRepository.save(vehicle);
+                        break;
+                    }
+                    totalPoints= route.size();
+                }
+                if(totalPoints < route.size()){
+                    Location location = vehicle.getCurrentLocation();
+                    saveLocationForCurrentRide(location, route, totalPoints, vehicle);
+                    System.out.println(totalPoints);
+                    List<WebSocketSession> sessions = new ArrayList<>();
+                    addPassengerSession(sessions, ride);
+                    WebSocketSession driverSession = RideHandler.driverSessions.get(ride.getDriver().getId().toString());
+                    if(driverSession != null) sessions.add(driverSession);
+                    WebSocketSession adminSession = RideHandler.adminSessions.get(Long.toString(6));
+                    if(adminSession != null) sessions.add(adminSession);
+                    if(!sessions.isEmpty()) {
+                        RideSimulationHandler.notifyUsersAboutVehicleLocations(sessions, location);
+                    }
+                    VehicleLocationWithAvailabilityDTO vehicleLocationWithAvailabilityDTO = new VehicleLocationWithAvailabilityDTO(vehicle.getId(),
+                            true, location.getAddress(), location.getLongitude(), location.getLatitude());
+                    simpMessagingTemplate.convertAndSend("/topic/map-updates", vehicleLocationWithAvailabilityDTO);
+
+                    totalPoints++;
+
+                }else timer.cancel();
+            }
+        }, 1000, 2000);
+    }
+
+    private void saveLocationForCurrentRide(Location location, List<LocationDTO> route, int totalPoints, Vehicle vehicle) {
+        location.setLongitude(route.get(totalPoints).getLongitude());
+        location.setLatitude(route.get(totalPoints).getLatitude());
+        location = locationRepository.save(location);
+        vehicle.setCurrentLocation(location);
+        vehicleRepository.save(vehicle);
+    }
+
+    private void addPassengerSession(List<WebSocketSession> sessions, Ride ride) {
+        for(Passenger passenger: ride.getPassengers()){
+            WebSocketSession passengerSession = RideHandler.passengerSessions.get(passenger.getId().toString());
+            if(passengerSession != null) sessions.add(passengerSession);
+        }
+    }
+
+    @Override
+    public List<LocationDTO> getRouteFromOpenRoute(String start, String end) {
+        String base = "https://api.openrouteservice.org/v2/directions/driving-car";
+        String key = "5b3ce3597851110001cf6248e686109bcf5e46dfa129805f14ec1f16";
+        String url = base + "?api_key=" + key + "&start="+start+"&end="+end;
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+
+        HttpEntity<String> request = new HttpEntity<>(headers);
+
+
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                url, HttpMethod.GET, request, String.class);
+
+        String responseString = response.getBody();
+        JSONObject json = new JSONObject(responseString);
+        JSONArray features = json.getJSONArray("features");
+        JSONObject ff = features.getJSONObject(0);
+        JSONObject geometry = ff.getJSONObject("geometry");
+        JSONArray coords = geometry.getJSONArray("coordinates");
+        List<LocationDTO> route = new ArrayList<>();
+        for (int i = 0; i < coords.length(); i++) {
+            JSONArray coord = coords.getJSONArray(i);
+            double longitude = coord.getDouble(0);
+            double latitude = coord.getDouble(1);
+
+            LocationDTO location = new LocationDTO();
+            location.setLongitude(longitude);
+            location.setLatitude(latitude);
+            route.add(location);
+        }
+        return route;
     }
 
     @Override

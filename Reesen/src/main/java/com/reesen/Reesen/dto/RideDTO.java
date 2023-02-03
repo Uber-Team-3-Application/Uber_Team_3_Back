@@ -24,9 +24,8 @@ public class RideDTO {
  	private VehicleTypeDTO vehicleType;
  	private boolean babyTransport;
  	private boolean petTransport;
-	 private RideStatus status;
-
-	 private LocalDateTime scheduledTime;
+ 	private RideStatus status;
+ 	private Date scheduledTime;
 
     public RideDTO(){
 
@@ -41,7 +40,9 @@ public class RideDTO {
 		this.babyTransport = ride.isBabyAccessible();
 		this.petTransport = ride.isPetAccessible();
 		this.status = ride.getStatus();
-		this.driver = new UserDTO(ride.getDriver().getId(), ride.getDriver().getEmail());
+		if(ride.getDriver() != null) {
+			this.driver = new UserDTO(ride.getDriver().getId(), ride.getDriver().getEmail());
+		}
 		setPassengers(ride);
 		setVehicleType(ride);
 		setLocations(ride);
@@ -178,11 +179,11 @@ public class RideDTO {
 		this.status = status;
 	}
 
-	public LocalDateTime getScheduledTime() {
+	public Date getScheduledTime() {
 		return scheduledTime;
 	}
 
-	public void setScheduledTime(LocalDateTime scheduledTime) {
+	public void setScheduledTime(Date scheduledTime) {
 		this.scheduledTime = scheduledTime;
 	}
 }

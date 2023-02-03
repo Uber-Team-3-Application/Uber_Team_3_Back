@@ -28,6 +28,10 @@ public interface IWorkingHoursService {
 
     Duration getTotalHoursWorkedInLastDay(Long driverId);
 
+    Duration getTotalHoursWorkedInLastWeek(Long driverId);
+
+    Duration getTotalHoursWorkedInLastMonth(Long driverId);
+
     boolean isShiftOngoing(Long driverId);
 
     Optional<Driver> getDriverFromWorkingHours(Long workingHourId);

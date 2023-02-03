@@ -1,15 +1,19 @@
 package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.model.Location;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class PanicLocationDTO {
 
     private String address;
     private double latitude;
     private double longitude;
 
-    public PanicLocationDTO() {
-    }
 
     public PanicLocationDTO(Location location) {
         this.address = location.getAddress();
@@ -17,27 +21,4 @@ public class PanicLocationDTO {
         this.longitude = location.getLongitude();
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
 }

@@ -8,12 +8,15 @@ import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.Route;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 
 import java.util.*;
 
 import java.util.Date;
 
 public interface IRideService {
+
+	// TODO: JELENA
 	Ride findOne(Long id);
 	Ride save(Ride ride);
 
@@ -22,10 +25,12 @@ public interface IRideService {
 	Ride findDriverActiveRide(Long driverId);
 
 	RideDTO withdrawRide(Long id);
+	// TODO: ------> JELENA
 
+	// TODO: VELJA
 	RideDTO panicRide(Long rideId, String reason, Long id);
 
-	Deduction cancelRide(Ride ride, String reason);
+	RideDTO cancelRide(Long id, String reason);
 
 	RideDTO endRide(Long id);
 
@@ -34,41 +39,50 @@ public interface IRideService {
 	List<Ride> findAll();
 
 	Page<Ride> findAll(Long driverId, Pageable page, Date from, Date to);
+	// TODO: ---> VELJA
+
+
+
+	//TODO: VUGA
 	Page<Ride> findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to);
 
 	Page<Ride> findAllForUserWithRole(Long userId, Pageable page, Date from, Date to, Role role);
+	Set<PassengerRideDTO> getFilteredRides(Page<Ride> userRides, Long driverId);
+
+
+	PassengerRideDTO getFilteredRide(Ride ride, Long driverId);
+
+	ReportSumAverageDTO getReport(ReportRequestDTO reportRequestDTO);
 
 	Ride findPassengerActiveRide(Long passengerId);
 
 	LinkedHashSet<Route> getLocationsByRide (Long rideId);
+	//TODO: ----> VUGA
 
-    Set<UserRidesDTO> getFilteredRides(Page<Ride> userRides, Long driverId);
 
-	UserRidesDTO getFilteredRide(Ride ride, Long driverId);
-
-	ReportSumAverageDTO getReport(ReportRequestDTO reportRequestDTO);
-
+	//TODO: VEKSON
 	ReportSumAverageDTO getReportForDriver(ReportRequestDTO reportRequestDTO);
 
 	ReportSumAverageDTO filterReports(List<ReportDTO<Double>> reportDTOS, long totalDays);
 	ReportSumAverageDTO filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS, long totalDays);
+	//TODO: ---> VEKSON
 
-	Set<Review> findAllReviewsBySpecificDriverAndRide(Long rideId);
-
-
+	// TODO: VUGA
 	double calculateDistance(Location departure, Location destination);
+	//TODO: ---> VUGA
 
+
+	// TODO: JELENA
 	boolean validateCreateRideDTO(CreateRideDTO createRideDTO);
 
 	boolean checkForPendingRide(Long passengerId);
 
 	RideDTO startRide(Long id);
 
-	void deleteFavouriteRides(Long id);
+    ReportSumAverageDTO getReportForPassenger(ReportRequestDTO reportRequestDTO);
 
-	FavoriteRideDTO addFavouriteRide(CreateFavoriteRideDTO favouriteRide);
+    List<RideWithVehicleDTO> getALlActiveRides();
+    // TODO: -----> JELENA
 
-	Set<FavoriteRouteDTO> getFavouriteRides(Long idFromToken);
 
-	boolean validateRideDTO(CreateFavoriteRideDTO  favouriteRide);
 }

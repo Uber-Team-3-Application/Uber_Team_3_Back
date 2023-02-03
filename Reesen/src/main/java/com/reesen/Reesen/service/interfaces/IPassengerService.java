@@ -2,6 +2,7 @@ package com.reesen.Reesen.service.interfaces;
 
 import com.reesen.Reesen.dto.PassengerDTO;
 import com.reesen.Reesen.exceptions.EmailNotConfirmedException;
+import com.reesen.Reesen.model.FavoriteRide;
 import com.reesen.Reesen.model.Passenger;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.model.VerificationToken;
@@ -31,4 +32,6 @@ public interface IPassengerService {
     void saveVerificationToken(VerificationToken verificationToken);
 
 	VerificationToken findByUrl(String url);
+
+    Set<FavoriteRide> getFavoriteRides(Long id);
 }

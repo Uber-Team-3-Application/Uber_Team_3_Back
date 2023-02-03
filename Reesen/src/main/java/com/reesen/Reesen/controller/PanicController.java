@@ -27,7 +27,7 @@ public class PanicController {
         this.panicService = panicService;
     }
 
-    @GetMapping(consumes = "application/json",  produces="application/json")
+    @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Paginated<PanicDTO>> getPanicNotifications(
     ){
@@ -38,6 +38,14 @@ public class PanicController {
 
         return new ResponseEntity<>(new Paginated<>(panicDTOs.size(), panicDTOs), HttpStatus.OK);
 
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PanicDTO> getPanicById(@PathVariable("id") Long id){
+        Panic panic = this.panicService.findOne(id);
+        PanicDTO panicDTO = new PanicDTO(panic);
+        return new ResponseEntity<>(panicDTO, HttpStatus.OK);
     }
 
 }

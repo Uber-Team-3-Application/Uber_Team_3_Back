@@ -1,10 +1,16 @@
 package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.model.Remark;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.Date;
 
+@Getter
+@Setter
+@AllArgsConstructor
 public class RemarkDTO {
 
     private Long id;
@@ -23,33 +29,4 @@ public class RemarkDTO {
         this.message = message;
     }
 
-    public RemarkDTO(Long id, Date date, String message) {
-        this.id = id;
-        this.date = date;
-        this.message = message;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }

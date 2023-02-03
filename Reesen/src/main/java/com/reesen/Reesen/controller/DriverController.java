@@ -6,6 +6,7 @@ import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.model.Driver.DriverEditBasicInformation;
 import com.reesen.Reesen.model.Driver.DriverEditVehicle;
 import com.reesen.Reesen.model.paginated.Paginated;
+import com.reesen.Reesen.service.ReviewService;
 import com.reesen.Reesen.service.interfaces.*;
 import com.reesen.Reesen.validation.UserRequestValidation;
 import com.reesen.Reesen.validation.interfaces.IImageValidationService;
@@ -41,7 +42,7 @@ public class DriverController {
     private final UserRequestValidation userRequestValidation;
     private final IImageValidationService imageValidationService;
     private final MessageSource messageSource;
-
+    private final ReviewService reviewService;
     @Autowired
     public DriverController(IDriverService driverService,
                             IDocumentService documentService,
@@ -51,7 +52,7 @@ public class DriverController {
                             IRideService rideService,
                             IPassengerService passengerService,
                             IDeductionService deductionService,
-                            IRouteService routeService, UserRequestValidation userRequestValidation, IImageValidationService imageValidationService, MessageSource messageSource) {
+                            IRouteService routeService, UserRequestValidation userRequestValidation, IImageValidationService imageValidationService, MessageSource messageSource, ReviewService reviewService) {
         this.driverService = driverService;
         this.documentService = documentService;
         this.vehicleService = vehicleService;
@@ -64,6 +65,7 @@ public class DriverController {
         this.userRequestValidation = userRequestValidation;
         this.imageValidationService = imageValidationService;
         this.messageSource = messageSource;
+        this.reviewService = reviewService;
     }
 
 
@@ -265,7 +267,7 @@ public class DriverController {
     @PostMapping(value = "/{id}/documents")
     @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN')")
     public ResponseEntity<DocumentDTO> addDocument(
-            @Valid @RequestBody DocumentDTO documentDTO,
+            @Valid @RequestBody DocumentDTOPost documentDTO,
             @PathVariable("id") Long driverId,
             @RequestHeader Map<String, String> headers
 
@@ -387,7 +389,7 @@ public class DriverController {
 
 
     @GetMapping(value = "/{id}")
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<CreatedDriverDTO> getDriver(
             @PathVariable Long id,
             @RequestHeader Map<String, String> headers) {
@@ -438,7 +440,7 @@ public class DriverController {
      *
      * **/
     @GetMapping(value = "/{id}/vehicle")
-    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER', 'PASSENGER')")
     public ResponseEntity<VehicleDTO> getVehicle(
             @PathVariable("id") Long id,
             @RequestHeader Map<String, String> headers) {
@@ -580,6 +582,7 @@ public class DriverController {
                 location.setDeparture(this.routeService.getDepartureByRoute(location).get());
 
             }
+            ride.setReview(this.reviewService.findReviewsByRide(ride));
             ride.setLocations(locations);
             rideDTOs.add(new DriverRideDTO(ride));
         }
@@ -710,5 +713,12 @@ public class DriverController {
         this.driverService.declineProfileEditRequest(editRequestId);
         return new ResponseEntity<>("Deleted request.", HttpStatus.OK);
 
+    }
+
+    @GetMapping(value = "/{id}/statistics")
+    @PreAuthorize("hasRole('DRIVER')")
+    public ResponseEntity<Set<DriverStatisticsDTO>> getStatistics(@PathVariable("id") Long driverId) {
+        Set<DriverStatisticsDTO> response = this.driverService.getStatistics(driverId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

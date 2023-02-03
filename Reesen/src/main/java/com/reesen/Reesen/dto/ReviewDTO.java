@@ -1,12 +1,20 @@
 package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.model.Review;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReviewDTO {
 
 	@NotNull(message = "{required}")
@@ -17,27 +25,5 @@ public class ReviewDTO {
 	@Length(max = 500, message = "{regex}")
 	private String comment;
 
-	public ReviewDTO() {
-	}
 
-	public ReviewDTO(int rating, String comment) {
-		this.rating = rating;
-		this.comment = comment;
-	}
-
-	public int getRating() {
-		return rating;
-	}
-
-	public void setRating(int rating) {
-		this.rating = rating;
-	}
-
-	public String getComment() {
-		return comment;
-	}
-
-	public void setComment(String comment) {
-		this.comment = comment;
-	}
 }
