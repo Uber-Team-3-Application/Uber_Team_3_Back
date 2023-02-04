@@ -538,7 +538,8 @@ public class RideService implements IRideService {
 	}
 
 	@Override
-	public Page<Ride> findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to) {
+	public Page<Ride>
+	findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to) {
 		Optional<Passenger> passenger = this.passengerRepository.findById(passengerId);
 		if (passenger.isEmpty()) return null;
 
@@ -714,6 +715,7 @@ public class RideService implements IRideService {
 
 	@Override
 	public double calculateDistance(Location departure, Location destination) {
+		if(departure == null || destination == null) return 0;
 		double theta = departure.getLongitude() - destination.getLongitude();
 		double dist = Math.sin(Math.toRadians(departure.getLatitude())) * Math.sin(Math.toRadians(destination.getLatitude()))
 				+ Math.cos(Math.toRadians(departure.getLatitude())) * Math.cos(Math.toRadians(destination.getLatitude())) * Math.cos(Math.toRadians(theta));
