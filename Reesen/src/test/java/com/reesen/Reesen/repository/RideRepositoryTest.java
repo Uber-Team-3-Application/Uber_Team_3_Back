@@ -561,7 +561,6 @@ public class RideRepositoryTest {
 
     /** @author Veljko */
     @Test
-    @DisplayName("Getting total cost per day for driver when driver's id is valid and with invalid dates")
     public void getTotalCostPerDayForSpecificDriver_withValidDriversId_andInvalidDateFromTo() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(2020, Calendar.JULY, 25, 0, 0, 0);
@@ -576,7 +575,6 @@ public class RideRepositoryTest {
 
     /** @author Veljko */
     @ParameterizedTest
-    @DisplayName("Getting total cost per day for driver when driver's id is invalid and with valid dates")
     @ValueSource(longs = {100L, 0L, -10L})
     public void getTotalCostPerDayForSpecificDriver_withInValidDriversId_andValidDateFromTo(Long driverId) {
         Calendar calendar = Calendar.getInstance();
