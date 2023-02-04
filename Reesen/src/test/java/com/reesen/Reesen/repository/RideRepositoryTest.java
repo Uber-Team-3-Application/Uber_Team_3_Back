@@ -3,6 +3,7 @@ package com.reesen.Reesen.repository;
 
 import com.reesen.Reesen.dto.ReportDTO;
 import com.reesen.Reesen.dto.RideLocationWithTimeDTO;
+import com.reesen.Reesen.model.Review;
 import com.reesen.Reesen.model.Ride;
 
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +20,7 @@ import org.springframework.test.context.TestPropertySource;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -365,6 +367,7 @@ public class RideRepositoryTest {
 
     }
 
+    /** @author Veljko */
     @Test
     @DisplayName("Get rides per day for specific driver with valid dates")
     public void getRidesPerDay_forSpecificDrive_withValidDriversId_withValidDatesFromTo() {
@@ -379,6 +382,7 @@ public class RideRepositoryTest {
 
     }
 
+    /** @author Veljko */
     @ParameterizedTest
     @DisplayName("Get rides per day for specific driver with invalid drivers id and valid dates")
     @ValueSource(longs = {0L, 1235L, -10L})
@@ -393,6 +397,7 @@ public class RideRepositoryTest {
     }
 
 
+    /** @author Veljko */
     @Test
     @DisplayName("Get rides per day for specific driver with invalid dates")
     public void getRidesPerDay_forSpecificDriver_withValidDriversId_withInvalidDatesFromTo() {
@@ -407,6 +412,7 @@ public class RideRepositoryTest {
 
     }
 
+    /** @author Veljko */
     @Test
     @DisplayName("Get total cost per day with valid dates from to")
     public void getTotalCostPerDay_withValidDateFromTo() {
@@ -422,7 +428,167 @@ public class RideRepositoryTest {
         assertThat(reports.size()).isEqualTo(2);
     }
 
+    /** @author Veljko */
+    @Test
+    @DisplayName("Get total cost per day with invalid dates from to")
+    public void getTotalCostPerDay_withInvalidDateFromTo() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2018, Calendar.JANUARY, 25, 0, 0, 0);
+        Date from = calendar.getTime();
+        calendar.set(2020, Calendar.DECEMBER, 28, 0, 0, 0);
+        Date to = calendar.getTime();
+        List<ReportDTO<Double>> reports = this.rideRepository.getTotalCostPerDay(from, to);
+        assertThat(reports.size()).isEqualTo(0);
+    }
 
+    /** @author Veljko */
+    @Test
+    @DisplayName("Getting total cost per day for driver when driver's id is valid and with valid dates")
+    public void getTotalCostPerDayForDriver_withValidDriversId_andValidDateFromTo() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2022, Calendar.JULY, 25, 0, 0, 0);
+        Date from = calendar.getTime();
+        calendar.set(2022, Calendar.OCTOBER, 28, 0, 0, 0);
+        Date to = calendar.getTime();
+        List<ReportDTO<Double>> reports = this.rideRepository.getTotalCostPerDayForDriver(from, to, driverId);
+
+        assertThat(reports.get(0).getTotal()).isEqualTo(4042);
+        assertThat(reports.get(1).getTotal()).isEqualTo(903);
+        assertThat(reports.size()).isEqualTo(2);
+
+    }
+
+
+    /** @author Veljko */
+    @Test
+    @DisplayName("Getting total cost per day for driver when driver's id is valid and with invalid dates")
+    public void getTotalCostPerDayForDriver_withValidDriversId_andInvalidDateFromTo() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2017, Calendar.JULY, 25, 0, 0, 0);
+        Date from = calendar.getTime();
+        calendar.set(2019, Calendar.OCTOBER, 28, 0, 0, 0);
+        Date to = calendar.getTime();
+        List<ReportDTO<Double>> reports = this.rideRepository.getTotalCostPerDayForDriver(from, to, driverId);
+
+        assertThat(reports.size()).isEqualTo(0);
+
+    }
+
+    /** @author Veljko */
+    @ParameterizedTest
+    @DisplayName("Getting total cost per day for driver when driver's id is invalid and with valid dates")
+    @ValueSource(longs = {100L, 0L, -10L})
+    public void getTotalCostPerDayForDriver_withInValidDriversId_andValidDateFromTo(Long driverId) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2022, Calendar.JULY, 25, 0, 0, 0);
+        Date from = calendar.getTime();
+        calendar.set(2022, Calendar.OCTOBER, 28, 0, 0, 0);
+        Date to = calendar.getTime();
+        List<ReportDTO<Double>> reports = this.rideRepository.getTotalCostPerDayForDriver(from, to, driverId);
+
+        assertThat(reports.size()).isEqualTo(0);
+
+    }
+
+
+    /** @author Veljko*/
+    @Test
+    public void getRides_forDriver_withValidDriversId_andValidDateOfStart() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2022, Calendar.JULY, 26, 0, 0, 0);
+        Date from = calendar.getTime();
+        Set<Ride> rides = this.rideRepository.getRides(driverId, from);
+        assertThat(rides.size()).isEqualTo(5);
+    }
+
+
+
+    /** @author Veljko*/
+    @Test
+    public void getRides_forDriver_withValidDriversId_andInvalidDateOfStart() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2023, Calendar.JULY, 26, 0, 0, 0);
+        Date from = calendar.getTime();
+        Set<Ride> rides = this.rideRepository.getRides(driverId, from);
+        assertThat(rides.size()).isEqualTo(0);
+    }
+
+
+
+    /** @author Veljko*/
+    @ParameterizedTest
+    @ValueSource(longs = {123L, -50L, 0L})
+    public void getRides_forDriver_withInvalidDriversId_andValidDateOfStart(Long driverId) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2022, Calendar.JULY, 26, 0, 0, 0);
+        Date from = calendar.getTime();
+        Set<Ride> rides = this.rideRepository.getRides(driverId, from);
+        assertThat(rides.size()).isEqualTo(0);
+    }
+
+    /** @author Veljko*/
+    @ParameterizedTest
+    @ValueSource(longs = {1L, 2L, 3L})
+    public void getReviewsByRideId_withValidRideId(Long rideId) {
+        Set<Review> reviews = this.rideRepository.findAllReviewsBySpecificDriverAndRide(rideId);
+        assertThat(reviews.size()).isGreaterThan(0);
+    }
+
+    /** @author Veljko*/
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L, 355L})
+    public void getReviewsByRideId_withInvalidRideId(Long rideId) {
+        Set<Review> reviews = this.rideRepository.findAllReviewsBySpecificDriverAndRide(rideId);
+        assertThat(reviews.size()).isEqualTo(0);
+    }
+
+
+    /** @author Veljko */
+    @Test
+    public void getTotalCostPerDayForSpecificDriver_withValidDriversId_andValidDateFromTo() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2022, Calendar.JULY, 25, 0, 0, 0);
+        Date from = calendar.getTime();
+        calendar.set(2022, Calendar.OCTOBER, 28, 0, 0, 0);
+        Date to = calendar.getTime();
+        List<ReportDTO<Double>> reports = this.rideRepository.getTotalCostPerDayForDriver(from, to, 2L);
+
+        assertThat(reports.get(0).getTotal()).isEqualTo(2045);
+        assertThat(reports.get(1).getTotal()).isEqualTo(1669);
+        assertThat(reports.size()).isEqualTo(2);
+    }
+
+
+    /** @author Veljko */
+    @Test
+    @DisplayName("Getting total cost per day for driver when driver's id is valid and with invalid dates")
+    public void getTotalCostPerDayForSpecificDriver_withValidDriversId_andInvalidDateFromTo() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2020, Calendar.JULY, 25, 0, 0, 0);
+        Date from = calendar.getTime();
+        calendar.set(2021, Calendar.OCTOBER, 28, 0, 0, 0);
+        Date to = calendar.getTime();
+        List<ReportDTO<Double>> reports = this.rideRepository.getTotalCostPerDayForDriver(from, to, 2L);
+
+        assertThat(reports.size()).isEqualTo(0);
+
+    }
+
+    /** @author Veljko */
+    @ParameterizedTest
+    @DisplayName("Getting total cost per day for driver when driver's id is invalid and with valid dates")
+    @ValueSource(longs = {100L, 0L, -10L})
+    public void getTotalCostPerDayForSpecificDriver_withInValidDriversId_andValidDateFromTo(Long driverId) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2022, Calendar.JULY, 25, 0, 0, 0);
+        Date from = calendar.getTime();
+        calendar.set(2022, Calendar.OCTOBER, 28, 0, 0, 0);
+        Date to = calendar.getTime();
+        List<ReportDTO<Double>> reports = this.rideRepository.getTotalCostPerDayForDriver(from, to, driverId);
+
+        assertThat(reports.size()).isEqualTo(0);
+
+    }
 
 
 }
