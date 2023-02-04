@@ -2,11 +2,10 @@ package com.reesen.Reesen.serivce;
 
 import com.reesen.Reesen.Enums.RideStatus;
 import com.reesen.Reesen.Enums.Role;
+import com.reesen.Reesen.Enums.VehicleName;
+import com.reesen.Reesen.dto.PassengerRideDTO;
+import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.Driver.Driver;
-import com.reesen.Reesen.model.Location;
-import com.reesen.Reesen.model.Passenger;
-import com.reesen.Reesen.model.Ride;
-import com.reesen.Reesen.model.Route;
 import com.reesen.Reesen.repository.*;
 import com.reesen.Reesen.service.PassengerService;
 import com.reesen.Reesen.service.RideService;
@@ -291,6 +290,8 @@ public class RideServiceTest {
 
         Ride passengerActiveRide = this.rideService.findPassengerActiveRide(passengerId);
 
+        verify(this.rideRepository, times(1)).findPassengerActiveRide(passengerId, RideStatus.STARTED);
+
         assertNotNull(passengerActiveRide);
         assertEquals(ride.getId(), passengerActiveRide.getId());
     }
@@ -304,17 +305,191 @@ public class RideServiceTest {
                 .thenReturn(null);
 
         Ride passengerActiveRide = this.rideService.findPassengerActiveRide(passengerId);
+        verify(this.rideRepository, times(1)).findPassengerActiveRide(passengerId, RideStatus.STARTED);
 
         assertNull(passengerActiveRide);
     }
 
 
     @Test
-    @DisplayName(value = "")
+    @DisplayName(value = "Gets filtered Ride with valid inputs and no deduction")
     public void getFilteredRideWith_validInput(){
+
+        Ride ride = new Ride();
+        ride.setId(1L);
+        ride.setVehicleType(new VehicleType(123, VehicleName.STANDARD));
+        setMocksForFilteredRide(ride, ride.getId());
+        PassengerRideDTO passengerRideDTO = this.rideService.getFilteredRide(ride, 1L);
+
+
+        verify(this.passengerRepository, times(1)).findPassengersByRidesContaining(ride);
+        verify(this.deductionRepository, times(1)).findDeductionByRide(ride);
+
+        assertNotNull(passengerRideDTO);
+        assertNull(passengerRideDTO.getRejection());
+        assertEquals(1L, passengerRideDTO.getDriver().getId());
+        assertEquals("STANDARD", passengerRideDTO.getVehicleType());
 
     }
 
+    @Test
+    @DisplayName(value = "Gets filtered Ride with valid inputs and Deduction")
+    public void getFilteredRideWith_validInputAnd_Deduction(){
+
+        Ride ride = new Ride();
+        ride.setId(0L);
+        ride.setVehicleType(new VehicleType(123, VehicleName.STANDARD));
+        setMocksForFilteredRide(ride, 1L);
+
+
+        PassengerRideDTO passengerRideDTO = this.rideService.getFilteredRide(ride, 1L);
+
+
+        verify(this.passengerRepository, times(1)).findPassengersByRidesContaining(ride);
+        verify(this.deductionRepository, times(1)).findDeductionByRide(ride);
+
+        assertNotNull(passengerRideDTO);
+        assertNotNull(passengerRideDTO.getRejection());
+        assertEquals(1L, passengerRideDTO.getDriver().getId());
+        assertEquals("STANDARD", passengerRideDTO.getVehicleType());
+
+    }
+    @Test
+    @DisplayName(value = "Gets filtered Ride with valid inputs and no driver")
+    public void getFilteredRideWith_validInputAnd_noDriver(){
+
+        Ride ride = new Ride();
+        ride.setId(1L);
+        ride.setVehicleType(new VehicleType(123, VehicleName.STANDARD));
+        setMocksForFilteredRide(ride, ride.getId());
+
+
+        PassengerRideDTO passengerRideDTO = this.rideService.getFilteredRide(ride, 0L);
+
+
+        verify(this.passengerRepository, times(1)).findPassengersByRidesContaining(ride);
+        verify(this.deductionRepository, times(1)).findDeductionByRide(ride);
+
+        assertNotNull(passengerRideDTO);
+        assertEquals(0L, passengerRideDTO.getDriver().getId());
+        assertEquals("STANDARD", passengerRideDTO.getVehicleType());
+
+    }
+
+    @Test
+    @DisplayName(value = "Gets filtered Rides with Driver Id Being One")
+    public void getFilteredRidesWithDriverIdValid(){
+
+        Ride first = new Ride();
+        first.setId(1L);
+        first.setVehicleType(new VehicleType(123, VehicleName.STANDARD));
+
+        Ride second = new Ride();
+        second.setId(2L);
+        second.setVehicleType(new VehicleType(200, VehicleName.LUXURY));
+        List<Ride> rides = new ArrayList<>();
+        rides.add(first);
+        rides.add(second);
+        Page<Ride> pageRides = new PageImpl<>(rides);
+
+        for(Ride ride: pageRides)
+            setMocksForFilteredRide(ride, ride.getId());
+
+        Set<PassengerRideDTO> passengerRideDTO = this.rideService.getFilteredRides(pageRides, 1L);
+
+
+        assertNotNull(passengerRideDTO);
+        assertEquals(2, passengerRideDTO.size());
+        for(PassengerRideDTO ride: passengerRideDTO){
+            assertEquals(1L, ride.getDriver().getId());
+            if(ride.getId() == 1L) assertEquals("STANDARD", ride.getVehicleType());
+            else assertEquals("LUXURY", ride.getVehicleType());
+        }
+
+    }
+
+
+    @Test
+    @DisplayName(value = "Gets filtered Rides with Driver Id Being Zero")
+    public void getFilteredRidesWithDriverIdInvalid(){
+
+        Ride first = new Ride();
+        first.setId(1L);
+        first.setVehicleType(new VehicleType(123, VehicleName.STANDARD));
+
+        Ride second = new Ride();
+        second.setId(2L);
+        second.setVehicleType(new VehicleType(200, VehicleName.LUXURY));
+        List<Ride> rides = new ArrayList<>();
+        rides.add(first);
+        rides.add(second);
+        Page<Ride> pageRides = new PageImpl<>(rides);
+
+        for(Ride ride: pageRides)
+            setMocksForFilteredRide(ride, ride.getId());
+
+        Set<PassengerRideDTO> passengerRideDTO = this.rideService.getFilteredRides(pageRides, 0L);
+
+
+        assertNotNull(passengerRideDTO);
+        assertEquals(2, passengerRideDTO.size());
+        for(PassengerRideDTO ride: passengerRideDTO){
+            assertEquals(0L, ride.getDriver().getId());
+            if(ride.getId() == 1L) assertEquals("STANDARD", ride.getVehicleType());
+            else assertEquals("LUXURY", ride.getVehicleType());
+        }
+
+    }
+
+
+    private void setMocksForFilteredRide(Ride ride, Long noDeductionRideId) {
+        Driver driver = new Driver();
+        driver.setId(1L);
+        Driver invalidDriver = new Driver();
+        invalidDriver.setId(0L);
+        Passenger passenger = new Passenger();
+        passenger.setId(1L);
+        Set<Passenger> passengers = new LinkedHashSet<>();
+        passengers.add(passenger);
+        Review review = new Review();
+        review.setId(1L);
+        Set<Review> reviews = new HashSet<>();
+        reviews.add(review);
+        Deduction deduction = new Deduction();
+        deduction.setId(1L);
+        Mockito.when(this.passengerRepository.findPassengersByRidesContaining(ride))
+                .thenReturn(passengers);
+
+        Mockito.when(this.reviewRepository.findAllByRideId(ride.getId()))
+                .thenReturn(reviews);
+
+        Mockito.when(this.passengerRepository.findbyReviewId(review.getId()))
+                .thenReturn(passenger);
+        if(ride.getId() == noDeductionRideId)
+            Mockito.when(this.deductionRepository.findDeductionByRide(ride))
+                    .thenReturn(Optional.empty());
+
+        else
+            Mockito.when(this.deductionRepository.findDeductionByRide(ride))
+                    .thenReturn(Optional.of(deduction));
+
+        Location departure = new Location( 14.44, 15.23, "adresa");
+        Location destination = new Location( 15.44, 15.23, "adresa");
+        Route route = new Route(departure, destination);
+        route.setId(1L);
+        LinkedHashSet<Route> locations = new LinkedHashSet<>();
+        locations.add(route);
+        Mockito.when(this.rideRepository.getLocationsByRide(ride.getId()))
+                .thenReturn(locations);
+        Mockito.when(this.routeRepository.getDepartureByRoute(route))
+                .thenReturn(Optional.of(departure));
+        Mockito.when(this.routeRepository.getDestinationByRoute(route))
+                .thenReturn(Optional.of(destination));
+        Mockito.when(this.userRepository.findById(driver.getId()))
+                .thenReturn(Optional.of(driver));
+        Mockito.when(this.driverRepository.findDriverByRidesContaining(ride))
+                .thenReturn(Optional.of(invalidDriver));
+    }
 
 
     private void setMocksForPassengerActiveRide(Ride ride, Long passengerId) {

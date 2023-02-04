@@ -48,9 +48,9 @@ public interface IRideService {
 
 	Page<Ride> findAllForUserWithRole(Long userId, Pageable page, Date from, Date to, Role role);// TODO:FINISHED
 
-	Set<PassengerRideDTO> getFilteredRides(Page<Ride> userRides, Long driverId);
+	Set<PassengerRideDTO> getFilteredRides(Page<Ride> userRides, Long driverId); //TODO:FINISHED
 
-	PassengerRideDTO getFilteredRide(Ride ride, Long driverId);
+	PassengerRideDTO getFilteredRide(Ride ride, Long driverId); //TODO:FINISHED
 
 	ReportSumAverageDTO getReport(ReportRequestDTO reportRequestDTO);
 
