@@ -44,19 +44,19 @@ public interface IRideService {
 
 
 	//TODO: VUGA
-	Page<Ride> findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to);
+	Page<Ride> findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to);// TODO:FINISHED
 
-	Page<Ride> findAllForUserWithRole(Long userId, Pageable page, Date from, Date to, Role role);
-	Set<PassengerRideDTO> getFilteredRides(Page<Ride> userRides, Long driverId);
+	Page<Ride> findAllForUserWithRole(Long userId, Pageable page, Date from, Date to, Role role);// TODO:FINISHED
 
+	Set<PassengerRideDTO> getFilteredRides(Page<Ride> userRides, Long driverId); //TODO:FINISHED
 
-	PassengerRideDTO getFilteredRide(Ride ride, Long driverId);
+	PassengerRideDTO getFilteredRide(Ride ride, Long driverId); //TODO:FINISHED
 
 	ReportSumAverageDTO getReport(ReportRequestDTO reportRequestDTO);
 
-	Ride findPassengerActiveRide(Long passengerId);
+	Ride findPassengerActiveRide(Long passengerId); // TODO:FINISHED
 
-	LinkedHashSet<Route> getLocationsByRide (Long rideId);
+	LinkedHashSet<Route> getLocationsByRide (Long rideId);// TODO:FINISHED
 	//TODO: ----> VUGA
 
 

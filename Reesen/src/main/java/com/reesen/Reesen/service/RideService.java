@@ -109,6 +109,13 @@ public class RideService implements IRideService {
 
 	@Override
 	public RideDTO createRideDTO(CreateRideDTO rideDTO, Long passengerId) {
+
+		if (rideDTO.getScheduledTime() != null) {
+			Calendar calendar = Calendar.getInstance();
+			calendar.add(Calendar.HOUR, 5);
+			if (rideDTO.getScheduledTime().after(calendar.getTime()))
+				return null;
+		}
 		Ride ride = new Ride();
 		Set<RouteDTO> locationsDTOs = rideDTO.getLocations();
 		LinkedHashSet<Route> locations = new LinkedHashSet<>();
@@ -531,7 +538,8 @@ public class RideService implements IRideService {
 	}
 
 	@Override
-	public Page<Ride> findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to) {
+	public Page<Ride>
+	findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to) {
 		Optional<Passenger> passenger = this.passengerRepository.findById(passengerId);
 		if (passenger.isEmpty()) return null;
 
@@ -707,6 +715,7 @@ public class RideService implements IRideService {
 
 	@Override
 	public double calculateDistance(Location departure, Location destination) {
+		if(departure == null || destination == null) return 0;
 		double theta = departure.getLongitude() - destination.getLongitude();
 		double dist = Math.sin(Math.toRadians(departure.getLatitude())) * Math.sin(Math.toRadians(destination.getLatitude()))
 				+ Math.cos(Math.toRadians(departure.getLatitude())) * Math.cos(Math.toRadians(destination.getLatitude())) * Math.cos(Math.toRadians(theta));
