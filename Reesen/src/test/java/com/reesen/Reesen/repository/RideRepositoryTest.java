@@ -417,7 +417,9 @@ public class RideRepositoryTest {
         Date to = calendar.getTime();
         List<ReportDTO<Double>> reports = this.rideRepository.getTotalCostPerDay(from, to);
 
-        assertThat(reports.get(0).getTotal()).isEqualTo(6087);
+        assertThat(reports.get(0).getTotal()).isEqualTo(4042);
+        assertThat(reports.get(1).getTotal()).isEqualTo(2045);
+        assertThat(reports.size()).isEqualTo(2);
     }
 
 
