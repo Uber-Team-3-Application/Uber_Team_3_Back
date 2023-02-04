@@ -1,10 +1,7 @@
 package com.reesen.Reesen.dto;
 
 import com.reesen.Reesen.model.Route;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 
@@ -12,6 +9,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @Getter
 @Setter
+@ToString
 public class RouteDTO {
 
 	@NotNull(message = "{required}")

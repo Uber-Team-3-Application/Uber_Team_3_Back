@@ -389,7 +389,7 @@ public class DriverController {
 
 
     @GetMapping(value = "/{id}")
-    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN', 'PASSENGER')")
     public ResponseEntity<CreatedDriverDTO> getDriver(
             @PathVariable Long id,
             @RequestHeader Map<String, String> headers) {
@@ -713,5 +713,12 @@ public class DriverController {
         this.driverService.declineProfileEditRequest(editRequestId);
         return new ResponseEntity<>("Deleted request.", HttpStatus.OK);
 
+    }
+
+    @GetMapping(value = "/{id}/statistics")
+    @PreAuthorize("hasRole('DRIVER')")
+    public ResponseEntity<Set<DriverStatisticsDTO>> getStatistics(@PathVariable("id") Long driverId) {
+        Set<DriverStatisticsDTO> response = this.driverService.getStatistics(driverId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

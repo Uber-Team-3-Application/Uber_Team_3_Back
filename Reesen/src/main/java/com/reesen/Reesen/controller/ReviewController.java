@@ -107,7 +107,7 @@ public class ReviewController {
     }
 
     @PostMapping("/{rideId}/driver")
-    @PreAuthorize("hasRole('PASSENGER')")
+    @PreAuthorize("hasAnyRole('PASSENGER')")
     public ResponseEntity<ReviewWithPassengerDTO> leaveReviewForTheDriver(
             @PathVariable Long rideId,
             @RequestBody @Valid ReviewDTO review,
