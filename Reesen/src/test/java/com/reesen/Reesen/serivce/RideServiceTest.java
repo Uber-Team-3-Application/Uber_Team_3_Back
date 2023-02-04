@@ -3,7 +3,7 @@ package com.reesen.Reesen.serivce;
 import com.reesen.Reesen.Enums.RideStatus;
 import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.Enums.VehicleName;
-import com.reesen.Reesen.dto.PassengerRideDTO;
+import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.*;
 import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.repository.*;
@@ -13,6 +13,8 @@ import com.reesen.Reesen.service.interfaces.ILocationService;
 import com.reesen.Reesen.service.interfaces.IWorkingHoursService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,6 +25,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.TestPropertySource;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -439,6 +443,113 @@ public class RideServiceTest {
             else assertEquals("LUXURY", ride.getVehicleType());
         }
 
+    }
+
+
+    @Test
+    @DisplayName(value = "Gets Reports for Rides Per Day")
+    public void getsReport_RidesPerDay(){
+        String typeOfReport = "RIDES_PER_DAY";
+        Date now = new Date();
+        Date later = Date.from(Instant.now().plus(2, ChronoUnit.DAYS));
+
+        ReportRequestDTO reportRequestDTO = new ReportRequestDTO("ADMIN", typeOfReport, now, later);
+        List<ReportDTO<Long>> reports = new ArrayList<>();
+        reports.add(new ReportDTO<>(now, 255L));
+        reports.add(new ReportDTO<>(later, 300L));
+
+        Mockito.when(this.rideRepository.getRidesPerDayReport(reportRequestDTO.getFrom(), reportRequestDTO.getTo()))
+                .thenReturn(reports);
+
+        ReportSumAverageDTO report = this.rideService.getReport(reportRequestDTO);
+
+        verify(this.rideRepository, times(1)).
+                getRidesPerDayReport(reportRequestDTO.getFrom(), reportRequestDTO.getTo());
+
+        assertEquals(2, report.getResult().size());
+        assertEquals(555, report.getSum());
+        assertEquals(277.5, report.getAverage(), 0.1);
+    }
+
+    @ParameterizedTest
+    @DisplayName(value = "Gets Reports for Money Earned/Spent Per Day")
+    @ValueSource(strings = {"MONEY_SPENT_PER_DAY", "MONEY_EARNED_PER_DAY"})
+    public void getsReport_MoneyPerDay(String typeOfReport){
+
+        Date now = new Date();
+        Date later = Date.from(Instant.now().plus(2, ChronoUnit.DAYS));
+
+        ReportRequestDTO reportRequestDTO = new ReportRequestDTO("ADMIN", typeOfReport, now, later);
+        List<ReportDTO<Double>> reports = new ArrayList<>();
+        reports.add(new ReportDTO<>(now, 255.0));
+        reports.add(new ReportDTO<>(later, 300.0));
+
+        Mockito.when(this.rideRepository.getTotalCostPerDay(reportRequestDTO.getFrom(), reportRequestDTO.getTo()))
+                .thenReturn(reports);
+
+        ReportSumAverageDTO report = this.rideService.getReport(reportRequestDTO);
+
+        verify(this.rideRepository, times(1)).
+                getTotalCostPerDay(reportRequestDTO.getFrom(), reportRequestDTO.getTo());
+
+        assertEquals(2, report.getResult().size());
+        assertEquals(555.0, report.getSum());
+        assertEquals(277.5, report.getAverage(), 0.1);
+    }
+
+    @Test
+    @DisplayName(value = "Gets Report for kilometers per day")
+    public void getsReport_KilometersPerDay(){
+
+        Date now = new Date();
+        Date later = Date.from(Instant.now().plus(2, ChronoUnit.DAYS));
+
+        ReportRequestDTO reportRequestDTO = new ReportRequestDTO("ADMIN", "KILOMETERS_PER_DAY", now, later);
+
+        // Calculated distance between these 2 points is around 3 kilometers
+        Location departure = new Location( 45.24979663860444, 19.85469131685411, "FIRST");
+        Location destination = new Location( 45.25694859081531, 19.837455559509213, "SECOND");
+        Route route = new Route(departure, destination);
+        route.setId(1L);
+        Set<Route> locations = new LinkedHashSet<>();
+        locations.add(route);
+
+        List<RideLocationWithTimeDTO> rides = new ArrayList<>();
+        rides.add(new RideLocationWithTimeDTO(1L, now, locations));
+        rides.add(new RideLocationWithTimeDTO(2L, later, locations));
+
+
+
+        Mockito.when(this.rideRepository.getAllRidesWithStartTimeBetween(reportRequestDTO.getFrom(), reportRequestDTO.getTo()))
+                .thenReturn(rides);
+        setMocksForKilometersPerDayReport(rides);
+
+
+        ReportSumAverageDTO report = this.rideService.getReport(reportRequestDTO);
+
+
+        verify(this.rideRepository, times(1)).
+                getAllRidesWithStartTimeBetween(reportRequestDTO.getFrom(), reportRequestDTO.getTo());
+
+        assertEquals(2, report.getResult().size());
+        assertEquals(3.0, report.getSum(), 0.2);
+        assertEquals(1.5, report.getAverage(), 0.2);
+    }
+
+    private void setMocksForKilometersPerDayReport(List<RideLocationWithTimeDTO> rides) {
+        for(RideLocationWithTimeDTO ride:rides){
+            Set<Route> locations = ride.getLocations();
+            when(this.rideRepository.getLocationsByRide(ride.getRideId()))
+                    .thenReturn((LinkedHashSet<Route>) locations);
+            for(Route location: locations){
+                when(this.routeRepository.getDepartureByRoute(location))
+                        .thenReturn(Optional.of(location.getDeparture()));
+
+                when(this.routeRepository.getDestinationByRoute(location))
+                        .thenReturn(Optional.of(location.getDestination()));
+            }
+
+        }
     }
 
 
