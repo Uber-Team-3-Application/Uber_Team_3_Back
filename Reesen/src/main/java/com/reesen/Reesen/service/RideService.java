@@ -102,11 +102,6 @@ public class RideService implements IRideService {
 	}
 
 	@Override
-	public Ride save(Ride ride) {
-		return this.rideRepository.save(ride);
-	}
-
-	@Override
 	public RideDTO createRideDTO(CreateRideDTO rideDTO, Long passengerId) {
 		Ride ride = new Ride();
 		Set<RouteDTO> locationsDTOs = rideDTO.getLocations();
