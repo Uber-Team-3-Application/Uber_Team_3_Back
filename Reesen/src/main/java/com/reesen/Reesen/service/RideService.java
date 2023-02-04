@@ -531,7 +531,8 @@ public class RideService implements IRideService {
 	}
 
 	@Override
-	public Page<Ride> findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to) {
+	public Page<Ride>
+	findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to) {
 		Optional<Passenger> passenger = this.passengerRepository.findById(passengerId);
 		if (passenger.isEmpty()) return null;
 
