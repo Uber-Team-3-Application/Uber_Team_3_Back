@@ -61,17 +61,17 @@ values (9.0, 8, 5);
 insert into Vehicle
 (is_baby_accessible, is_pet_accessible, model, number_of_seats, registration_plate, current_location_id, vehicle_type_id)
 values
-(true, true, 'Audi A3', 4, 'KK077KK', 1, 1);
+    (true, true, 'Audi A3', 4, 'KK077KK', 1, 1);
 
 insert into Vehicle
 (is_baby_accessible, is_pet_accessible, model, number_of_seats, registration_plate, current_location_id, vehicle_type_id)
 values
-(true, true, 'Opel Astra G', 4, 'SM333RK', 2, 1);
+    (true, true, 'Opel Astra G', 4, 'SM333RK', 2, 1);
 
 insert into Vehicle
 ( is_baby_accessible, is_pet_accessible, model, number_of_seats, registration_plate, current_location_id, vehicle_type_id)
 values
-(true, true, 'Mecedes Benz C class', 4, 'SM077CF', 3, 2);
+    (true, true, 'Mecedes Benz C class', 4, 'SM077CF', 3, 2);
 
 insert into Drivers(id, vehicle_id) values(1, 1);
 insert into Drivers(id, vehicle_id) values(2, 2);
@@ -210,3 +210,4 @@ insert into Ride_Locations (ride_id, locations_id) values (7, 4); -- ok
 insert into Review (driver_comment, driver_rating, vehicle_comment, vehicle_rating, passenger_id, ride_id)
 values ('Vozač je bio jako ljubazan.', 5, 'Vozilo je solidno uredno', 4, 5, 7);
 insert into Ride_Review (ride_id, review_id) values (7, 10);
+
