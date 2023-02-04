@@ -110,7 +110,7 @@ values(TO_DATE('15/11/2022 11:52', 'dd/MM/yyyy HH:mm'), 'Rider went of course', 
 
 insert into Ride ( estimated_time, is_baby_accessible, is_panic_pressed, is_pet_accessible,
                    status, time_of_end, time_of_start, total_price, deduction_id, driver_id, vehicle_type_id)
-values (21, false , false, false,'FINISHED',TO_DATE('20/5/2022 18:35', 'dd/MM/yyyy HH:mm'),
+values (21, false , false, false,'FINISHED',TO_DATE('26/7/2022 18:35', 'dd/MM/yyyy HH:mm'),
         TO_DATE('26/7/2022 18:00', 'dd/MM/yyyy HH:mm'), 2045, null, 2, 3);
 
 insert into Drivers_Rides (driver_id, rides_id) values (2, 2);

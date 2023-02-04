@@ -20,10 +20,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -420,6 +416,7 @@ public class RideRepositoryTest {
         calendar.set(2022, Calendar.JULY, 28, 0, 0, 0);
         Date to = calendar.getTime();
         List<ReportDTO<Double>> reports = this.rideRepository.getTotalCostPerDay(from, to);
+
         assertThat(reports.get(0).getTotal()).isEqualTo(6087);
     }
 
