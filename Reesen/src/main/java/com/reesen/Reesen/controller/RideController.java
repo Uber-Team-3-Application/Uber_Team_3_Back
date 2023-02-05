@@ -12,6 +12,7 @@ import com.reesen.Reesen.service.interfaces.IRideService;
 import com.reesen.Reesen.validation.UserRequestValidation;
 import org.json.HTTP;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,7 +38,9 @@ public class RideController {
         this.userRequestValidation = userRequestValidation;
     }
 
-    @PostMapping
+    @PostMapping(
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     @PreAuthorize("hasAnyRole('PASSENGER')")
     public ResponseEntity<RideDTO> createRide(@Valid @Nullable @RequestBody CreateRideDTO rideDTO, @RequestHeader Map<String, String> headers){
         String role = this.userRequestValidation.getRoleFromToken(headers);
@@ -48,7 +51,8 @@ public class RideController {
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/driver/{driverId}/active")
+    @GetMapping(value = "/driver/{driverId}/active",
+                produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN')")
     public ResponseEntity<RideDTO> getDriverActiveRide(@PathVariable("driverId") Long driverId, @RequestHeader Map<String, String> headers){
         if(driverId < 1)
@@ -111,7 +115,8 @@ public class RideController {
         return new ResponseEntity<>(panicRide, HttpStatus.OK);
     }
 
-    @PutMapping(value = "/{id}/accept")
+    @PutMapping(value = "/{id}/accept",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAnyRole('DRIVER')")
     public ResponseEntity<RideDTO> acceptRide(@PathVariable Long id){
         if(id < 1)

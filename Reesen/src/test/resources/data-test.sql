@@ -13,14 +13,14 @@ values('Mirko', 'Preradovic', 'profilna', '12421421','mirko@gmail.com', 'Mirko12
 
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
 
-values('Marko', 'Kraljevic', 'profilna', '1242146', 'marko@gmail.com', 'Marko123', true, true, 'Mirkova 14, Novi Sad', 'DRIVER');
+values('Marko', 'Kraljevic', 'profilna', '1242146', 'marko@gmail.com', '$2a$12$y5EZ5/ofrcf6U0OR4qofLeXUqghAsPkLN9cuzFWyUGWh6sYsIsdfO', false, true, 'Mirkova 14, Novi Sad', 'DRIVER');
 
 
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
 values('Nemanja', 'Stefanovic', 'profilna', '+38121521', 'nemus@gmail.com', 'Nemanja123',  false, false , 'Radnicka 20, Novi Sad', 'PASSENGER');
 
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
-values('Marko', 'Preradovic', 'profilna', '+38121521', 'markopreradovic@gmail.com', 'Marko123', false, false , 'Kurtijeva 12, Novi Sad', 'PASSENGER');
+values('Marko', 'Preradovic', 'profilna', '+38121521', 'markopreradovic@gmail.com', '$2a$12$y5EZ5/ofrcf6U0OR4qofLeXUqghAsPkLN9cuzFWyUGWh6sYsIsdfO', false, true , 'Kurtijeva 12, Novi Sad', 'PASSENGER');
 
 
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
@@ -210,3 +210,5 @@ insert into Ride_Locations (ride_id, locations_id) values (7, 4); -- ok
 insert into Review (driver_comment, driver_rating, vehicle_comment, vehicle_rating, passenger_id, ride_id)
 values ('Vozač je bio jako ljubazan.', 5, 'Vozilo je solidno uredno', 4, 5, 7);
 insert into Ride_Review (ride_id, review_id) values (7, 10);
+
+
