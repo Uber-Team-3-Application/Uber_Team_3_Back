@@ -423,7 +423,7 @@ public class RideControllerTest {
     @DisplayName("Doesnt end ride that does not exist")
     public void doesntEndRide_thatDoesNotExist(){
 
-        ResponseEntity<String> endResponse = this.restTemplate.exchange(
+        ResponseEntity<String> endResponse = this.driverRestTemplate.exchange(
                 BASE_PATH + "/" + 124124 + "/end",
                 HttpMethod.PUT,
                 null,
@@ -444,7 +444,7 @@ public class RideControllerTest {
         ResponseEntity<RideDTO> acceptResponse = acceptRide(createResponse);
         assertEquals(HttpStatus.OK, acceptResponse.getStatusCode());
 
-        ResponseEntity<String> endResponse = this.driverRestTemplate.exchange(
+        ResponseEntity<ErrorResponseMessage> endResponse = this.driverRestTemplate.exchange(
                 BASE_PATH + "/" + acceptResponse.getBody().getId() + "/end",
                 HttpMethod.PUT,
                 null,
@@ -452,8 +452,105 @@ public class RideControllerTest {
                 }
         );
         assertEquals(HttpStatus.BAD_REQUEST, endResponse.getStatusCode());
-        assertEquals("Cannot end a ride that is not in status STARTED!", endResponse.getBody());
+        assertEquals("Cannot end a ride that is not in status STARTED!", endResponse.getBody().getMessage());
 
+        // cleanup
+        withdrawRide(acceptResponse.getBody());
+    }
+
+    @Test
+    @DisplayName("Panic ride with valid input as a DRIVER")
+    public void panicRide_withAllValidInputAsDriver(){
+
+        ResponseEntity<RideDTO> createResponse = createRide();
+        assertEquals(HttpStatus.OK, createResponse.getStatusCode());
+
+        ResponseEntity<RideDTO> acceptResponse = acceptRide(createResponse);
+        assertEquals(HttpStatus.OK, acceptResponse.getStatusCode());
+
+        ResponseEntity<RideDTO> startResponse = startRide(acceptResponse);
+        assertEquals(HttpStatus.OK, startResponse.getStatusCode());
+
+        ResponseEntity<RideDTO> panicResponse = this.driverRestTemplate.exchange(
+                BASE_PATH + "/" + createResponse.getBody().getId() + "/panic",
+                HttpMethod.PUT,
+                new HttpEntity<>(new ReasonDTO("Panic reason")),
+                new ParameterizedTypeReference<RideDTO>() {
+                }
+        );
+        assertEquals(HttpStatus.OK, panicResponse.getStatusCode());
+        assertEquals(RideStatus.FINISHED, panicResponse.getBody().getStatus());
+        assertNotNull(panicResponse.getBody().getEndTime());
+
+    }
+    @Test
+    @DisplayName("Panic ride with valid input as a PASSENGER")
+    public void panicRide_withAllValidInputAsPassenger(){
+
+        ResponseEntity<RideDTO> createResponse = createRide();
+        assertEquals(HttpStatus.OK, createResponse.getStatusCode());
+
+        ResponseEntity<RideDTO> acceptResponse = acceptRide(createResponse);
+        assertEquals(HttpStatus.OK, acceptResponse.getStatusCode());
+
+        ResponseEntity<RideDTO> startResponse = startRide(acceptResponse);
+        assertEquals(HttpStatus.OK, startResponse.getStatusCode());
+
+        ResponseEntity<RideDTO> panicResponse = this.passengerRestTemplate.exchange(
+                BASE_PATH + "/" + createResponse.getBody().getId() + "/panic",
+                HttpMethod.PUT,
+                new HttpEntity<>(new ReasonDTO("Panic reason")),
+                new ParameterizedTypeReference<RideDTO>() {
+                }
+        );
+        assertEquals(HttpStatus.OK, panicResponse.getStatusCode());
+        assertEquals(RideStatus.FINISHED, panicResponse.getBody().getStatus());
+        assertNotNull(panicResponse.getBody().getEndTime());
+
+    }
+    @Test
+    @DisplayName("Doesnt Panic ride with non existing ride")
+    public void doesntPanicRide_whenRideDoesntExist(){
+
+        ResponseEntity<String> panicResponse = this.passengerRestTemplate.exchange(
+                BASE_PATH + "/" + 123534 + "/panic",
+                HttpMethod.PUT,
+                new HttpEntity<>(new ReasonDTO("Panic reason")),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        assertEquals(HttpStatus.NOT_FOUND, panicResponse.getStatusCode());
+        assertEquals("Ride does not exist!", panicResponse.getBody());
+    }
+
+    @Test
+    @DisplayName("Doesnt Panic ride with no reason")
+    public void doesntPanicRide_whenNoReasonGiver(){
+
+        ResponseEntity<String> panicResponse = this.passengerRestTemplate.exchange(
+                BASE_PATH + "/" + 5 + "/panic",
+                HttpMethod.PUT,
+                new HttpEntity<>(null),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        assertEquals(HttpStatus.BAD_REQUEST, panicResponse.getStatusCode());
+        assertEquals("Must give a reason!", panicResponse.getBody());
+    }
+
+    @Test
+    @DisplayName("Doesnt Panic ride that doesnt have status STARTED")
+    public void doesntPanicRide_whenRideIsNotStarted(){
+
+        ResponseEntity<String> panicResponse = this.passengerRestTemplate.exchange(
+                BASE_PATH + "/" + 5 + "/panic",
+                HttpMethod.PUT,
+                new HttpEntity<>(null),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        assertEquals(HttpStatus.BAD_REQUEST, panicResponse.getStatusCode());
+        assertEquals("Cannot panic a ride that is not started!", panicResponse.getBody());
     }
 
 

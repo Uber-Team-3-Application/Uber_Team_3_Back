@@ -112,6 +112,8 @@ public class RideController {
         if(reason == null)
             return new ResponseEntity("Must give a reason!", HttpStatus.BAD_REQUEST);
         Ride ride = this.rideService.findOne(id);
+        if(ride.getStatus() != RideStatus.STARTED)
+            return new ResponseEntity(new ErrorResponseMessage("Cannot panic a ride that is not started!"), HttpStatus.BAD_REQUEST);
         RideDTO panicRide  = this.rideService.panicRide(id, reason.getReason(), this.userRequestValidation.getIdFromToken(headers));
         return new ResponseEntity<>(panicRide, HttpStatus.OK);
     }
