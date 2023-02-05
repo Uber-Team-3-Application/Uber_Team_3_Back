@@ -103,6 +103,12 @@ public class RideService implements IRideService {
 
 	@Override
 	public RideDTO createRideDTO(CreateRideDTO rideDTO, Long passengerId) {
+		if (rideDTO.getScheduledTime() != null) {
+			Calendar calendar = Calendar.getInstance();
+			calendar.add(Calendar.HOUR, 5);
+			if (rideDTO.getScheduledTime().after(calendar.getTime()))
+				return null;
+		}
 		Ride ride = new Ride();
 		Set<RouteDTO> locationsDTOs = rideDTO.getLocations();
 		LinkedHashSet<Route> locations = new LinkedHashSet<>();
@@ -117,8 +123,6 @@ public class RideService implements IRideService {
 			route.setDestination(destination);
 
 			route = this.routeRepository.save(route);
-			route.setDeparture(departure);
-			route.setDestination(destination);
 			locations.add(route);
 		}
 
@@ -133,7 +137,10 @@ public class RideService implements IRideService {
 			if (pass != null)
 				passengers.add(pass);
 		}
-		passengers.add(this.passengerService.findOne(passengerId).get());
+		if(this.passengerRepository.findById(passengerId).isPresent())
+			passengers.add(this.passengerRepository.findById(passengerId).get());
+		else
+			return null;
 		ride.setPassengers(passengers);
 		ride.setStatus(RideStatus.PENDING);
 
@@ -184,7 +191,7 @@ public class RideService implements IRideService {
 	}
 
 	@Scheduled(fixedDelay = 5000)  // schedule to run every minute at 15th second
-	public void scheduleRide() {
+	private void scheduleRide() {
 		Set<Ride> rides = rideRepository.findAllByScheduledTimeIsNotNullAndStatus(RideStatus.SCHEDULED);
 		Date now = new Date();
 		for(Ride ride : rides){
