@@ -40,8 +40,6 @@ public class RideControllerTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
-    @Autowired
-    private MessageSource messageSource;
 
     private TestRestTemplate driverRestTemplate, passengerRestTemplate;
 
@@ -542,7 +540,7 @@ public class RideControllerTest {
     @DisplayName("Doesnt Panic ride that doesnt have status STARTED")
     public void doesntPanicRide_whenRideIsNotStarted(){
 
-        ResponseEntity<String> panicResponse = this.passengerRestTemplate.exchange(
+        ResponseEntity<ErrorResponseMessage> panicResponse = this.passengerRestTemplate.exchange(
                 BASE_PATH + "/" + 5 + "/panic",
                 HttpMethod.PUT,
                 new HttpEntity<>(new ReasonDTO("He is crazy")),
@@ -550,14 +548,51 @@ public class RideControllerTest {
                 }
         );
         assertEquals(HttpStatus.BAD_REQUEST, panicResponse.getStatusCode());
-        assertEquals("Cannot panic a ride that is not started!", panicResponse.getBody());
+        assertEquals("Cannot panic a ride that is not started!", panicResponse.getBody().getMessage());
+    }
+
+    @Test
+    @DisplayName("Doesnt Panic ride as an invalid User")
+    public void doesntPanicRide_whenUserIsInvalid(){
+        headers.set("X-Auth-Token", null);
+        HttpEntity<LoginDTO> adminLogin = new HttpEntity<>(new LoginDTO("nikolaj@gmail.com", "Nikolaj123"), headers);
+        ResponseEntity<TokenDTO> adminResponse = restTemplate
+                .exchange("/api/user/login",
+                        HttpMethod.POST,
+                        adminLogin,
+                        new ParameterizedTypeReference<TokenDTO>() {
+                        });
+
+        String adminToken = adminResponse.getBody().getToken();
+        headers.set("X-Auth-Token", adminToken);
+        ResponseEntity<String> panicResponse = this.restTemplate.exchange(
+                BASE_PATH + "/" + 5 + "/panic",
+                HttpMethod.PUT,
+                new HttpEntity<>(new ReasonDTO("He is crazy"), headers),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        assertEquals(HttpStatus.FORBIDDEN, panicResponse.getStatusCode());
+        assertEquals("Access Denied", panicResponse.getBody());
+    }
+    @Test
+    @DisplayName("Doesnt Panic ride as an unauthenticated User")
+    public void doesntPanicRide_whenUserIsNotAuthenticated(){
+        ResponseEntity<String> panicResponse = this.restTemplate.exchange(
+                BASE_PATH + "/" + 5 + "/panic",
+                HttpMethod.PUT,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        assertEquals(HttpStatus.UNAUTHORIZED, panicResponse.getStatusCode());
     }
 
 
 
     private ResponseEntity<RideDTO> createRide() {
-        LocationDTO departure = new LocationDTO("adresa", 19.55, 22.2);
-        LocationDTO destination = new LocationDTO("adresa2", 19.22, 22.1);
+        LocationDTO departure = new LocationDTO("address first", 19.55, 22.2);
+        LocationDTO destination = new LocationDTO("address second", 19.22, 22.1);
         RouteDTO route = new RouteDTO(departure, destination);
         LinkedHashSet<RouteDTO> routes = new LinkedHashSet<>();
         routes.add(route);
