@@ -9,7 +9,9 @@ import java.util.Set;
 import com.reesen.Reesen.Enums.RideStatus;
 import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.model.*;
+import lombok.ToString;
 
+@ToString
 public class RideDTO {
 
 	private Long id;

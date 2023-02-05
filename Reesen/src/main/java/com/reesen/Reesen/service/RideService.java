@@ -360,7 +360,9 @@ public class RideService implements IRideService {
 			route.setDestination(this.routeRepository.getDestinationByRoute(route).get());
 		}
 		newRide.setLocations(newLocations);
-		User user = userRepository.findById(passengerId).get();
+		User user = userRepository.findById(passengerId).orElse(null);
+		if (user == null)
+			return null;
 		this.panicRepository.save(new Panic(new Date(), reason, newRide, user));
 
 		Long adminId = this.userRepository.findAdmin(Role.ADMIN);

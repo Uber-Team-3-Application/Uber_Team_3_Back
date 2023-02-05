@@ -13,8 +13,10 @@ import com.reesen.Reesen.service.interfaces.ILocationService;
 import com.reesen.Reesen.service.interfaces.IWorkingHoursService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -535,6 +537,115 @@ public class RideServiceTest {
         assertEquals(3.0, report.getSum(), 0.2);
         assertEquals(1.5, report.getAverage(), 0.2);
     }
+
+    @Test
+    public void setPanicForRide_whenRideIdIsValid_andPassengerIdIsValid() {
+        Ride ride = new Ride();
+        ride.setId(1L);
+        ride.setStatus(RideStatus.ACTIVE);
+        Driver driver = new Driver();
+        driver.setId(2L);
+        driver.setActive(true);
+        Passenger passenger = new Passenger();
+        passenger.setId(1L);
+        passenger.setEmail("luke@gmail.com");
+        setMocksForPanicRide(ride, 123L, 15L, passenger, driver);
+        RideDTO dto = this.rideService.panicRide(ride.getId(), "Something wrong", passenger.getId());
+
+        assertNotNull(dto);
+        assertEquals(dto.getDriver().getId(), driver.getId());
+        assertThat(dto.getPassengers().size()).isEqualTo(1);
+
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(longs = {123L, -5L, 3L})
+    public void setPanicForRide_whenRideIdIsInvalid_andPassengerIdIsValid(Long invalidId) {
+        Ride ride = new Ride();
+        ride.setId(invalidId);
+        ride.setStatus(RideStatus.ACTIVE);
+        Driver driver = new Driver();
+        driver.setId(2L);
+        driver.setActive(true);
+        Passenger passenger = new Passenger();
+        passenger.setId(1L);
+        passenger.setEmail("luke@gmail.com");
+        setMocksForPanicRide(ride, invalidId, 15L, passenger, driver);
+        RideDTO dto = this.rideService.panicRide(ride.getId(), "Something wrong", passenger.getId());
+        assertNull(dto);
+
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {15L, 25L, 156L})
+    public void setPanicForRide_whenRideIdIsValid_andPassengerIdIsInvalid(Long passengerId) {
+        Ride ride = new Ride();
+        ride.setId(1L);
+        ride.setStatus(RideStatus.ACTIVE);
+        Driver driver = new Driver();
+        driver.setId(2L);
+        driver.setActive(true);
+        Passenger passenger = new Passenger();
+        passenger.setId(passengerId);
+        passenger.setEmail("luke@gmail.com");
+        setMocksForPanicRide(ride, 123L, passengerId, passenger, driver);
+        RideDTO dto = this.rideService.panicRide(ride.getId(), "Something wrong", passenger.getId());
+        assertNull(dto);
+    }
+
+
+    
+    
+
+
+
+    private void setMocksForPanicRide(Ride ride, Long invalidId, Long passengerInvalidId,
+                                      Passenger passenger, Driver driver) {
+        Set<Passenger> passengers = new HashSet<>();
+        passengers.add(passenger);
+        VehicleType vehicleType = new VehicleType();
+        vehicleType.setId(1L);
+        Admin admin = new Admin();
+        admin.setId(1L);
+        Location departure = new Location( 14.44, 15.23, "adresa");
+        Location destination = new Location( 15.44, 15.23, "adresa");
+        Route route = new Route(departure, destination);
+        route.setId(1L);
+        LinkedHashSet<Route> locations = new LinkedHashSet<>();
+        locations.add(route);
+        Mockito.when(this.rideRepository.getLocationsByRide(1L))
+                .thenReturn(locations);
+        Mockito.when(this.rideRepository.getLocationsByRide(invalidId)).thenReturn(null);
+        Mockito.when(this.routeRepository.getDepartureByRoute(route))
+                .thenReturn(Optional.of(departure));
+        Mockito.when(this.routeRepository.getDestinationByRoute(route))
+                .thenReturn(Optional.of(destination));
+        Mockito.when(this.rideRepository.findById(1L)).thenReturn(Optional.of(ride));
+
+        Mockito.when(this.rideRepository.getVehicleTypeId(1L)).thenReturn(vehicleType.getId());
+        Mockito.when(this.rideRepository.getVehicleTypeId(invalidId)).thenReturn(null);
+
+        Mockito.when(this.userRepository.findAdmin(Role.ADMIN)).thenReturn(admin.getId());
+        Mockito.when(this.driverRepository.findDriverByRidesContaining(ride)).thenReturn(Optional.of(driver));
+
+        Mockito.when(this.passengerRepository.findPassengersByRidesContaining(ride)).thenReturn(passengers);
+
+        Mockito.when(this.userRepository.findById(driver.getId())).thenReturn(Optional.of(driver));
+        Mockito.when(this.userRepository.findById(1L)).thenReturn(Optional.of(passenger));
+
+        Mockito.when(this.vehicleTypeRepository.findById(vehicleType.getId())).thenReturn(Optional.of(vehicleType));
+
+        Mockito.when(this.rideRepository.findDriverByRideId(1L)).thenReturn(driver);
+        Mockito.when(this.rideRepository.findDriverByRideId(invalidId)).thenReturn(null);
+
+        Mockito.when(this.rideRepository.findPassengerByRideId(1L)).thenReturn(passengers);
+        Mockito.when(this.rideRepository.findPassengerByRideId(invalidId)).thenReturn(null);
+
+        Mockito.when(this.rideRepository.save(ride)).thenReturn(ride);
+    }
+
+
 
     private void setMocksForKilometersPerDayReport(List<RideLocationWithTimeDTO> rides) {
         for(RideLocationWithTimeDTO ride:rides){
