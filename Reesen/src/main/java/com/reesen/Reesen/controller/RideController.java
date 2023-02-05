@@ -92,7 +92,7 @@ public class RideController {
     }
 
     @PutMapping(value = "/{id}/withdraw")
-    @PreAuthorize("hasAnyRole('PASSENGER')")
+    @PreAuthorize("hasRole('PASSENGER')")
     public ResponseEntity<RideDTO> cancelExistingRide(@PathVariable Long id){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -152,13 +152,14 @@ public class RideController {
     }
 
     @PutMapping(value = "/{id}/end")
-    @PreAuthorize("hasAnyRole('DRIVER')")
+    @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<RideDTO> endRide(@PathVariable Long id, @RequestHeader Map<String, String> headers){
         String role = this.userRequestValidation.getRoleFromToken(headers);
-        if(id < 1)
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(this.rideService.findOne(id) == null)
+        Ride ride = this.rideService.findOne(id);
+        if(ride == null)
             return new ResponseEntity("Ride does not exist!", HttpStatus.NOT_FOUND);
+        if(!(ride.getStatus() == RideStatus.ACTIVE) && !(ride.getStatus() == RideStatus.STARTED))
+            return new ResponseEntity(new ErrorResponseMessage("Cannot end a ride that is not in status STARTED!"), HttpStatus.BAD_REQUEST);
         if(!role.equalsIgnoreCase("driver"))
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         RideDTO endedRide = this.rideService.endRide(id);

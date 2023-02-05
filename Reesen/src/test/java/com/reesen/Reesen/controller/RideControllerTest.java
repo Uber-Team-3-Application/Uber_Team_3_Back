@@ -1,5 +1,6 @@
 package com.reesen.Reesen.controller;
 
+import com.reesen.Reesen.Enums.RideStatus;
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.ErrorResponseMessage;
 import org.junit.jupiter.api.*;
@@ -280,6 +281,35 @@ public class RideControllerTest {
         assertEquals("Ride does not exist!", startResponse.getBody());
 
     }
+    @Test
+    @DisplayName("Cant start ride as user different from DRIVER")
+    public void doesntStartRide_asInvalidUser(){
+
+        ResponseEntity<String> startResponse = this.passengerRestTemplate.exchange(
+                BASE_PATH + "/" + 1241 + "/start",
+                HttpMethod.PUT,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        assertEquals(HttpStatus.FORBIDDEN, startResponse.getStatusCode());
+        assertEquals("Access Denied", startResponse.getBody());
+
+    }
+
+    @Test
+    @DisplayName("Cant start ride as an unregistered user")
+    public void doesntStartRide_asUnregisteredUser(){
+
+        ResponseEntity<String> startResponse = this.restTemplate.exchange(
+                BASE_PATH + "/" + 1241 + "/start",
+                HttpMethod.PUT,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        assertEquals(HttpStatus.UNAUTHORIZED, startResponse.getStatusCode());
+    }
 
     @Test
     @DisplayName("Cant start ride that has invalid id")
@@ -347,26 +377,85 @@ public class RideControllerTest {
         ResponseEntity<RideDTO> acceptResponse = acceptRide(createResponse);
         assertEquals(HttpStatus.OK, acceptResponse.getStatusCode());
 
-        ResponseEntity<RideDTO> startResponse = this.driverRestTemplate.exchange(
-                BASE_PATH + "/" + createResponse.getBody().getId() + "/start",
-                HttpMethod.PUT,
-                null,
-                new ParameterizedTypeReference<RideDTO>() {
-                }
-        );
+        ResponseEntity<RideDTO> startResponse = startRide(acceptResponse);
         assertEquals(HttpStatus.OK, startResponse.getStatusCode());
-        assertNotNull(startResponse.getBody());
-        RideDTO ride = startResponse.getBody();
+        ResponseEntity<RideDTO> endResponse =  endRide(startResponse);
+        assertEquals(HttpStatus.OK, endResponse.getStatusCode());
+        assertNotNull(endResponse.getBody());
+        RideDTO ride = endResponse.getBody();
         assertEquals(createResponse.getBody().getId(), ride.getId());
         assertNull(ride.getRejection());
         assertNotNull(ride.getStartTime());
-        assertNull(ride.getEndTime());
-        assertEquals("STARTED", ride.getStatus().toString());
-
-        ResponseEntity<RideDTO> endResponse =  endRide(startResponse);
-        assertEquals(HttpStatus.OK, endResponse.getStatusCode());
+        assertNotNull(ride.getEndTime());
+        assertEquals("FINISHED", ride.getStatus().toString());
 
     }
+    @Test
+    @DisplayName("Doesnt end ride as a user that is not Driver")
+    public void doesntEndRide_asInvalidUser(){
+
+        ResponseEntity<String> endResponse = this.passengerRestTemplate.exchange(
+                BASE_PATH + "/" + 123 + "/end",
+                HttpMethod.PUT,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        assertEquals(HttpStatus.FORBIDDEN, endResponse.getStatusCode());
+        assertEquals("Access Denied", endResponse.getBody());
+    }
+
+    @Test
+    @DisplayName("Doesnt end ride as an unauthorized user")
+    public void doesntEndRide_asUnauthorizedUser(){
+
+        ResponseEntity<String> endResponse = this.restTemplate.exchange(
+                BASE_PATH + "/" + 123 + "/end",
+                HttpMethod.PUT,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        assertEquals(HttpStatus.UNAUTHORIZED, endResponse.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Doesnt end ride that does not exist")
+    public void doesntEndRide_thatDoesNotExist(){
+
+        ResponseEntity<String> endResponse = this.restTemplate.exchange(
+                BASE_PATH + "/" + 124124 + "/end",
+                HttpMethod.PUT,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        assertEquals(HttpStatus.NOT_FOUND, endResponse.getStatusCode());
+        assertEquals("Ride does not exist!", endResponse.getBody());
+    }
+
+    @Test
+    @DisplayName("Doesnt end ride that is not started")
+    public void doesntEndRide_thatIsNotStarted(){
+
+        ResponseEntity<RideDTO> createResponse = createRide();
+        assertEquals(HttpStatus.OK, createResponse.getStatusCode());
+
+        ResponseEntity<RideDTO> acceptResponse = acceptRide(createResponse);
+        assertEquals(HttpStatus.OK, acceptResponse.getStatusCode());
+
+        ResponseEntity<String> endResponse = this.driverRestTemplate.exchange(
+                BASE_PATH + "/" + acceptResponse.getBody().getId() + "/end",
+                HttpMethod.PUT,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        assertEquals(HttpStatus.BAD_REQUEST, endResponse.getStatusCode());
+        assertEquals("Cannot end a ride that is not in status STARTED!", endResponse.getBody());
+
+    }
+
 
 
     private ResponseEntity<RideDTO> createRide() {
@@ -384,6 +473,8 @@ public class RideControllerTest {
                 RideDTO.class
         );
     }
+
+
     private ResponseEntity<RideDTO> startRide(ResponseEntity<RideDTO> createResponse){
         return this.driverRestTemplate.exchange(
                 BASE_PATH + "/" + createResponse.getBody().getId() + "/start",
@@ -412,6 +503,7 @@ public class RideControllerTest {
                 }
         );
     }
+
     private ResponseEntity<RideDTO> cancelRide(RideDTO ride) {
         return this.driverRestTemplate.exchange(
                 BASE_PATH + "/" + ride.getId() + "/cancel",
