@@ -13,14 +13,14 @@ values('Mirko', 'Preradovic', 'profilna', '12421421','mirko@gmail.com', 'Mirko12
 
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
 
-values('Marko', 'Kraljevic', 'profilna', '1242146', 'marko@gmail.com', 'Marko123', true, true, 'Mirkova 14, Novi Sad', 'DRIVER');
+values('Marko', 'Kraljevic', 'profilna', '1242146', 'marko@gmail.com', '$2a$12$y5EZ5/ofrcf6U0OR4qofLeXUqghAsPkLN9cuzFWyUGWh6sYsIsdfO', false, true, 'Mirkova 14, Novi Sad', 'DRIVER');
 
 
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
 values('Nemanja', 'Stefanovic', 'profilna', '+38121521', 'nemus@gmail.com', 'Nemanja123',  false, false , 'Radnicka 20, Novi Sad', 'PASSENGER');
 
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
-values('Marko', 'Preradovic', 'profilna', '+38121521', 'markopreradovic@gmail.com', 'Marko123', false, false , 'Kurtijeva 12, Novi Sad', 'PASSENGER');
+values('Marko', 'Preradovic', 'profilna', '+38121521', 'markopreradovic@gmail.com', '$2a$12$y5EZ5/ofrcf6U0OR4qofLeXUqghAsPkLN9cuzFWyUGWh6sYsIsdfO', false, true , 'Kurtijeva 12, Novi Sad', 'PASSENGER');
 
 
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
@@ -28,7 +28,7 @@ values('Nebojsa', 'Vuga', 'profilna', '1243124', 'nebojsavuga@gmail.com', 'Neboj
 
 
 insert into Users(name, surname, profile_picture, telephone_number, email, password, is_blocked, is_active, address, role)
-values('Nikolaj', 'Velimirovic', 'profilna', '124124214', 'nikolaj@gmail.com', 'Nikolaj123', false, false, 'Radnicka 19, Novi Sad', 'ADMIN');
+values('Nikolaj', 'Velimirovic', 'profilna', '124124214', 'nikolaj@gmail.com', '$2a$12$jlK.4bfoq8vGlRTrlNT4DuL4yS..KaCJPU3bFJieqMR47wiSwxC16', false, false, 'Radnicka 19, Novi Sad', 'ADMIN');
 
 
 insert into Passenger(id, is_confirmed_mail, amount_of_money) values(3, true, 1000);
