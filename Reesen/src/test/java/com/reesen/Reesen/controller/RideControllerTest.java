@@ -545,7 +545,7 @@ public class RideControllerTest {
         ResponseEntity<String> panicResponse = this.passengerRestTemplate.exchange(
                 BASE_PATH + "/" + 5 + "/panic",
                 HttpMethod.PUT,
-                new HttpEntity<>(null),
+                new HttpEntity<>(new ReasonDTO("He is crazy")),
                 new ParameterizedTypeReference<>() {
                 }
         );
