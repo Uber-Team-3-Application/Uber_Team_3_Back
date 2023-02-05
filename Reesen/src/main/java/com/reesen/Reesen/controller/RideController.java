@@ -1,5 +1,6 @@
 package com.reesen.Reesen.controller;
 
+import com.reesen.Reesen.Enums.RideStatus;
 import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.Deduction;
@@ -117,12 +118,16 @@ public class RideController {
 
     @PutMapping(value = "/{id}/accept",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAnyRole('DRIVER')")
+    @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<RideDTO> acceptRide(@PathVariable Long id){
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(this.rideService.findOne(id) == null)
+        Ride ride = this.rideService.findOne(id);
+        if(ride == null)
             return new ResponseEntity("Ride does not exist!", HttpStatus.NOT_FOUND);
+        if(ride.getStatus() != RideStatus.PENDING){
+            return new ResponseEntity(new ErrorResponseMessage("Cannot accept a ride that is not in status PENDING!"), HttpStatus.BAD_REQUEST);
+        }
         RideDTO acceptedRide = this.rideService.acceptRide(id);
         return new ResponseEntity<>(acceptedRide, HttpStatus.OK);
     }
