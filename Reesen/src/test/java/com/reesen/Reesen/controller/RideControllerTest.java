@@ -337,6 +337,37 @@ public class RideControllerTest {
     }
 
 
+    @Test
+    @DisplayName("Ends ride with valid input")
+    public void endRide_withAllValidInput(){
+
+        ResponseEntity<RideDTO> createResponse = createRide();
+        assertEquals(HttpStatus.OK, createResponse.getStatusCode());
+
+        ResponseEntity<RideDTO> acceptResponse = acceptRide(createResponse);
+        assertEquals(HttpStatus.OK, acceptResponse.getStatusCode());
+
+        ResponseEntity<RideDTO> startResponse = this.driverRestTemplate.exchange(
+                BASE_PATH + "/" + createResponse.getBody().getId() + "/start",
+                HttpMethod.PUT,
+                null,
+                new ParameterizedTypeReference<RideDTO>() {
+                }
+        );
+        assertEquals(HttpStatus.OK, startResponse.getStatusCode());
+        assertNotNull(startResponse.getBody());
+        RideDTO ride = startResponse.getBody();
+        assertEquals(createResponse.getBody().getId(), ride.getId());
+        assertNull(ride.getRejection());
+        assertNotNull(ride.getStartTime());
+        assertNull(ride.getEndTime());
+        assertEquals("STARTED", ride.getStatus().toString());
+
+        ResponseEntity<RideDTO> endResponse =  endRide(startResponse);
+        assertEquals(HttpStatus.OK, endResponse.getStatusCode());
+
+    }
+
 
     private ResponseEntity<RideDTO> createRide() {
         LocationDTO departure = new LocationDTO("adresa", 19.55, 22.2);
@@ -351,6 +382,15 @@ public class RideControllerTest {
                 BASE_PATH,
                 new HttpEntity<>(createRide),
                 RideDTO.class
+        );
+    }
+    private ResponseEntity<RideDTO> startRide(ResponseEntity<RideDTO> createResponse){
+        return this.driverRestTemplate.exchange(
+                BASE_PATH + "/" + createResponse.getBody().getId() + "/start",
+                HttpMethod.PUT,
+                null,
+                new ParameterizedTypeReference<RideDTO>() {
+                }
         );
     }
 
