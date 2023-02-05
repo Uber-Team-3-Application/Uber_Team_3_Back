@@ -133,13 +133,17 @@ public class RideController {
     }
 
     @PutMapping(value = "/{id}/start")
-    @PreAuthorize("hasAnyRole('DRIVER')")
+    @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<RideDTO> startRide(@PathVariable Long id, @RequestHeader Map<String, String> headers){
         String role = this.userRequestValidation.getRoleFromToken(headers);
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(this.rideService.findOne(id) == null)
+        Ride ride = this.rideService.findOne(id);
+        if(ride == null)
             return new ResponseEntity("Ride does not exist!", HttpStatus.NOT_FOUND);
+        if(ride.getStatus() != RideStatus.ACCEPTED){
+            return new ResponseEntity(new ErrorResponseMessage("Cannot start a ride that is not in status ACCEPTED!"), HttpStatus.BAD_REQUEST);
+        }
         if(!role.equalsIgnoreCase("driver"))// ||
             // !(this.driverService.findDriverByRidesContaining(this.rideService.findOne(id)).getId() == this.userRequestValidation.getIdFromToken(headers)) )
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
