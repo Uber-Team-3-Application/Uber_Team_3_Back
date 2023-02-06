@@ -27,5 +27,13 @@ public class ReportRequestDTO {
         this.to = to;
     }
 
+    public ReportRequestDTO(String role, String typeOfReport, Date from, Date to, Long driverId){
+        this.role = Role.GetRole(role);
+        this.typeOfReport = TypeOfReport.getTypeOfReport(typeOfReport);
+        this.from = from;
+        this.to = to;
+        this.driverId = driverId;
+    }
+
 
 }

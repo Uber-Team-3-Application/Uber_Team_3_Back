@@ -695,6 +695,12 @@ public class RideService implements IRideService {
 
 	@Override
 	public ReportSumAverageDTO filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS, long totalDays) {
+
+		if (totalDays <= 0){
+			throw new IllegalArgumentException("Total days must be positive");
+
+		}
+
 		ReportSumAverageDTO reportSumAverageDTO = new ReportSumAverageDTO();
 
 		Map<Date, Double> reports = new LinkedHashMap<>();
@@ -730,6 +736,10 @@ public class RideService implements IRideService {
 
 	@Override
 	public ReportSumAverageDTO filterReports(List<ReportDTO<Double>> reportDTOS, long totalDays) {
+
+		if (totalDays <= 0) {
+			throw new IllegalArgumentException("Total days must be positive");
+		}
 
 		ReportSumAverageDTO reportSumAverageDTO = new ReportSumAverageDTO();
 		Map<Date, Double> reports = new LinkedHashMap<>();
