@@ -169,7 +169,7 @@ public class RideController {
     }
 
     @PutMapping(value = "/{id}/cancel")
-    @PreAuthorize("hasAnyRole('DRIVER')")
+    @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<RideDTO> cancelRide(@PathVariable Long id, @Nullable @RequestBody ReasonDTO reason, @RequestHeader Map<String, String> headers){
         String role = this.userRequestValidation.getRoleFromToken(headers);
         if(id < 1)
@@ -177,8 +177,9 @@ public class RideController {
         if(this.rideService.findOne(id) == null)
             return new ResponseEntity("Ride does not exist!", HttpStatus.NOT_FOUND);
         if(!role.equalsIgnoreCase("driver"))
-            //  !(this.driverService.findDriverByRidesContaining(this.rideService.findOne(id)).getId() == this.userRequestValidation.getIdFromToken(headers)) )
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        Ride ride = this.rideService.findOne(id);
+
         if(reason == null)
             return new ResponseEntity("Must give a reason!", HttpStatus.BAD_REQUEST);
         RideDTO canceledRide = this.rideService.cancelRide(id, reason.getReason());
@@ -211,7 +212,7 @@ public class RideController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @GetMapping(value = "/favorites")
-    @PreAuthorize("hasAnyRole('PASSENGER')")
+    @PreAuthorize("hasRole('PASSENGER')")
     public ResponseEntity<Set<FavoriteRideDTO>> getFavouriteRides(@RequestHeader Map<String, String> headers)
     {
         Set<FavoriteRideDTO> response = this.favoriteRideService.getFavouriteRides(userRequestValidation.getIdFromToken(headers));
@@ -223,10 +224,12 @@ public class RideController {
     {
         if(id < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(this.favoriteRideService.findOne(id) == null)
+        if(this.favoriteRideService.findOne(id) == null) {
             return new ResponseEntity("Favorite location does not exist!", HttpStatus.NOT_FOUND);
+        }
         this.favoriteRideService.deleteFavouriteRides(id, this.userRequestValidation.getIdFromToken(headers));
-        return new ResponseEntity<>("Successful deletion of favorite location!",HttpStatus.NO_CONTENT);
+
+        return new ResponseEntity("Successful deletion of favorite location!",HttpStatus.NO_CONTENT);
     }
 
     @GetMapping(value = "/all-active-rides")
