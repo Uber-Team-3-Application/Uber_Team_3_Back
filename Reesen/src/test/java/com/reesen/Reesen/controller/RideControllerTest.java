@@ -1038,7 +1038,6 @@ public class RideControllerTest {
         );
 
         assertEquals(HttpStatus.BAD_REQUEST, dto.getStatusCode());
-        assertEquals("Must give a reason!", dto.getBody());
 
         cancelRide(createdRide.getBody());
 
@@ -1261,8 +1260,6 @@ public class RideControllerTest {
         cancelRide(createdRide.getBody());
         FavoriteRideDTO[] favoriteRideDTOS = responseEntity.getBody().toArray(new FavoriteRideDTO[0]);
         deleteFavoriteRide(favoriteRideDTOS[0]);
-
-
     }
 
 

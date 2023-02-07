@@ -69,7 +69,7 @@ public interface IRideService {
 	double calculateDistance(Location departure, Location destination);
 	//TODO: ---> VUGA
 
-
+	Ride save(Ride ride);
 	// TODO: JELENA
 	boolean validateCreateRideDTO(CreateRideDTO createRideDTO);
 

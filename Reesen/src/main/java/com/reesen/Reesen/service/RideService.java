@@ -101,6 +101,10 @@ public class RideService implements IRideService {
 		}
 		return null;
 	}
+	@Override
+	public Ride save(Ride ride) {
+		return this.rideRepository.save(ride);
+	}
 
 	@Override
 	public RideDTO createRideDTO(CreateRideDTO rideDTO, Long passengerId) {

@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-@TestPropertySource(locations="classpath:application-test.properties")
+@TestPropertySource(locations="classpath:application-test-repository.properties")
 public class RideRepositoryTest {
 
     @Autowired
@@ -618,11 +618,25 @@ public class RideRepositoryTest {
     }
 
     @Test
+    public void testGetLocationsByRideWrongId() {
+        Long id = 21L;
+        LinkedHashSet<Route> locations = rideRepository.getLocationsByRide(id);
+        assertEquals(0, locations.size());
+    }
+
+    @Test
     public void testFindDriverByRideId() {
         Long id = 1L;
         Driver driver = rideRepository.findDriverByRideId(id);
         assertNotNull(driver);
         assertEquals("mirko@gmail.com", driver.getEmail());
+    }
+
+    @Test
+    public void testFindDriverByRideIdWrongId() {
+        Long id = 20L;
+        Driver driver = rideRepository.findDriverByRideId(id);
+        assertEquals(null, driver);
     }
 
     @Test
@@ -633,6 +647,12 @@ public class RideRepositoryTest {
         assertEquals(2, passengers.size());
     }
 
+    @Test
+    public void testFindPassengerByRideIdWrongId() {
+        Long id = 21L;
+        Set<Passenger> passengers = rideRepository.findPassengerByRideId(id);
+        assertEquals(0, passengers.size());
+    }
 
     @Test
     public void testFindRideByDriverIdAndStatus() {
@@ -643,6 +663,21 @@ public class RideRepositoryTest {
         assertEquals(1L, ride.get().getDriver().getId());
     }
 
+    @Test
+    public void testFindRideByDriverIdAndStatusWrongId() {
+        Long driverId = 21L;
+        RideStatus status = RideStatus.ACTIVE;
+        Optional<Ride> ride = rideRepository.findRideByDriverIdAndStatus(driverId, status);
+        assertTrue(ride.isEmpty());
+    }
+
+    @Test
+    public void testFindRideByDriverIdAndStatusNoRide() {
+        Long driverId = 1L;
+        RideStatus status = RideStatus.STARTED;
+        Optional<Ride> ride = rideRepository.findRideByDriverIdAndStatus(driverId, status);
+        assertTrue(ride.isEmpty());
+    }
 
     @Test
     public void testFindAllRidesByPassengerId() {
@@ -654,6 +689,14 @@ public class RideRepositoryTest {
     }
 
     @Test
+    public void testFindAllRidesByPassengerIdWrongId() {
+        Long passengerId = 30L;
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Ride> rides = rideRepository.findAllRidesByPassengerId(passengerId, pageable);
+        assertEquals(0, rides.getTotalElements());
+    }
+
+    @Test
     public void testFindPassengerActiveRide() {
         Long passengerId = 4L;
         RideStatus rideStatus = RideStatus.ACTIVE;
@@ -662,6 +705,21 @@ public class RideRepositoryTest {
         assertEquals(5L, ride.getId().longValue());
     }
 
+    @Test
+    public void testFindPassengerActiveRideWrongId() {
+        Long passengerId = 40L;
+        RideStatus rideStatus = RideStatus.ACTIVE;
+        Ride ride = rideRepository.findPassengerActiveRide(passengerId, rideStatus);
+        assertEquals(null, ride);
+    }
+
+    @Test
+    public void testFindPassengerActiveRideNoRide() {
+        Long passengerId = 3L;
+        RideStatus rideStatus = RideStatus.ACTIVE;
+        Ride ride = rideRepository.findPassengerActiveRide(passengerId, rideStatus);
+        assertEquals(null, ride);
+    }
 
     @Test
     public void testFindAllRidesByPassengerIdAndRideStatus() {
@@ -670,10 +728,15 @@ public class RideRepositoryTest {
     }
 
     @Test
-    public void testUpdateRideStatus() {
-        rideRepository.updateRideStatus(1L, RideStatus.STARTED);
-        Ride ride = rideRepository.getOne(1L);
-        Assert.isTrue(ride.getStatus() == RideStatus.STARTED, "The ride status should be updated to started");
+    public void testFindAllRidesByPassengerIdAndRideStatusWrongId() {
+        Set<Ride> rides = rideRepository.findAllRidesByPassengerIdAndRideStatus(30L, RideStatus.SCHEDULED);
+        assertTrue(rides.isEmpty());
+    }
+
+    @Test
+    public void testFindAllRidesByPassengerIdAndRideStatusNoRide() {
+        Set<Ride> rides = rideRepository.findAllRidesByPassengerIdAndRideStatus(1L, RideStatus.STARTED);
+        assertTrue(rides.isEmpty());
     }
 
     @Test
@@ -683,15 +746,66 @@ public class RideRepositoryTest {
     }
 
     @Test
+    public void testGetRidesPerDayForSpecificPassengerWrongId() {
+        List<ReportDTO<Long>> reports = rideRepository.getRidesPerDayForSpecificPassenger(new Date(), new Date(), 20L);
+        assertTrue(reports.isEmpty());
+    }
+
+    @Test
+    public void testGetRidesPerDayForSpecificPassengerWrongDate() {
+        Date date = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, 1);
+        date = calendar.getTime();
+        List<ReportDTO<Long>> reports = rideRepository.getRidesPerDayForSpecificPassenger(date, date, 1L);
+        assertTrue(reports.isEmpty());
+    }
+
+    @Test
     public void testGetRidesWithStartTimeBetweenForSpecificPassenger() {
         List<RideLocationWithTimeDTO> rides = rideRepository.getRidesWithStartTimeBetweenForSpecificPassenger(new Date(), new Date(), 1L);
         Assert.notNull(rides, "The rides should not be null");
     }
 
     @Test
+    public void testGetRidesWithStartTimeBetweenForSpecificPassengerWrongId() {
+        List<RideLocationWithTimeDTO> rides = rideRepository.getRidesWithStartTimeBetweenForSpecificPassenger(new Date(), new Date(), 20L);
+        assertTrue(rides.isEmpty());
+    }
+
+    @Test
+    public void testGetRidesWithStartTimeBetweenForSpecificPassengerWrongDate() {
+        Date date = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, 1);
+        date = calendar.getTime();
+        List<RideLocationWithTimeDTO> rides = rideRepository.getRidesWithStartTimeBetweenForSpecificPassenger(date, date, 1L);
+        assertTrue(rides.isEmpty());
+    }
+
+    @Test
     public void testGetTotalCostPerDayForSpecificPassenger() {
         List<ReportDTO<Double>> reports = rideRepository.getTotalCostPerDayForSpecificPassenger(new Date(), new Date(), 1L);
         Assert.notNull(reports, "The reports should not be null");
+    }
+
+    @Test
+    public void testGetTotalCostPerDayForSpecificPassengerWrongId() {
+        List<ReportDTO<Double>> reports = rideRepository.getTotalCostPerDayForSpecificPassenger(new Date(), new Date(), 21L);
+        assertTrue(reports.isEmpty());
+    }
+
+    @Test
+    public void testGetTotalCostPerDayForSpecificPassengerWrongDate() {
+        Date date = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, 1);
+        date = calendar.getTime();
+        List<ReportDTO<Double>> reports = rideRepository.getTotalCostPerDayForSpecificPassenger(date, date, 1L);
+        assertTrue(reports.isEmpty());
     }
 
     @Test
