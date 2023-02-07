@@ -18,7 +18,6 @@ public interface IRideService {
 
 	// TODO: JELENA
 	Ride findOne(Long id);
-	Ride save(Ride ride);
 
 	RideDTO createRideDTO(CreateRideDTO rideDTO, Long passengerId);
 
@@ -28,50 +27,49 @@ public interface IRideService {
 	// TODO: ------> JELENA
 
 	// TODO: VELJA
-	RideDTO panicRide(Long rideId, String reason, Long id);
+	RideDTO panicRide(Long rideId, String reason, Long id); // OK
 
-	RideDTO cancelRide(Long id, String reason);
+	RideDTO cancelRide(Long id, String reason); // OK
 
-	RideDTO endRide(Long id);
+	RideDTO endRide(Long id); // OK
 
-	RideDTO acceptRide(Long id);
+	RideDTO acceptRide(Long id); // OK
 
-	List<Ride> findAll();
+	List<Ride> findAll(); // OK
 
-	Page<Ride> findAll(Long driverId, Pageable page, Date from, Date to);
+	Page<Ride> findAll(Long driverId, Pageable page, Date from, Date to); // OK
 	// TODO: ---> VELJA
 
 
 
 	//TODO: VUGA
-	Page<Ride> findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to);
+	Page<Ride> findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to);// TODO:FINISHED
 
-	Page<Ride> findAllForUserWithRole(Long userId, Pageable page, Date from, Date to, Role role);
-	Set<PassengerRideDTO> getFilteredRides(Page<Ride> userRides, Long driverId);
+	Page<Ride> findAllForUserWithRole(Long userId, Pageable page, Date from, Date to, Role role);// TODO:FINISHED
 
+	Set<PassengerRideDTO> getFilteredRides(Page<Ride> userRides, Long driverId); //TODO:FINISHED
 
-	PassengerRideDTO getFilteredRide(Ride ride, Long driverId);
+	PassengerRideDTO getFilteredRide(Ride ride, Long driverId); //TODO:FINISHED
 
 	ReportSumAverageDTO getReport(ReportRequestDTO reportRequestDTO);
 
-	Ride findPassengerActiveRide(Long passengerId);
+	Ride findPassengerActiveRide(Long passengerId); // TODO:FINISHED
 
-	LinkedHashSet<Route> getLocationsByRide (Long rideId);
+	LinkedHashSet<Route> getLocationsByRide (Long rideId);// TODO:FINISHED
 	//TODO: ----> VUGA
 
 
 	//TODO: VEKSON
-	ReportSumAverageDTO getReportForDriver(ReportRequestDTO reportRequestDTO);
-
-	ReportSumAverageDTO filterReports(List<ReportDTO<Double>> reportDTOS, long totalDays);
-	ReportSumAverageDTO filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS, long totalDays);
+	ReportSumAverageDTO getReportForDriver(ReportRequestDTO reportRequestDTO); // FINISHED
+	ReportSumAverageDTO filterReports(List<ReportDTO<Double>> reportDTOS, long totalDays); // FINISHED
+	ReportSumAverageDTO filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS, long totalDays); // FINISHED
 	//TODO: ---> VEKSON
 
 	// TODO: VUGA
 	double calculateDistance(Location departure, Location destination);
 	//TODO: ---> VUGA
 
-
+	Ride save(Ride ride);
 	// TODO: JELENA
 	boolean validateCreateRideDTO(CreateRideDTO createRideDTO);
 

@@ -61,17 +61,17 @@ values (9.0, 8, 5);
 insert into Vehicle
 (is_baby_accessible, is_pet_accessible, model, number_of_seats, registration_plate, current_location_id, vehicle_type_id)
 values
-    (true, true, 'Audi A3', 4, 'KK077KK', 1, 1);
+(true, true, 'Audi A3', 4, 'KK077KK', 1, 1);
 
 insert into Vehicle
 (is_baby_accessible, is_pet_accessible, model, number_of_seats, registration_plate, current_location_id, vehicle_type_id)
 values
-    (true, true, 'Opel Astra G', 4, 'SM333RK', 2, 1);
+(true, true, 'Opel Astra G', 4, 'SM333RK', 2, 1);
 
 insert into Vehicle
 ( is_baby_accessible, is_pet_accessible, model, number_of_seats, registration_plate, current_location_id, vehicle_type_id)
 values
-    (true, true, 'Mecedes Benz C class', 4, 'SM077CF', 3, 2);
+(true, true, 'Mecedes Benz C class', 4, 'SM077CF', 3, 2);
 
 insert into Drivers(id, vehicle_id) values(1, 1);
 insert into Drivers(id, vehicle_id) values(2, 2);
@@ -166,7 +166,7 @@ insert into Ride_Review (ride_id, review_id) values (4, 7);
 
 insert into Ride (estimated_time, is_baby_accessible, is_panic_pressed, is_pet_accessible,
                   status, time_of_end, time_of_start, total_price, deduction_id, driver_id, vehicle_type_id)
-values (9, false, false, true,'FINISHED',TO_DATE('15/11/2022 09:10', 'dd/MM/yyyy HH:mm'),
+values (9, false, false, true,'ACTIVE',TO_DATE('15/11/2022 09:10', 'dd/MM/yyyy HH:mm'),
         TO_DATE('15/11/2022 08:50', 'dd/MM/yyyy HH:mm'), 903, null, 1, 1);
 
 insert into Drivers_Rides (driver_id, rides_id) values (1, 5);

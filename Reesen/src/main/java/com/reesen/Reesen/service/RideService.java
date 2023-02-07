@@ -101,7 +101,6 @@ public class RideService implements IRideService {
 		}
 		return null;
 	}
-
 	@Override
 	public Ride save(Ride ride) {
 		return this.rideRepository.save(ride);
@@ -109,7 +108,6 @@ public class RideService implements IRideService {
 
 	@Override
 	public RideDTO createRideDTO(CreateRideDTO rideDTO, Long passengerId) {
-
 		if (rideDTO.getScheduledTime() != null) {
 			Calendar calendar = Calendar.getInstance();
 			calendar.add(Calendar.HOUR, 5);
@@ -130,8 +128,6 @@ public class RideService implements IRideService {
 			route.setDestination(destination);
 
 			route = this.routeRepository.save(route);
-			route.setDeparture(departure);
-			route.setDestination(destination);
 			locations.add(route);
 		}
 
@@ -146,7 +142,10 @@ public class RideService implements IRideService {
 			if (pass != null)
 				passengers.add(pass);
 		}
-		passengers.add(this.passengerService.findOne(passengerId).get());
+		if(this.passengerRepository.findById(passengerId).isPresent())
+			passengers.add(this.passengerRepository.findById(passengerId).get());
+		else
+			return null;
 		ride.setPassengers(passengers);
 		ride.setStatus(RideStatus.PENDING);
 
@@ -202,7 +201,7 @@ public class RideService implements IRideService {
 	}
 
 	@Scheduled(fixedDelay = 5000)  // schedule to run every minute at 15th second
-	public void scheduleRide() {
+	private void scheduleRide() {
 		Set<Ride> rides = rideRepository.findAllByScheduledTimeIsNotNullAndStatus(RideStatus.SCHEDULED);
 		Date now = new Date();
 		for(Ride ride : rides){
@@ -294,12 +293,6 @@ public class RideService implements IRideService {
 		return result;
 	}
 
-	private boolean getRejectedRidesForDriver(Long driverId, Long passengerId) {
-		Set<Ride> rejectedRides = this.rideRepository.findAllRidesByDriverIdAndPassengerIdAndScheduledTimeBeforeAndStatus(driverId, passengerId, LocalDateTime.now().minusMinutes(15), RideStatus.REJECTED);
-		if (rejectedRides.isEmpty()) return true;
-		return false;
-	}
-
 	private Optional<Ride> findDriverScheduledRide(Long driverId) {
 		return this.rideRepository.findRideByDriverIdAndStatus(driverId, RideStatus.ACCEPTED);
 	}
@@ -360,7 +353,9 @@ public class RideService implements IRideService {
 			route.setDestination(this.routeRepository.getDestinationByRoute(route).get());
 		}
 		newRide.setLocations(newLocations);
-		User user = userRepository.findById(passengerId).get();
+		User user = userRepository.findById(passengerId).orElse(null);
+		if (user == null)
+			return null;
 		this.panicRepository.save(new Panic(new Date(), reason, newRide, user));
 
 		Long adminId = this.userRepository.findAdmin(Role.ADMIN);
@@ -538,7 +533,8 @@ public class RideService implements IRideService {
 	}
 
 	@Override
-	public Page<Ride> findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to) {
+	public Page<Ride>
+	findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to) {
 		Optional<Passenger> passenger = this.passengerRepository.findById(passengerId);
 		if (passenger.isEmpty()) return null;
 
@@ -692,6 +688,12 @@ public class RideService implements IRideService {
 
 	@Override
 	public ReportSumAverageDTO filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS, long totalDays) {
+
+		if (totalDays <= 0){
+			throw new IllegalArgumentException("Total days must be positive");
+
+		}
+
 		ReportSumAverageDTO reportSumAverageDTO = new ReportSumAverageDTO();
 
 		Map<Date, Double> reports = new LinkedHashMap<>();
@@ -714,6 +716,7 @@ public class RideService implements IRideService {
 
 	@Override
 	public double calculateDistance(Location departure, Location destination) {
+		if(departure == null || destination == null) return 0;
 		double theta = departure.getLongitude() - destination.getLongitude();
 		double dist = Math.sin(Math.toRadians(departure.getLatitude())) * Math.sin(Math.toRadians(destination.getLatitude()))
 				+ Math.cos(Math.toRadians(departure.getLatitude())) * Math.cos(Math.toRadians(destination.getLatitude())) * Math.cos(Math.toRadians(theta));
@@ -726,6 +729,10 @@ public class RideService implements IRideService {
 
 	@Override
 	public ReportSumAverageDTO filterReports(List<ReportDTO<Double>> reportDTOS, long totalDays) {
+
+		if (totalDays <= 0) {
+			throw new IllegalArgumentException("Total days must be positive");
+		}
 
 		ReportSumAverageDTO reportSumAverageDTO = new ReportSumAverageDTO();
 		Map<Date, Double> reports = new LinkedHashMap<>();
