@@ -1,9 +1,6 @@
 package com.reesen.Reesen.model;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -13,6 +10,7 @@ import java.util.Random;
 @EqualsAndHashCode
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 public class ResetPasswordToken {
     @Id

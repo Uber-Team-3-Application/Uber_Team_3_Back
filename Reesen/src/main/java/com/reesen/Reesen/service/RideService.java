@@ -11,6 +11,7 @@ import com.reesen.Reesen.model.Driver.Driver;
 import com.reesen.Reesen.repository.*;
 import com.reesen.Reesen.service.interfaces.ILocationService;
 import com.reesen.Reesen.service.interfaces.IWorkingHoursService;
+import com.sun.xml.bind.v2.runtime.output.SAXOutput;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.reesen.Reesen.service.interfaces.IRideService;
 import org.springframework.data.domain.Page;
@@ -148,6 +149,9 @@ public class RideService implements IRideService {
 			Object[] result = this.findSuitableDriver(ride);
 			if (result[0] == null) {
 				ride.setStatus(RideStatus.REJECTED);
+				for(Passenger passenger: ride.getPassengers())
+					simpMessagingTemplate.convertAndSend("/topic/passenger/ride/" + passenger.getId(), "No suitable driver found!");
+
 			} else {
 				ride.setDriver((Driver) result[0]);
 				ride.setEstimatedTime((Double) result[1]);
@@ -179,6 +183,8 @@ public class RideService implements IRideService {
 				RideHandler.notifyChosenDriver(session, new RideDTO(ride));
 			}
 			else {
+				System.out.println(ride.getDriver().getId());
+
 				simpMessagingTemplate.convertAndSend("/topic/driver/ride/" + ride.getDriver().getId(), new RideDTO(ride));
 			}
 		} else if (rideDTO.getScheduledTime() == null) {
@@ -343,7 +349,10 @@ public class RideService implements IRideService {
 			route.setDestination(this.routeRepository.getDestinationByRoute(route).get());
 		}
 		newRide.setLocations(newLocations);
-		this.panicRepository.save(new Panic(new Date(), reason, newRide, userRepository.findById(passengerId).get()));
+		User user = userRepository.findById(passengerId).orElse(null);
+		if (user == null)
+			return null;
+		this.panicRepository.save(new Panic(new Date(), reason, newRide, user));
 
 		Long adminId = this.userRepository.findAdmin(Role.ADMIN);
 		WebSocketSession webSocketSession = RideHandler.adminSessions.get(adminId.toString());
@@ -352,6 +361,22 @@ public class RideService implements IRideService {
 		}else {
 			simpMessagingTemplate.convertAndSend("/topic/admin/panic/" + adminId, new RideDTO(ride));
 		}
+		if(user.getRole() == Role.DRIVER) {
+			WebSocketSession driverSession = RideHandler.driverSessions.get(adminId.toString());
+			if (driverSession != null) {
+				RideHandler.notifyAdminAboutPanic(driverSession, new RideDTO(ride));
+			} else {
+				simpMessagingTemplate.convertAndSend("/topic/panic/" + user.getId(), new RideDTO(ride));
+			}
+		}else{
+			WebSocketSession passengerSession = RideHandler.passengerSessions.get(adminId.toString());
+			if (passengerSession != null) {
+				RideHandler.notifyAdminAboutPanic(passengerSession, new RideDTO(ride));
+			} else {
+				simpMessagingTemplate.convertAndSend("/topic/panic/" + user.getId(), new RideDTO(ride));
+			}
+		}
+
 
 		return new RideDTO(newRide);
 	}
@@ -363,8 +388,8 @@ public class RideService implements IRideService {
 			return null;
 		}
 		Ride ride = this.findOne(id);
-		ride.setStatus(RideStatus.REJECTED);
-		rideRepository.updateRideStatus(ride.getId(), RideStatus.REJECTED);
+		ride.setStatus(RideStatus.CANCELED);
+		rideRepository.updateRideStatus(ride.getId(), RideStatus.CANCELED);
 		Deduction deduction = deductionRepository.save(new Deduction(ride, ride.getDriver(), reason, LocalDateTime.now()));
 		ride.setDeduction(deduction);
 		rideRepository.save(ride);
@@ -415,6 +440,12 @@ public class RideService implements IRideService {
 			simpMessagingTemplate.convertAndSend("/topic/passenger/end-ride/"+p.getId(), new RideDTO(ride));
 		}
 		simpMessagingTemplate.convertAndSend("/topic/driver/end-ride/"+ride.getDriver().getId(), new RideDTO(ride));
+		Long adminId = this.userRepository.findAdmin(Role.ADMIN);
+		WebSocketSession adminSession = RideHandler.driverSessions.get(adminId.toString());
+		if(adminSession != null){
+			RideHandler.notifyAdminAboutEndRide(adminSession, new RideDTO(ride));
+		}
+		simpMessagingTemplate.convertAndSend("/topic/admin/end-ride/"+adminId, new RideDTO(ride));
 
 
 		return new RideDTO(ride);
@@ -443,6 +474,13 @@ public class RideService implements IRideService {
 			for (Passenger p : ride.getPassengers()) {
 				simpMessagingTemplate.convertAndSend("/topic/passenger/ride/" + p.getId(), new RideDTO(ride));
 			}
+			WebSocketSession session = RideHandler.driverSessions.get(ride.getDriver().getId().toString());
+			if(session != null){
+				RideHandler.notifyDriverAboutAcceptedRide(session, new RideDTO(ride));
+
+			}
+			simpMessagingTemplate.convertAndSend("/topic/driver/ride/" + ride.getDriver().getId(), new RideDTO(ride));
+
 
 		} else {
 			scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {
@@ -491,7 +529,8 @@ public class RideService implements IRideService {
 	}
 
 	@Override
-	public Page<Ride> findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to) {
+	public Page<Ride>
+	findAllRidesForPassenger(Long passengerId, Pageable page, Date from, Date to) {
 		Optional<Passenger> passenger = this.passengerRepository.findById(passengerId);
 		if (passenger.isEmpty()) return null;
 
@@ -645,6 +684,12 @@ public class RideService implements IRideService {
 
 	@Override
 	public ReportSumAverageDTO filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS, long totalDays) {
+
+		if (totalDays <= 0){
+			throw new IllegalArgumentException("Total days must be positive");
+
+		}
+
 		ReportSumAverageDTO reportSumAverageDTO = new ReportSumAverageDTO();
 
 		Map<Date, Double> reports = new LinkedHashMap<>();
@@ -667,6 +712,7 @@ public class RideService implements IRideService {
 
 	@Override
 	public double calculateDistance(Location departure, Location destination) {
+		if(departure == null || destination == null) return 0;
 		double theta = departure.getLongitude() - destination.getLongitude();
 		double dist = Math.sin(Math.toRadians(departure.getLatitude())) * Math.sin(Math.toRadians(destination.getLatitude()))
 				+ Math.cos(Math.toRadians(departure.getLatitude())) * Math.cos(Math.toRadians(destination.getLatitude())) * Math.cos(Math.toRadians(theta));
@@ -679,6 +725,10 @@ public class RideService implements IRideService {
 
 	@Override
 	public ReportSumAverageDTO filterReports(List<ReportDTO<Double>> reportDTOS, long totalDays) {
+
+		if (totalDays <= 0) {
+			throw new IllegalArgumentException("Total days must be positive");
+		}
 
 		ReportSumAverageDTO reportSumAverageDTO = new ReportSumAverageDTO();
 		Map<Date, Double> reports = new LinkedHashMap<>();

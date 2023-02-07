@@ -9,7 +9,9 @@ import java.util.Set;
 import com.reesen.Reesen.Enums.RideStatus;
 import com.reesen.Reesen.Enums.VehicleName;
 import com.reesen.Reesen.model.*;
+import lombok.ToString;
 
+@ToString
 public class RideDTO {
 
 	private Long id;
@@ -25,7 +27,7 @@ public class RideDTO {
  	private boolean babyTransport;
  	private boolean petTransport;
  	private RideStatus status;
-	 private Date scheduledTime;
+ 	private Date scheduledTime;
 
     public RideDTO(){
 
@@ -43,36 +45,24 @@ public class RideDTO {
 		if(ride.getDriver() != null) {
 			this.driver = new UserDTO(ride.getDriver().getId(), ride.getDriver().getEmail());
 		}
-		setPassengers(ride);
-		setVehicleType(ride);
-		setLocations(ride);
-		if(ride.getDeduction() == null) this.rejection = null;
-		else this.rejection = new DeductionDTO(ride.getDeduction().getReason(), ride.getDeduction().getDeductionTime());
-		this.scheduledTime = ride.getScheduledTime();
-	}
-
-	private void setLocations(Ride ride) {
-		locations = new LinkedHashSet<>();
-		for (Route route : ride.getLocations()) {
-			locations.add(new RouteDTO(route));
-		}
-	}
-
-
-	private void setPassengers(Ride ride) {
 		passengers = new HashSet<>();
 		for (Passenger passenger : ride.getPassengers()) {
 			passengers.add(new UserDTO(passenger.getId(), passenger.getEmail()));
 		}
-	}
-
-	private void setVehicleType(Ride ride) {
 		if (ride.getVehicleType().getName() == VehicleName.VAN)
 			this.vehicleType = VehicleTypeDTO.VAN;
 		else if (ride.getVehicleType().getName() == VehicleName.LUXURY)
 			this.vehicleType = VehicleTypeDTO.LUXURY;
 		else if (ride.getVehicleType().getName() == VehicleName.STANDARD)
 			this.vehicleType = VehicleTypeDTO.STANDARD;
+
+		locations = new LinkedHashSet<>();
+		for (Route route : ride.getLocations()) {
+			locations.add(new RouteDTO(route));
+		}
+		if(ride.getDeduction() == null) this.rejection = null;
+		else this.rejection = new DeductionDTO(ride.getDeduction().getReason(), ride.getDeduction().getDeductionTime());
+		this.scheduledTime = ride.getScheduledTime();
 	}
 
 	public DeductionDTO getRejection() {

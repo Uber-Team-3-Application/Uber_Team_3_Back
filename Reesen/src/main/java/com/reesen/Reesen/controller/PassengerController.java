@@ -50,7 +50,6 @@ public class PassengerController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'PASSENGER')")
     public ResponseEntity<PassengerDTO> createPassenger(@RequestBody @Valid PassengerDTO passengerDTO){
         if(this.passengerService.findByEmail(passengerDTO.getEmail()) != null)
             return new ResponseEntity(
