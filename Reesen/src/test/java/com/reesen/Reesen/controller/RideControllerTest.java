@@ -631,6 +631,8 @@ public class RideControllerTest {
         );
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals("Cannot create a ride while you have one already pending!", response.getBody().getMessage());
+        ResponseEntity<RideDTO> withdraw = cancelRide(createResponse.getBody());
+        assertEquals(HttpStatus.OK, withdraw.getStatusCode());
     }
 
     @Test
@@ -674,7 +676,11 @@ public class RideControllerTest {
         assertNotNull(acceptResponse.getBody());
         assertEquals(HttpStatus.OK, acceptResponse.getStatusCode());
 
-        ResponseEntity<RideDTO> response = getDriverActiveRide(acceptResponse.getBody().getDriver().getId());
+        ResponseEntity<RideDTO> startedRide = startRide(acceptResponse);
+        assertNotNull(startedRide.getBody());
+        assertEquals(HttpStatus.OK, startedRide.getStatusCode());
+
+        ResponseEntity<RideDTO> response = getDriverActiveRide(startedRide.getBody().getDriver().getId());
         assertNotNull(response.getBody());
         assertEquals(HttpStatus.OK, response.getStatusCode());
         RideDTO ride = response.getBody();
@@ -754,6 +760,10 @@ public class RideControllerTest {
         ResponseEntity<RideDTO> acceptResponse = acceptRide(createResponse);
         assertNotNull(acceptResponse.getBody());
         assertEquals(HttpStatus.OK, acceptResponse.getStatusCode());
+
+        ResponseEntity<RideDTO> startedRide = startRide(acceptResponse);
+        assertNotNull(startedRide.getBody());
+        assertEquals(HttpStatus.OK, startedRide.getStatusCode());
 
         ResponseEntity<RideDTO> response = getPassengerActiveRide(passengerId);
         assertNotNull(response.getBody());
@@ -849,7 +859,7 @@ public class RideControllerTest {
     @Test
     public void getRide_nonExistingRide(){
         ResponseEntity<String> response = this.passengerRestTemplate.exchange(
-                BASE_PATH + "/" + 8,
+                BASE_PATH + "/" + 23456,
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<String>() {
@@ -909,9 +919,6 @@ public class RideControllerTest {
         assertEquals(1, ride.getPassengers().size());
         assertNull(ride.getScheduledTime());
         assertEquals("CANCELED", ride.getStatus().toString());
-
-        ResponseEntity<RideDTO> withdraw = cancelRide(ride);
-        assertEquals(HttpStatus.OK, withdraw.getStatusCode());
     }
 
     @Test
@@ -1045,7 +1052,7 @@ public class RideControllerTest {
         return this.passengerRestTemplate.exchange(
                 BASE_PATH + "/" + ride.getId() + "/withdraw",
                 HttpMethod.PUT,
-                new HttpEntity<>(new ReasonDTO("I can't")),
+                null,
                 new ParameterizedTypeReference<RideDTO>() {
                 }
         );
