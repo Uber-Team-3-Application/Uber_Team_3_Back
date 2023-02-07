@@ -836,7 +836,7 @@ public class RideControllerTest {
 
     // GET RIDE
     @Test
-    public void getRideSuccess(){
+    public void getRide_Success(){
 
         ResponseEntity<RideDTO> createResponse = createRide();
         assertEquals(HttpStatus.OK, createResponse.getStatusCode());
@@ -919,6 +919,7 @@ public class RideControllerTest {
         assertEquals(1, ride.getPassengers().size());
         assertNull(ride.getScheduledTime());
         assertEquals("CANCELED", ride.getStatus().toString());
+
     }
 
     @Test
