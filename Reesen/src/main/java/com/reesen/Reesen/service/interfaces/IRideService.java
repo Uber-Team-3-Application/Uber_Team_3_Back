@@ -18,7 +18,6 @@ public interface IRideService {
 
 	// TODO: JELENA
 	Ride findOne(Long id);
-	Ride save(Ride ride);
 
 	RideDTO createRideDTO(CreateRideDTO rideDTO, Long passengerId);
 

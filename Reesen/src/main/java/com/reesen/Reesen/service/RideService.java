@@ -103,13 +103,7 @@ public class RideService implements IRideService {
 	}
 
 	@Override
-	public Ride save(Ride ride) {
-		return this.rideRepository.save(ride);
-	}
-
-	@Override
 	public RideDTO createRideDTO(CreateRideDTO rideDTO, Long passengerId) {
-
 		if (rideDTO.getScheduledTime() != null) {
 			Calendar calendar = Calendar.getInstance();
 			calendar.add(Calendar.HOUR, 5);
@@ -130,8 +124,6 @@ public class RideService implements IRideService {
 			route.setDestination(destination);
 
 			route = this.routeRepository.save(route);
-			route.setDeparture(departure);
-			route.setDestination(destination);
 			locations.add(route);
 		}
 
@@ -146,7 +138,10 @@ public class RideService implements IRideService {
 			if (pass != null)
 				passengers.add(pass);
 		}
-		passengers.add(this.passengerService.findOne(passengerId).get());
+		if(this.passengerRepository.findById(passengerId).isPresent())
+			passengers.add(this.passengerRepository.findById(passengerId).get());
+		else
+			return null;
 		ride.setPassengers(passengers);
 		ride.setStatus(RideStatus.PENDING);
 
@@ -202,7 +197,7 @@ public class RideService implements IRideService {
 	}
 
 	@Scheduled(fixedDelay = 5000)  // schedule to run every minute at 15th second
-	public void scheduleRide() {
+	private void scheduleRide() {
 		Set<Ride> rides = rideRepository.findAllByScheduledTimeIsNotNullAndStatus(RideStatus.SCHEDULED);
 		Date now = new Date();
 		for(Ride ride : rides){
@@ -292,12 +287,6 @@ public class RideService implements IRideService {
 		result[1] = (minimumMinutes + (this.calculateDistance(locationService.getFirstLocation(ride.getLocations()), locationService.getLastLocation(ride.getLocations())) / 80) * 60 * 2);
 
 		return result;
-	}
-
-	private boolean getRejectedRidesForDriver(Long driverId, Long passengerId) {
-		Set<Ride> rejectedRides = this.rideRepository.findAllRidesByDriverIdAndPassengerIdAndScheduledTimeBeforeAndStatus(driverId, passengerId, LocalDateTime.now().minusMinutes(15), RideStatus.REJECTED);
-		if (rejectedRides.isEmpty()) return true;
-		return false;
 	}
 
 	private Optional<Ride> findDriverScheduledRide(Long driverId) {
