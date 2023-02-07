@@ -3,15 +3,13 @@ package com.reesen.Reesen.controller;
 import com.reesen.Reesen.Enums.RideStatus;
 import com.reesen.Reesen.Enums.Role;
 import com.reesen.Reesen.dto.*;
-import com.reesen.Reesen.model.Deduction;
 import com.reesen.Reesen.model.ErrorResponseMessage;
-import com.reesen.Reesen.model.Passenger;
 import com.reesen.Reesen.model.Ride;
 import com.reesen.Reesen.service.interfaces.IDriverService;
 import com.reesen.Reesen.service.interfaces.IFavoriteRideService;
+import com.reesen.Reesen.service.interfaces.IPassengerService;
 import com.reesen.Reesen.service.interfaces.IRideService;
 import com.reesen.Reesen.validation.UserRequestValidation;
-import org.json.HTTP;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,11 +28,15 @@ import java.util.Set;
 public class RideController {
 
     private final IRideService rideService;
+    private final IDriverService driverService;
+    private final IPassengerService passengerService;
     private final IFavoriteRideService favoriteRideService;;
     private final UserRequestValidation userRequestValidation;
 
-    public RideController(IRideService rideService, IFavoriteRideService favoriteRideService, UserRequestValidation userRequestValidation) {
+    public RideController(IRideService rideService, IDriverService driverService, IPassengerService passengerService, IFavoriteRideService favoriteRideService, UserRequestValidation userRequestValidation) {
         this.rideService = rideService;
+        this.driverService = driverService;
+        this.passengerService = passengerService;
         this.favoriteRideService = favoriteRideService;
         this.userRequestValidation = userRequestValidation;
     }
@@ -56,7 +58,7 @@ public class RideController {
                 produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAnyRole('DRIVER', 'ADMIN')")
     public ResponseEntity<RideDTO> getDriverActiveRide(@PathVariable("driverId") Long driverId, @RequestHeader Map<String, String> headers){
-        if(driverId < 1)
+        if(this.driverService.findOne(driverId).isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         Ride ride = this.rideService.findDriverActiveRide(driverId);
         if(ride == null)
@@ -69,7 +71,7 @@ public class RideController {
     @GetMapping(value = "/passenger/{passengerId}/active")
     @PreAuthorize("hasAnyRole('ADMIN', 'PASSENGER')")
     public ResponseEntity<RideDTO> getPassengerActiveRide(@PathVariable("passengerId") Long passengerId, @RequestHeader Map<String, String> headers){
-        if(passengerId < 1)
+        if(this.passengerService.findOne(passengerId).isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         Ride ride = this.rideService.findPassengerActiveRide(passengerId);
         if(ride == null)
@@ -98,6 +100,8 @@ public class RideController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(this.rideService.findOne(id) == null)
             return new ResponseEntity("Ride does not exist!", HttpStatus.NOT_FOUND);
+        if(this.rideService.findOne(id).getStatus() != RideStatus.STARTED && this.rideService.findOne(id).getStatus() != RideStatus.ACCEPTED)
+            return new ResponseEntity("Ride not started or accepted!", HttpStatus.BAD_REQUEST);
         RideDTO withdrawRide = this.rideService.withdrawRide(id);
         return new ResponseEntity<>(withdrawRide, HttpStatus.OK);
     }
