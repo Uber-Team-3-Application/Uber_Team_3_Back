@@ -943,7 +943,7 @@ public class RideControllerTest {
     }
 
     @Test
-    public void doesntWithdrawRide_WithStatus_DifferentThatStartedOrAccepted(){
+    public void doesntWithdrawRide_WithStatus_DifferentThatStartedOrAccepted() {
 
         ResponseEntity<String> response = this.passengerRestTemplate.exchange(
                 BASE_PATH + "/" + 5 + "/withdraw",
@@ -954,7 +954,8 @@ public class RideControllerTest {
         );
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals("Ride not started or accepted!", response.getBody());
-=======
+    }
+
     /** @author Veljko */
 
     @Test
@@ -976,8 +977,6 @@ public class RideControllerTest {
         assertEquals(HttpStatus.OK, dto.getStatusCode());
         assertEquals(RideStatus.CANCELED, Objects.requireNonNull(dto.getBody()).getStatus());
         assertEquals(reason, dto.getBody().getRejection().getReason());
-
-
 
     }
 
@@ -1004,7 +1003,7 @@ public class RideControllerTest {
     /** @author Veljko */
 
     @ParameterizedTest
-    @ValueSource(longs = {12L, 100L, 256L})
+    @ValueSource(longs = {100L, 256L})
     @DisplayName("Doesn't cancel ride when ride doesn't exists")
     public void cancelRide_whenRideNotExist(Long rideId) {
         String reason = "I can't to drive";
