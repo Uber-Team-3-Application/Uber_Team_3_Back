@@ -360,7 +360,9 @@ public class RideService implements IRideService {
 			route.setDestination(this.routeRepository.getDestinationByRoute(route).get());
 		}
 		newRide.setLocations(newLocations);
-		User user = userRepository.findById(passengerId).get();
+		User user = userRepository.findById(passengerId).orElse(null);
+		if (user == null)
+			return null;
 		this.panicRepository.save(new Panic(new Date(), reason, newRide, user));
 
 		Long adminId = this.userRepository.findAdmin(Role.ADMIN);
@@ -693,6 +695,12 @@ public class RideService implements IRideService {
 
 	@Override
 	public ReportSumAverageDTO filterTotalRidesReports(List<ReportDTO<Long>> reportDTOS, long totalDays) {
+
+		if (totalDays <= 0){
+			throw new IllegalArgumentException("Total days must be positive");
+
+		}
+
 		ReportSumAverageDTO reportSumAverageDTO = new ReportSumAverageDTO();
 
 		Map<Date, Double> reports = new LinkedHashMap<>();
@@ -728,6 +736,10 @@ public class RideService implements IRideService {
 
 	@Override
 	public ReportSumAverageDTO filterReports(List<ReportDTO<Double>> reportDTOS, long totalDays) {
+
+		if (totalDays <= 0) {
+			throw new IllegalArgumentException("Total days must be positive");
+		}
 
 		ReportSumAverageDTO reportSumAverageDTO = new ReportSumAverageDTO();
 		Map<Date, Double> reports = new LinkedHashMap<>();

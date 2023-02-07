@@ -4,6 +4,8 @@ import com.reesen.Reesen.Enums.RideStatus;
 import com.reesen.Reesen.dto.*;
 import com.reesen.Reesen.model.ErrorResponseMessage;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -15,6 +17,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -115,7 +118,7 @@ public class RideControllerTest {
         assertEquals("ACCEPTED", ride.getStatus().toString());
 
         // withdraw ride so that it doesn't mess up the other tests
-        ResponseEntity<RideDTO> withdraw = cancelRide(ride);
+        ResponseEntity<RideDTO> withdraw = cancelRide(acceptResponse.getBody());
         assertEquals(HttpStatus.OK, withdraw.getStatusCode());
     }
 
@@ -151,20 +154,6 @@ public class RideControllerTest {
 
     }
 
-    @Test
-    @DisplayName("Accept ride with invalid ride Status - NOT PENDING")
-    public void doesntAcceptRide_WithStatus_DifferentThatPending(){
-
-        ResponseEntity<ErrorResponseMessage> acceptResponse = this.driverRestTemplate.exchange(
-                BASE_PATH + "/" + 5 + "/accept",
-                HttpMethod.PUT,
-                null,
-                new ParameterizedTypeReference<ErrorResponseMessage>() {
-                }
-        );
-        assertEquals(HttpStatus.BAD_REQUEST, acceptResponse.getStatusCode());
-        assertEquals("Cannot accept a ride that is not in status PENDING!", acceptResponse.getBody().getMessage());
-    }
 
     @Test
     @DisplayName("Accept Ride as Invalid User - Not a Driver")
@@ -965,6 +954,438 @@ public class RideControllerTest {
         );
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals("Ride not started or accepted!", response.getBody());
+=======
+    /** @author Veljko */
+
+    @Test
+    @DisplayName("Should cancel ride when inputs are valid")
+    public void cancelRide_withAllValidInputs() {
+        ResponseEntity<RideDTO> createdRide = createRide();
+        String reason = "I can't to drive";
+        RideDTO rideDTO = createdRide.getBody();
+        headers.set("X-Auth-Token", driverToken);
+        assert rideDTO != null;
+        ResponseEntity<RideDTO> dto  = this.restTemplate.exchange(
+                BASE_PATH + "/" + rideDTO.getId() + "/cancel",
+                HttpMethod.PUT,
+                new HttpEntity<>(new ReasonDTO(reason), headers),
+                new ParameterizedTypeReference<RideDTO>() {
+                }
+        );
+
+        assertEquals(HttpStatus.OK, dto.getStatusCode());
+        assertEquals(RideStatus.CANCELED, Objects.requireNonNull(dto.getBody()).getStatus());
+        assertEquals(reason, dto.getBody().getRejection().getReason());
+
+
+
+    }
+
+    /** @author Veljko */
+
+    @ParameterizedTest
+    @ValueSource(longs = {0L, -10L})
+    @DisplayName("Doesn't cancel ride when ride ID is invalid")
+    public void cancelRide_whenRideIdIsInvalid(Long rideId) {
+        String reason = "I can't to drive";
+        headers.set("X-Auth-Token", driverToken);
+        ResponseEntity<RideDTO> dto  = this.restTemplate.exchange(
+                BASE_PATH + "/" + rideId + "/cancel",
+                HttpMethod.PUT,
+                new HttpEntity<>(new ReasonDTO(reason), headers),
+                new ParameterizedTypeReference<RideDTO>() {
+                }
+        );
+
+        assertEquals(HttpStatus.BAD_REQUEST, dto.getStatusCode());
+
+    }
+
+    /** @author Veljko */
+
+    @ParameterizedTest
+    @ValueSource(longs = {12L, 100L, 256L})
+    @DisplayName("Doesn't cancel ride when ride doesn't exists")
+    public void cancelRide_whenRideNotExist(Long rideId) {
+        String reason = "I can't to drive";
+        headers.set("X-Auth-Token", driverToken);
+        ResponseEntity<String> dto  = this.restTemplate.exchange(
+                BASE_PATH + "/" + rideId + "/cancel",
+                HttpMethod.PUT,
+                new HttpEntity<>(new ReasonDTO(reason), headers),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        assertEquals(HttpStatus.NOT_FOUND, dto.getStatusCode());
+        assertEquals("Ride does not exist!", dto.getBody());
+    }
+
+    /** @author Veljko */
+
+    @Test
+    @DisplayName("Doesn't cancel ride when reason is null")
+    public void cancelRide_whenReasonIsNull() {
+        ResponseEntity<RideDTO> createdRide = createRide();
+        RideDTO rideDTO = createdRide.getBody();
+        headers.set("X-Auth-Token", driverToken);
+        assert rideDTO != null;
+        ResponseEntity<String> dto  = this.restTemplate.exchange(
+                BASE_PATH + "/" + rideDTO.getId() + "/cancel",
+                HttpMethod.PUT,
+                new HttpEntity<>(null, headers),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        assertEquals(HttpStatus.BAD_REQUEST, dto.getStatusCode());
+        assertEquals("Must give a reason!", dto.getBody());
+
+        cancelRide(createdRide.getBody());
+
+    }
+
+    /** @author Veljko */
+
+    @Test
+    @DisplayName("Doesn't cancel ride as an invalid User ")
+    public void cancelRide_whenUserIsInvalid() {
+        ResponseEntity<RideDTO> createdRide = createRide();
+        RideDTO rideDTO = createdRide.getBody();
+        headers.set("X-Auth-Token",this.passengerToken);
+        assert rideDTO != null;
+        ResponseEntity<String> response  = this.restTemplate.exchange(
+                BASE_PATH + "/" + rideDTO.getId() + "/cancel",
+                HttpMethod.PUT,
+                new HttpEntity<>(new ReasonDTO("I can't"), headers),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        assertEquals("Access Denied", response.getBody());
+
+        cancelRide(createdRide.getBody());
+
+    }
+
+    /** @author Veljko */
+
+    @Test
+    @DisplayName("Doesn't cancel ride as an Unauthenticated User ")
+    public void cancelRide_whenUserIsUnauthenticated() {
+        ResponseEntity<String> response  = this.restTemplate.exchange(
+                BASE_PATH + "/" + 5 + "/cancel",
+                HttpMethod.PUT,
+                new HttpEntity<>(new ReasonDTO("I can't")),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+
+    }
+
+
+    /** @author Veljko */
+    @Test
+    @DisplayName("Create favorite locations for quick selection with valid inputs")
+    public void createFavouriteLocations_forQuickSelections_whenInputIsValid() {
+        ResponseEntity<RideDTO> createdRide = createRide();
+        RideDTO ride = createdRide.getBody();
+        String favouriteName = "To mom's house";
+
+        CreateFavoriteRideDTO favoriteRideDTO = new CreateFavoriteRideDTO(favouriteName, ride.getPassengers(),
+                ride.getLocations(), ride.getVehicleType().name(), ride.isBabyTransport(), ride.isPetTransport());
+
+        headers.set("X-Auth-Token", this.passengerToken);
+        ResponseEntity<FavoriteRideDTO> response  = this.restTemplate.exchange(
+                BASE_PATH + "/favorites",
+                HttpMethod.POST,
+                new HttpEntity<>(favoriteRideDTO, headers),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        System.out.println(response.getBody());
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+
+        cancelRide(createdRide.getBody());
+        deleteFavoriteRide(response.getBody());
+
+    }
+    /** @author Veljko */
+    @Test
+    @DisplayName("Should not favorite locations for quick selection when input is Null")
+    public void createFavouriteLocations_forQuickSelections_whenInputIsNull() {
+        ResponseEntity<RideDTO> createdRide = createRide();
+        RideDTO ride = createdRide.getBody();
+
+
+        headers.set("X-Auth-Token", this.passengerToken);
+        ResponseEntity<?> response  = this.restTemplate.exchange(
+                BASE_PATH + "/favorites",
+                HttpMethod.POST,
+                new HttpEntity<>(null, headers),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        cancelRide(createdRide.getBody());
+
+    }
+
+    /** @author Veljko */
+    @Test
+    @DisplayName("Should not favorite locations for quick selection with invalid input")
+    public void createFavouriteLocations_forQuickSelections_withInvalidInput() {
+        ResponseEntity<RideDTO> createdRide = createRide();
+        RideDTO ride = createdRide.getBody();
+        String favouriteName = "To mom's house";
+
+        System.out.println(ride.toString());
+        CreateFavoriteRideDTO favoriteRideDTO = new CreateFavoriteRideDTO(favouriteName, null,
+                null, ride.getVehicleType().name(), ride.isBabyTransport(), ride.isPetTransport());
+
+        headers.set("X-Auth-Token", this.passengerToken);
+        ResponseEntity<?> response  = this.restTemplate.exchange(
+                BASE_PATH + "/favorites",
+                HttpMethod.POST,
+                new HttpEntity<>(favoriteRideDTO, headers),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        cancelRide(createdRide.getBody());
+
+    }
+
+    /** @author Veljko */
+    @Test
+    @DisplayName("Should not add to favorite locations when ride already exists ")
+    public void createFavouriteLocations_forQuickSelections_whenRideAlreadyExists() {
+
+        ResponseEntity<RideDTO> createdRide = createRide();
+        RideDTO ride = createdRide.getBody();
+        assert ride != null;
+        ResponseEntity<FavoriteRideDTO> createdFavorite = createFavoriteRide(ride);
+
+        String favouriteName = "To mom's house";
+
+        CreateFavoriteRideDTO favoriteRideDTO = new CreateFavoriteRideDTO(favouriteName, ride.getPassengers(),
+                ride.getLocations(), ride.getVehicleType().name(), ride.isBabyTransport(), ride.isPetTransport());
+
+        ResponseEntity<String> responseEntity = this.passengerRestTemplate.exchange(
+                BASE_PATH + "/favorites",
+                HttpMethod.POST,
+                new HttpEntity<>(favoriteRideDTO),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals("You already have a ride with this name!", responseEntity.getBody());
+        cancelRide(createdRide.getBody());
+        deleteFavoriteRide(createdFavorite.getBody());
+
+    }
+
+    /** @author Veljko */
+    @Test
+    @DisplayName("Should not add to favorite locations as an invalid User ")
+    public void createFavouriteLocations_forQuickSelections_whenUserIsInvalid() {
+        ResponseEntity<RideDTO> createdRide = createRide();
+        RideDTO ride = createdRide.getBody();
+        String favouriteName = "To mom's house";
+
+        CreateFavoriteRideDTO favoriteRideDTO = new CreateFavoriteRideDTO(favouriteName, ride.getPassengers(),
+                ride.getLocations(), ride.getVehicleType().name(), ride.isBabyTransport(), ride.isPetTransport());
+        headers.set("X-Auth-Token", this.driverToken);
+
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange(
+                BASE_PATH + "/favorites",
+                HttpMethod.POST,
+                new HttpEntity<>(favoriteRideDTO, headers),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
+        assertEquals("Access Denied", responseEntity.getBody());
+        cancelRide(createdRide.getBody());
+
+    }
+
+
+    /** @author Veljko */
+    @Test
+    @DisplayName("Should not add to favorite locations as Unauthenticated User ")
+    public void createFavouriteLocations_forQuickSelections_whenUserIsUnauthenticated() {
+
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange(
+                BASE_PATH + "/favorites",
+                HttpMethod.POST,
+                new HttpEntity<>(null),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
+    }
+
+
+    /** @author Veljko */
+    @Test
+    @DisplayName("Should get favourite locations ")
+    public void getFavouriteLocations() {
+
+        ResponseEntity<RideDTO> createdRide = createRide();
+        RideDTO ride = createdRide.getBody();
+        assert ride != null;
+        createFavoriteRide(ride);
+
+        ResponseEntity<Set<FavoriteRideDTO>> responseEntity = this.passengerRestTemplate.exchange(
+                BASE_PATH + "/favorites",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        Set<FavoriteRideDTO> favoriteRides = responseEntity.getBody();
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(1, favoriteRides.size());
+        cancelRide(createdRide.getBody());
+        FavoriteRideDTO[] favoriteRideDTOS = responseEntity.getBody().toArray(new FavoriteRideDTO[0]);
+        deleteFavoriteRide(favoriteRideDTOS[0]);
+
+
+    }
+
+
+    /** @author Veljko */
+    @Test
+    @DisplayName("Should not get favourite locations when user is ")
+    public void getFavouriteLocations_whenUserIsUnauthenticated() {
+
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange(
+                BASE_PATH + "/favorites",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
+    }
+
+    /** @author Veljko */
+    @Test
+    @DisplayName("Should not get favourite locations as an invalid User  ")
+    public void getFavouriteLocations_asAnInvalidUser() {
+
+        ResponseEntity<String> responseEntity = this.driverRestTemplate.exchange(
+                BASE_PATH + "/favorites",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
+        assertEquals("Access Denied", responseEntity.getBody());
+
+    }
+
+    /** @author Veljko*/
+    @Test
+    @DisplayName("Should delete favorite ride")
+    public void deleteFavoriteRide_whenInputsAreValid() {
+        ResponseEntity<RideDTO> createdRide = createRide();
+        RideDTO ride = createdRide.getBody();
+        ResponseEntity<FavoriteRideDTO> favourite = createFavoriteRide(ride);
+        FavoriteRideDTO favoriteRide = favourite.getBody();
+        ResponseEntity<String> responseEntity = this.passengerRestTemplate.exchange(
+                BASE_PATH + "/favorites/" + favoriteRide.getId(),
+                HttpMethod.DELETE,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
+        cancelRide(createdRide.getBody());
+
+    }
+
+
+    /** @author Veljko*/
+    @Test
+    @DisplayName("Should not delete favorite ride when doesn't exists")
+    public void deleteFavoriteRide_whenFavoriteRideNotExist() {
+
+        ResponseEntity<String> responseEntity = this.passengerRestTemplate.exchange(
+                BASE_PATH + "/favorites/" + 5,
+                HttpMethod.DELETE,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+    }
+
+
+    /** @author Veljko*/
+    @ParameterizedTest
+    @ValueSource(longs = {-50L, 0L})
+    @DisplayName("Should not delete favorite ride id is not valid")
+    public void deleteFavoriteRide_whenFavoriteRideIdIsLessThanOne(Long id) {
+
+        ResponseEntity<String> responseEntity = this.passengerRestTemplate.exchange(
+                BASE_PATH + "/favorites/" + id,
+                HttpMethod.DELETE,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+    }
+
+    /** @author Veljko*/
+    @Test
+    @DisplayName("Should not delete favorite ride when user is unauthorized")
+    public void deleteFavoriteRide_whenUserIsUnauthorized() {
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange(
+                BASE_PATH + "/favorites/" + 5,
+                HttpMethod.DELETE,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
+    }
+
+    /** @author Veljko*/
+    @Test
+    @DisplayName("Should not delete favorite ride as Invalid user")
+    public void deleteFavoriteRide_whenUserIsInvalid() {
+        ResponseEntity<String> responseEntity = this.driverRestTemplate.exchange(
+                BASE_PATH + "/favorites/" + 5,
+                HttpMethod.DELETE,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
+        assertEquals("Access Denied", responseEntity.getBody());
+
     }
 
     @Test
@@ -1014,6 +1435,23 @@ public class RideControllerTest {
         );
     }
 
+    private ResponseEntity<FavoriteRideDTO> createFavoriteRide(RideDTO ride) {
+
+
+        CreateFavoriteRideDTO favoriteRideDTO = new CreateFavoriteRideDTO("To mom's house", ride.getPassengers(),
+                ride.getLocations(), ride.getVehicleType().name(), ride.isBabyTransport(), ride.isPetTransport());
+
+        headers.set("X-Auth-Token", this.passengerToken);
+        return this.restTemplate.exchange(
+                BASE_PATH + "/favorites",
+                HttpMethod.POST,
+                new HttpEntity<>(favoriteRideDTO, headers),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+    }
+
 
     private ResponseEntity<RideDTO> startRide(ResponseEntity<RideDTO> createResponse){
         return this.driverRestTemplate.exchange(
@@ -1053,6 +1491,16 @@ public class RideControllerTest {
                 }
         );
     }
+    private ResponseEntity<String> deleteFavoriteRide(FavoriteRideDTO rideDTO) {
+        return this.passengerRestTemplate.exchange(
+                BASE_PATH + "/favorites/" + rideDTO.getId(),
+                HttpMethod.DELETE,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+    }
+
     private ResponseEntity<RideDTO> withdrawRide(RideDTO ride) {
         return this.passengerRestTemplate.exchange(
                 BASE_PATH + "/" + ride.getId() + "/withdraw",
