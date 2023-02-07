@@ -10,6 +10,7 @@ import java.util.Map;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class ReportSumAverageDTO {
 
     Map<Date, Double> result;

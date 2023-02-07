@@ -1,0 +1,11 @@
+    Date now = new Date();
+        setMocksForRidesWithSpecificRole(now);
+
+        Page<Ride> rides = rideService.findAllForUserWithRole(4L,
+                PageRequest.of(0, 10),
+                now, now, Role.PASSENGER);
+
+        verify(rideRepository, times(1)).findAllRidesByPassengerIdAndTimeOfStartAfterAndTimeOfEndBefore(4L, now, now, PageRequest.of(0, 10));
+
+        assertNotNull(rides);
+        assertThat(rides.getNumberOfElements()).isGreaterThan(0);
