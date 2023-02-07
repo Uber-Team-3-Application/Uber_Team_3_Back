@@ -100,7 +100,7 @@ public class RideController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(this.rideService.findOne(id) == null)
             return new ResponseEntity("Ride does not exist!", HttpStatus.NOT_FOUND);
-        if(this.rideService.findOne(id).getStatus() != RideStatus.STARTED || this.rideService.findOne(id).getStatus() != RideStatus.ACCEPTED)
+        if(this.rideService.findOne(id).getStatus() != RideStatus.STARTED && this.rideService.findOne(id).getStatus() != RideStatus.ACCEPTED)
             return new ResponseEntity("Ride not started or accepted!", HttpStatus.BAD_REQUEST);
         RideDTO withdrawRide = this.rideService.withdrawRide(id);
         return new ResponseEntity<>(withdrawRide, HttpStatus.OK);

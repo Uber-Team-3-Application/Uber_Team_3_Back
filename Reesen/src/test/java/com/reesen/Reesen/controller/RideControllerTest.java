@@ -329,11 +329,15 @@ public class RideControllerTest {
 
         ResponseEntity<RideDTO> createResponse = createRide();
         assertEquals(HttpStatus.OK, createResponse.getStatusCode());
-        withdrawRide(createResponse.getBody());
+
+        ResponseEntity<RideDTO> acceptRide = acceptRide(createResponse);
+        assertEquals(HttpStatus.OK, acceptRide.getStatusCode());
+
+        ResponseEntity<RideDTO> withdrawResponse = withdrawRide(acceptRide.getBody());
 
 
         ResponseEntity<ErrorResponseMessage> startResponse = this.driverRestTemplate.exchange(
-                BASE_PATH + "/" + createResponse.getBody().getId() + "/start",
+                BASE_PATH + "/" + withdrawResponse.getBody().getId() + "/start",
                 HttpMethod.PUT,
                 null,
                 new ParameterizedTypeReference<>() {
